@@ -1,0 +1,3852 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FlowBuilder — Dashboard de Automação e Integrações</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0F0F1A;
+      --card:      #1A1A2E;
+      --sidebar:   #12121F;
+      --border:    #252540;
+      --orange:    #FF6B35;
+      --green:     #00D68F;
+      --red:       #FF4757;
+      --blue:      #4834D4;
+      --purple:    #7C3AED;
+      --text:      #E8E8F0;
+      --muted:     #6B6B8A;
+      --hover:     #22223A;
+      --card2:     #16162A;
+      --highlight: rgba(255,107,53,0.12);
+      --font-main: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --radius:    12px;
+      --radius-sm: 8px;
+      --shadow:    0 4px 24px rgba(0,0,0,0.4);
+      --transition: 0.2s ease;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-main);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      overflow: hidden;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ============================================================
+       SCROLLBAR
+    ============================================================ */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+    /* ============================================================
+       SIDEBAR
+    ============================================================ */
+    .sidebar {
+      width: 240px;
+      min-width: 240px;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 100;
+      transition: var(--transition);
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 20px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--orange), #FF8C42);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: white;
+      flex-shrink: 0;
+      box-shadow: 0 0 16px rgba(255,107,53,0.4);
+    }
+
+    .logo-text {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: var(--text);
+    }
+
+    .logo-text span {
+      color: var(--orange);
+    }
+
+    .sidebar-section {
+      padding: 12px 10px 4px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--muted);
+      font-size: 13.5px;
+      font-weight: 500;
+      position: relative;
+      margin-bottom: 2px;
+      user-select: none;
+    }
+
+    .nav-item:hover {
+      background: var(--hover);
+      color: var(--text);
+    }
+
+    .nav-item.active {
+      background: var(--highlight);
+      color: var(--orange);
+    }
+
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 6px;
+      bottom: 6px;
+      width: 3px;
+      background: var(--orange);
+      border-radius: 0 3px 3px 0;
+    }
+
+    .nav-item i {
+      width: 18px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--red);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-family: var(--font-mono);
+    }
+
+    .nav-badge.green { background: var(--green); color: #0a1a12; }
+    .nav-badge.blue  { background: var(--blue); }
+    .nav-badge.gray  { background: var(--muted); }
+
+    .sidebar-footer {
+      padding: 16px 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .user-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: var(--radius-sm);
+      background: var(--hover);
+      cursor: pointer;
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: white;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .user-info { flex: 1; min-width: 0; }
+    .user-name { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-plan { font-size: 11px; color: var(--orange); }
+
+    /* ============================================================
+       MAIN CONTENT
+    ============================================================ */
+    .main {
+      margin-left: 240px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ============================================================
+       TOPBAR
+    ============================================================ */
+    .topbar {
+      height: 58px;
+      min-height: 58px;
+      background: var(--sidebar);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 16px;
+    }
+
+    .topbar-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      flex: 1;
+    }
+
+    .topbar-subtitle {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+
+    .topbar-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 7px 12px;
+      width: 220px;
+    }
+
+    .topbar-search input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 13px;
+      font-family: var(--font-main);
+      width: 100%;
+    }
+
+    .topbar-search i { color: var(--muted); font-size: 13px; }
+
+    .topbar-btn {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: var(--font-main);
+      transition: var(--transition);
+    }
+
+    .topbar-btn.primary {
+      background: var(--orange);
+      color: white;
+    }
+
+    .topbar-btn.primary:hover {
+      background: #FF8C42;
+      box-shadow: 0 0 16px rgba(255,107,53,0.35);
+    }
+
+    .topbar-btn.ghost {
+      background: var(--card);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .topbar-btn.ghost:hover {
+      color: var(--text);
+      border-color: var(--muted);
+    }
+
+    .topbar-notif {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-sm);
+      background: var(--card);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--muted);
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .topbar-notif:hover { color: var(--text); }
+
+    .notif-dot {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 7px;
+      height: 7px;
+      background: var(--red);
+      border-radius: 50%;
+      border: 2px solid var(--sidebar);
+    }
+
+    /* ============================================================
+       CONTENT AREA
+    ============================================================ */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    /* ============================================================
+       SECTIONS
+    ============================================================ */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* ============================================================
+       STATS GRID
+    ============================================================ */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .stat-card:hover {
+      border-color: var(--muted);
+      transform: translateY(-1px);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+    }
+
+    .stat-card.orange::before { background: var(--orange); }
+    .stat-card.green::before  { background: var(--green); }
+    .stat-card.red::before    { background: var(--red); }
+    .stat-card.blue::before   { background: var(--blue); }
+
+    .stat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+    }
+
+    .stat-icon.orange { background: rgba(255,107,53,0.15); color: var(--orange); }
+    .stat-icon.green  { background: rgba(0,214,143,0.15); color: var(--green); }
+    .stat-icon.red    { background: rgba(255,71,87,0.15); color: var(--red); }
+    .stat-icon.blue   { background: rgba(72,52,212,0.15); color: var(--blue); }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text);
+      font-family: var(--font-mono);
+      letter-spacing: -1px;
+    }
+
+    .stat-delta {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11.5px;
+      font-weight: 600;
+      margin-top: 4px;
+      padding: 2px 7px;
+      border-radius: 20px;
+    }
+
+    .stat-delta.up   { color: var(--green); background: rgba(0,214,143,0.1); }
+    .stat-delta.down { color: var(--red); background: rgba(255,71,87,0.1); }
+
+    /* ============================================================
+       GRID 2 COLS
+    ============================================================ */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .grid-3-1 {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 16px;
+    }
+
+    /* ============================================================
+       CARD
+    ============================================================ */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .card-subtitle {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .card-action {
+      font-size: 12px;
+      color: var(--orange);
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .card-action:hover { color: #FF8C42; }
+
+    /* ============================================================
+       CHART
+    ============================================================ */
+    .chart-container {
+      position: relative;
+      height: 200px;
+    }
+
+    /* ============================================================
+       ACTIVITY LIST
+    ============================================================ */
+    .activity-list { display: flex; flex-direction: column; gap: 0; }
+
+    .activity-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .activity-item:last-child { border-bottom: none; }
+
+    .activity-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .activity-dot.success { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .activity-dot.error   { background: var(--red);   box-shadow: 0 0 6px var(--red); }
+    .activity-dot.pending { background: var(--orange); box-shadow: 0 0 6px var(--orange); }
+
+    .activity-info { flex: 1; min-width: 0; }
+    .activity-name { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .activity-meta { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+    .activity-time {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      white-space: nowrap;
+    }
+
+    /* ============================================================
+       STATUS BADGE
+    ============================================================ */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+
+    .badge.success { background: rgba(0,214,143,0.12); color: var(--green); }
+    .badge.error   { background: rgba(255,71,87,0.12); color: var(--red); }
+    .badge.pending { background: rgba(255,107,53,0.12); color: var(--orange); }
+    .badge.paused  { background: rgba(107,107,138,0.15); color: var(--muted); }
+    .badge.active  { background: rgba(0,214,143,0.12); color: var(--green); }
+
+    /* ============================================================
+       SECTION 2 — WORKFLOWS
+    ============================================================ */
+    .workflows-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .workflows-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .workflow-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      transition: var(--transition);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .workflow-card:hover {
+      border-color: rgba(255,107,53,0.3);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .workflow-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .workflow-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .workflow-icon.orange { background: rgba(255,107,53,0.15); color: var(--orange); }
+    .workflow-icon.green  { background: rgba(0,214,143,0.15); color: var(--green); }
+    .workflow-icon.blue   { background: rgba(72,52,212,0.15); color: var(--blue); }
+    .workflow-icon.purple { background: rgba(124,58,237,0.15); color: var(--purple); }
+    .workflow-icon.red    { background: rgba(255,71,87,0.15); color: var(--red); }
+
+    .workflow-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .workflow-trigger {
+      font-size: 11.5px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .workflow-trigger i { font-size: 10px; }
+
+    .workflow-stats {
+      display: flex;
+      gap: 16px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .wf-stat { display: flex; flex-direction: column; gap: 2px; }
+    .wf-stat-value { font-size: 15px; font-weight: 700; color: var(--text); font-family: var(--font-mono); }
+    .wf-stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .workflow-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 14px;
+    }
+
+    .workflow-last {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+    }
+
+    /* ============================================================
+       TOGGLE
+    ============================================================ */
+    .toggle {
+      position: relative;
+      display: inline-block;
+      width: 38px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .toggle input { opacity: 0; width: 0; height: 0; }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--border);
+      border-radius: 20px;
+      transition: var(--transition);
+    }
+
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: var(--transition);
+    }
+
+    .toggle input:checked + .toggle-slider { background: var(--green); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
+
+    /* ============================================================
+       SECTION 3 — VISUAL EDITOR
+    ============================================================ */
+    .editor-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr 240px;
+      gap: 0;
+      height: calc(100vh - 58px - 48px);
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .editor-panel {
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .editor-panel-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .node-template {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 11px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      cursor: grab;
+      margin-bottom: 8px;
+      transition: var(--transition);
+      background: var(--bg);
+    }
+
+    .node-template:hover {
+      border-color: var(--orange);
+      background: var(--highlight);
+    }
+
+    .node-template-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    .node-template-name { font-size: 12px; font-weight: 500; color: var(--text); }
+    .node-template-type { font-size: 10px; color: var(--muted); }
+
+    /* CANVAS */
+    .editor-canvas {
+      position: relative;
+      background: var(--bg);
+      overflow: hidden;
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    .canvas-toolbar {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 4px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 4px;
+      z-index: 10;
+    }
+
+    .canvas-tool {
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--muted);
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: none;
+      background: none;
+      font-family: var(--font-main);
+    }
+
+    .canvas-tool:hover { background: var(--hover); color: var(--text); }
+    .canvas-tool.active { background: var(--orange); color: white; }
+
+    .canvas-zoom {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      z-index: 10;
+    }
+
+    .zoom-btn {
+      width: 32px;
+      height: 32px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 14px;
+      transition: var(--transition);
+    }
+
+    .zoom-btn:hover { color: var(--text); }
+
+    /* SVG canvas */
+    .canvas-svg {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+
+    /* Flow Nodes */
+    .flow-node {
+      position: absolute;
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      min-width: 160px;
+      cursor: move;
+      user-select: none;
+      transition: box-shadow 0.2s, border-color 0.2s;
+      z-index: 5;
+    }
+
+    .flow-node:hover, .flow-node.selected {
+      box-shadow: 0 0 0 2px var(--orange), var(--shadow);
+      border-color: var(--orange);
+    }
+
+    .flow-node.trigger { border-color: var(--green); }
+    .flow-node.trigger:hover, .flow-node.trigger.selected {
+      box-shadow: 0 0 0 2px var(--green), var(--shadow);
+    }
+
+    .flow-node.ai { border-color: var(--purple); }
+    .flow-node.ai:hover, .flow-node.ai.selected {
+      box-shadow: 0 0 0 2px var(--purple), var(--shadow);
+    }
+
+    .flow-node.crm { border-color: var(--blue); }
+    .flow-node.crm:hover, .flow-node.crm.selected {
+      box-shadow: 0 0 0 2px var(--blue), var(--shadow);
+    }
+
+    .flow-node.action { border-color: var(--orange); }
+    .flow-node.action:hover, .flow-node.action.selected {
+      box-shadow: 0 0 0 2px var(--orange), var(--shadow);
+    }
+
+    .flow-node.condition { border-color: var(--red); }
+    .flow-node.condition:hover, .flow-node.condition.selected {
+      box-shadow: 0 0 0 2px var(--red), var(--shadow);
+    }
+
+    .node-header-inner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .node-icon-wrap {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .node-icon-wrap.green  { background: rgba(0,214,143,0.15); color: var(--green); }
+    .node-icon-wrap.purple { background: rgba(124,58,237,0.15); color: var(--purple); }
+    .node-icon-wrap.blue   { background: rgba(72,52,212,0.15); color: var(--blue); }
+    .node-icon-wrap.orange { background: rgba(255,107,53,0.15); color: var(--orange); }
+    .node-icon-wrap.red    { background: rgba(255,71,87,0.15); color: var(--red); }
+
+    .node-title { font-size: 13px; font-weight: 700; color: var(--text); }
+    .node-sub   { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+    .node-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .node-tag.trigger   { background: rgba(0,214,143,0.1); color: var(--green); }
+    .node-tag.ai-tag    { background: rgba(124,58,237,0.1); color: var(--purple); }
+    .node-tag.crm-tag   { background: rgba(72,52,212,0.1); color: var(--blue); }
+    .node-tag.action-tag{ background: rgba(255,107,53,0.1); color: var(--orange); }
+    .node-tag.condition-tag { background: rgba(255,71,87,0.1); color: var(--red); }
+
+    .node-port {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--bg);
+      cursor: crosshair;
+      transition: var(--transition);
+    }
+
+    .node-port:hover {
+      border-color: var(--orange);
+      background: var(--orange);
+      transform: scale(1.3);
+    }
+
+    .node-port.in  { left: -7px;  top: 50%; transform: translateY(-50%); }
+    .node-port.out { right: -7px; top: 50%; transform: translateY(-50%); }
+    .node-port.out:hover { transform: translateY(-50%) scale(1.3); }
+
+    /* Editor right panel */
+    .editor-props {
+      background: var(--card);
+      border-left: 1px solid var(--border);
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .props-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+      gap: 12px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .props-empty i { font-size: 32px; opacity: 0.4; }
+    .props-empty p { font-size: 12px; }
+
+    .prop-group { margin-bottom: 16px; }
+    .prop-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .prop-input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      color: var(--text);
+      font-size: 12.5px;
+      font-family: var(--font-main);
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .prop-input:focus { border-color: var(--orange); }
+
+    .prop-select {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      color: var(--text);
+      font-size: 12.5px;
+      font-family: var(--font-main);
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* ============================================================
+       SECTION 4 — EXECUTIONS
+    ============================================================ */
+    .exec-filters {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .filter-btn {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: var(--font-main);
+    }
+
+    .filter-btn:hover { color: var(--text); border-color: var(--muted); }
+    .filter-btn.active { background: var(--orange); border-color: var(--orange); color: white; }
+
+    .exec-table {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .exec-table-header {
+      display: grid;
+      grid-template-columns: 40px 1fr 140px 100px 100px 100px 80px;
+      padding: 11px 16px;
+      background: var(--card2);
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .exec-row {
+      display: grid;
+      grid-template-columns: 40px 1fr 140px 100px 100px 100px 80px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .exec-row:hover { background: var(--hover); }
+    .exec-row:last-child { border-bottom: none; }
+
+    .exec-id {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+    }
+
+    .exec-workflow { font-size: 13px; font-weight: 600; color: var(--text); }
+    .exec-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+    .exec-time {
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: var(--muted);
+    }
+
+    .exec-duration {
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: var(--text);
+    }
+
+    .exec-data {
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: var(--muted);
+    }
+
+    /* ============================================================
+       SECTION 5 — CONNECTORS
+    ============================================================ */
+    .connectors-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .connector-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+      transition: var(--transition);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .connector-card:hover {
+      border-color: rgba(255,107,53,0.3);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .connector-card.connected {
+      border-color: rgba(0,214,143,0.25);
+    }
+
+    .connector-status-dot {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .connector-status-dot.connected { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .connector-status-dot.disconnected { background: var(--muted); }
+
+    .connector-logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      margin: 0 auto 12px;
+    }
+
+    .connector-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .connector-desc {
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.4;
+      margin-bottom: 14px;
+    }
+
+    .connector-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .connector-tag.connected   { background: rgba(0,214,143,0.12); color: var(--green); }
+    .connector-tag.disconnected{ background: rgba(107,107,138,0.12); color: var(--muted); }
+
+    .connector-btn {
+      display: block;
+      width: 100%;
+      margin-top: 12px;
+      padding: 7px 0;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: var(--font-main);
+    }
+
+    .connector-btn:hover {
+      border-color: var(--orange);
+      color: var(--orange);
+    }
+
+    .connector-btn.connected-btn {
+      border-color: rgba(0,214,143,0.3);
+      color: var(--green);
+    }
+
+    /* ============================================================
+       SECTION 6 — PLANS
+    ============================================================ */
+    .plans-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .plans-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .plans-title span { color: var(--orange); }
+
+    .plans-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .plans-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .toggle-label { font-size: 13px; color: var(--muted); font-weight: 500; }
+    .toggle-label.active { color: var(--text); }
+
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .plan-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .plan-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+
+    .plan-card.featured {
+      border-color: var(--orange);
+      background: linear-gradient(160deg, #1E1A2E 0%, #1A1A2E 100%);
+    }
+
+    .plan-badge {
+      position: absolute;
+      top: -11px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--orange);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 14px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .plan-name { font-size: 14px; font-weight: 700; color: var(--muted); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
+    .plan-price { display: flex; align-items: flex-end; gap: 4px; margin-bottom: 8px; }
+    .plan-currency { font-size: 20px; font-weight: 700; color: var(--text); line-height: 1; padding-bottom: 4px; }
+    .plan-amount { font-size: 44px; font-weight: 800; color: var(--text); line-height: 1; font-family: var(--font-mono); letter-spacing: -2px; }
+    .plan-period { font-size: 13px; color: var(--muted); padding-bottom: 6px; }
+    .plan-desc { font-size: 12.5px; color: var(--muted); margin-bottom: 24px; line-height: 1.5; }
+
+    .plan-features { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+
+    .plan-feature {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .plan-feature i { color: var(--green); font-size: 12px; flex-shrink: 0; }
+    .plan-feature.missing { color: var(--muted); }
+    .plan-feature.missing i { color: var(--muted); }
+
+    .plan-cta {
+      width: 100%;
+      padding: 11px 0;
+      border-radius: var(--radius-sm);
+      border: none;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: var(--font-main);
+    }
+
+    .plan-cta.outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .plan-cta.outline:hover { border-color: var(--orange); color: var(--orange); }
+
+    .plan-cta.filled {
+      background: linear-gradient(135deg, var(--orange), #FF8C42);
+      color: white;
+      box-shadow: 0 4px 16px rgba(255,107,53,0.35);
+    }
+
+    .plan-cta.filled:hover {
+      box-shadow: 0 6px 20px rgba(255,107,53,0.5);
+      transform: translateY(-1px);
+    }
+
+    .plan-cta.dark {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .plan-cta.dark:hover { border-color: var(--text); }
+
+    /* ============================================================
+       MINI STATS ROW (below plans)
+    ============================================================ */
+    .plan-trust {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      max-width: 900px;
+      margin: 32px auto 0;
+    }
+
+    .trust-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .trust-value { font-size: 22px; font-weight: 800; color: var(--text); font-family: var(--font-mono); }
+    .trust-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* ============================================================
+       MINI CHART IN DASHBOARD
+    ============================================================ */
+    .sparkline {
+      width: 80px;
+      height: 32px;
+      display: inline-block;
+    }
+
+    /* ============================================================
+       SEARCH FILTER ROW
+    ============================================================ */
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .filter-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      flex: 1;
+      max-width: 320px;
+    }
+
+    .filter-search input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 13px;
+      font-family: var(--font-main);
+      width: 100%;
+    }
+
+    .filter-search i { color: var(--muted); font-size: 13px; }
+
+    /* ============================================================
+       PROGRESS BAR
+    ============================================================ */
+    .progress-bar {
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 1s ease;
+    }
+
+    .progress-fill.green  { background: linear-gradient(90deg, var(--green), #00F5A0); }
+    .progress-fill.orange { background: linear-gradient(90deg, var(--orange), #FF8C42); }
+    .progress-fill.blue   { background: linear-gradient(90deg, var(--blue), #6B5BFF); }
+    .progress-fill.red    { background: linear-gradient(90deg, var(--red), #FF6B6B); }
+
+    /* ============================================================
+       STATUS INDICATOR (pulsing dot)
+    ============================================================ */
+    .status-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--green);
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(0,214,143,0.5); }
+      70% { box-shadow: 0 0 0 8px rgba(0,214,143,0); }
+      100% { box-shadow: 0 0 0 0 rgba(0,214,143,0); }
+    }
+
+    /* ============================================================
+       CONNECTION LINE ANIMATION
+    ============================================================ */
+    .flow-line {
+      stroke-dasharray: 8 4;
+      animation: flow-dash 0.8s linear infinite;
+    }
+
+    @keyframes flow-dash {
+      to { stroke-dashoffset: -12; }
+    }
+
+    /* ============================================================
+       TOAST NOTIFICATION
+    ============================================================ */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 280px;
+      box-shadow: var(--shadow);
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to   { transform: translateX(0);   opacity: 1; }
+    }
+
+    .toast i { font-size: 16px; flex-shrink: 0; }
+    .toast.success i { color: var(--green); }
+    .toast.error   i { color: var(--red); }
+    .toast.info    i { color: var(--blue); }
+
+    .toast-msg { font-size: 13px; font-weight: 500; color: var(--text); }
+    .toast-sub  { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+    /* ============================================================
+       WORKFLOW DETAIL ROW (quick stats inside card)
+    ============================================================ */
+    .node-count {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: var(--muted);
+      background: var(--hover);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 1200px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .workflows-grid { grid-template-columns: repeat(2, 1fr); }
+      .connectors-grid { grid-template-columns: repeat(2, 1fr); }
+      .plans-grid { grid-template-columns: 1fr; max-width: 400px; }
+      .grid-3-1 { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+      .editor-layout { grid-template-columns: 1fr; }
+      .editor-panel, .editor-props { display: none; }
+      .exec-table-header, .exec-row { grid-template-columns: 1fr 120px 80px; }
+      .exec-table-header > *:not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(4)),
+      .exec-row > *:not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(4)) { display: none; }
+    }
+
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .workflows-grid { grid-template-columns: 1fr; }
+      .connectors-grid { grid-template-columns: repeat(2, 1fr); }
+      .content { padding: 16px; }
+    }
+
+    /* ============================================================
+       UTILS
+    ============================================================ */
+    .mb-16 { margin-bottom: 16px; }
+    .mb-24 { margin-bottom: 24px; }
+    .mt-16 { margin-top: 16px; }
+    .flex  { display: flex; }
+    .gap-8 { gap: 8px; }
+    .gap-12{ gap: 12px; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .text-muted { color: var(--muted); }
+    .text-sm { font-size: 12px; }
+    .font-mono { font-family: var(--font-mono); }
+
+    /* ============================================================
+       MINI TABLE (recent workflows in dashboard)
+    ============================================================ */
+    .mini-table { width: 100%; border-collapse: collapse; }
+    .mini-table th {
+      text-align: left;
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .mini-table td {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 12.5px;
+      color: var(--text);
+      vertical-align: middle;
+    }
+
+    .mini-table tr:last-child td { border-bottom: none; }
+
+    /* ============================================================
+       NODE EXECUTION TIMELINE
+    ============================================================ */
+    .exec-timeline {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-top: 16px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .timeline-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      min-width: 80px;
+    }
+
+    .timeline-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .timeline-icon.success { background: rgba(0,214,143,0.15); color: var(--green); border: 2px solid var(--green); }
+    .timeline-icon.error   { background: rgba(255,71,87,0.15); color: var(--red); border: 2px solid var(--red); }
+    .timeline-icon.pending { background: rgba(255,107,53,0.1); color: var(--orange); border: 2px dashed var(--orange); }
+
+    .timeline-label { font-size: 10px; color: var(--muted); text-align: center; white-space: nowrap; }
+
+    .timeline-line {
+      flex: 1;
+      height: 2px;
+      background: var(--border);
+      min-width: 32px;
+      margin-bottom: 22px;
+    }
+
+    .timeline-line.success { background: var(--green); }
+    .timeline-line.error   { background: var(--red); }
+
+    /* ============================================================
+       SECTION HEADER
+    ============================================================ */
+    .section-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
+
+    .section-desc {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ============================================================
+       MISC
+    ============================================================ */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 16px 0;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .tag.whatsapp { background: rgba(37,211,102,0.12); color: #25D366; }
+    .tag.telegram  { background: rgba(0,136,204,0.12); color: #0088cc; }
+    .tag.openai    { background: rgba(124,58,237,0.12); color: var(--purple); }
+    .tag.stripe    { background: rgba(99,91,255,0.12); color: #635BFF; }
+    .tag.hubspot   { background: rgba(255,122,0,0.12); color: #FF7A00; }
+    .tag.slack     { background: rgba(74,21,75,0.12); color: #4A154B; }
+    .tag.sheets    { background: rgba(14,157,88,0.12); color: #0E9D58; }
+    .tag.postgres  { background: rgba(51,103,145,0.12); color: #336791; }
+
+    /* ============================================================
+       EXEC LOG ENTRY (expanded)
+    ============================================================ */
+    .log-entry {
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      margin-top: 8px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-height: 200px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .log-entry.visible { display: block; }
+
+    .log-line { display: flex; gap: 10px; }
+    .log-time { color: var(--muted); flex-shrink: 0; }
+    .log-level { flex-shrink: 0; }
+    .log-level.info  { color: var(--blue); }
+    .log-level.ok    { color: var(--green); }
+    .log-level.err   { color: var(--red); }
+    .log-level.warn  { color: var(--orange); }
+    .log-msg { color: var(--text); }
+
+    /* Dashboard quick actions */
+    .quick-actions {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .quick-action {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .quick-action:hover { border-color: var(--orange); color: var(--orange); }
+    .quick-action i { font-size: 13px; color: var(--orange); }
+
+    /* ============================================================
+       GRADIENT TEXT
+    ============================================================ */
+    .gradient-text {
+      background: linear-gradient(135deg, var(--orange), #FF8C42, #FFD166);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ============================================================
+       MINI NODE PILL (inside editor)
+    ============================================================ */
+    .mini-stat-bar {
+      display: flex;
+      gap: 12px;
+      background: var(--card2);
+      border-top: 1px solid var(--border);
+      padding: 10px 16px;
+    }
+
+    .mini-stat-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .mini-stat-item i { font-size: 11px; }
+    .mini-stat-item strong { color: var(--text); }
+
+    /* ============================================================
+       RUN BUTTON ANIMATION
+    ============================================================ */
+    .run-btn {
+      background: linear-gradient(135deg, var(--green), #00F5A0);
+      color: #0a1a12;
+      font-weight: 700;
+      padding: 7px 16px;
+      border-radius: var(--radius-sm);
+      border: none;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-family: var(--font-main);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: var(--transition);
+    }
+
+    .run-btn:hover {
+      box-shadow: 0 0 16px rgba(0,214,143,0.4);
+    }
+
+    /* ============================================================
+       DETAIL PANEL NODE PROPS (visible state)
+    ============================================================ */
+    .props-node-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 14px;
+    }
+
+    .props-node-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .props-node-type {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ============================================================
+       TYPING ANIMATION
+    ============================================================ */
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .cursor-blink {
+      display: inline-block;
+      width: 2px;
+      height: 12px;
+      background: var(--orange);
+      animation: blink 1s step-end infinite;
+      vertical-align: middle;
+      margin-left: 2px;
+    }
+
+    /* ============================================================
+       HOVER CARD GLOW
+    ============================================================ */
+    .glow-orange { box-shadow: 0 0 20px rgba(255,107,53,0.2); }
+    .glow-green  { box-shadow: 0 0 20px rgba(0,214,143,0.2); }
+
+    /* ============================================================
+       PLAN HIGHLIGHT ORBIT
+    ============================================================ */
+    .plan-card.featured::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(255,107,53,0.1), transparent, rgba(255,107,53,0.05));
+      pointer-events: none;
+    }
+
+    /* ============================================================
+       SECTION 5 — CONNECTOR DETAIL (modal-like)
+    ============================================================ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      max-width: 480px;
+      width: 90%;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      animation: modalIn 0.25s ease;
+    }
+
+    @keyframes modalIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: var(--hover);
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .modal-close:hover { color: var(--text); }
+
+    /* ============================================================
+       EMPTY STATE
+    ============================================================ */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--muted);
+    }
+
+    .empty-state i { font-size: 40px; opacity: 0.3; margin-bottom: 12px; display: block; }
+    .empty-state h3 { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .empty-state p { font-size: 13px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     SIDEBAR
+============================================================ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon"><i class="fa-solid fa-bolt-lightning"></i></div>
+    <div class="logo-text">Flow<span>Builder</span></div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="sidebar-section">Principal</div>
+
+    <div class="nav-item active" onclick="navigate('dashboard', this)">
+      <i class="fa-solid fa-chart-line"></i>
+      Dashboard
+    </div>
+
+    <div class="nav-item" onclick="navigate('workflows', this)">
+      <i class="fa-solid fa-diagram-project"></i>
+      Workflows
+      <span class="nav-badge green">12</span>
+    </div>
+
+    <div class="nav-item" onclick="navigate('editor', this)">
+      <i class="fa-solid fa-pen-ruler"></i>
+      Editor Visual
+    </div>
+
+    <div class="sidebar-section">Monitoramento</div>
+
+    <div class="nav-item" onclick="navigate('executions', this)">
+      <i class="fa-solid fa-list-check"></i>
+      Execuções
+      <span class="nav-badge">3</span>
+    </div>
+
+    <div class="sidebar-section">Configurações</div>
+
+    <div class="nav-item" onclick="navigate('connectors', this)">
+      <i class="fa-solid fa-plug-circle-bolt"></i>
+      Conectores
+      <span class="nav-badge blue">8</span>
+    </div>
+
+    <div class="nav-item" onclick="navigate('plans', this)">
+      <i class="fa-solid fa-crown"></i>
+      Planos
+    </div>
+
+    <div class="sidebar-section">Sistema</div>
+
+    <div class="nav-item">
+      <i class="fa-solid fa-gear"></i>
+      Configurações
+    </div>
+
+    <div class="nav-item">
+      <i class="fa-solid fa-book-open"></i>
+      Documentação
+    </div>
+
+    <div class="nav-item">
+      <i class="fa-solid fa-circle-question"></i>
+      Suporte
+      <span class="nav-badge gray">24h</span>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar">R</div>
+      <div class="user-info">
+        <div class="user-name">Rafael Silva</div>
+        <div class="user-plan"><i class="fa-solid fa-crown" style="font-size:9px"></i> Pro Plan</div>
+      </div>
+      <i class="fa-solid fa-ellipsis-vertical" style="color:var(--muted);font-size:14px"></i>
+    </div>
+  </div>
+</aside>
+
+<!-- ============================================================
+     MAIN
+============================================================ -->
+<main class="main">
+
+  <!-- ========== TOPBAR ========== -->
+  <div class="topbar" id="topbar">
+    <div>
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div class="topbar-subtitle" id="topbar-sub">Visão geral da automação</div>
+    </div>
+
+    <div class="topbar-search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" placeholder="Buscar workflows, execuções..." />
+    </div>
+
+    <div class="topbar-notif" onclick="showToast('info','Notificações','3 execuções com atenção')">
+      <i class="fa-solid fa-bell"></i>
+      <div class="notif-dot"></div>
+    </div>
+
+    <button class="topbar-btn ghost" onclick="showToast('info','Importar','Funcionalidade disponível no plano Pro')">
+      <i class="fa-solid fa-file-import"></i> Importar
+    </button>
+
+    <button class="topbar-btn primary" id="topbar-cta" onclick="handleTopCta()">
+      <i class="fa-solid fa-plus"></i> Novo Workflow
+    </button>
+  </div>
+
+  <!-- ========== CONTENT ========== -->
+  <div class="content">
+
+    <!-- ======================================================
+         SECTION 1 — DASHBOARD
+    ====================================================== -->
+    <div class="section active" id="sec-dashboard">
+
+      <div class="quick-actions mb-16">
+        <div class="quick-action" onclick="navigate('workflows', document.querySelector('.nav-item:nth-child(2)'))">
+          <i class="fa-solid fa-diagram-project"></i> Meus Workflows
+        </div>
+        <div class="quick-action" onclick="navigate('editor', document.querySelectorAll('.nav-item')[2])">
+          <i class="fa-solid fa-pen-ruler"></i> Abrir Editor
+        </div>
+        <div class="quick-action" onclick="navigate('executions', document.querySelectorAll('.nav-item')[3])">
+          <i class="fa-solid fa-clock-rotate-left"></i> Ver Execuções
+        </div>
+        <div class="quick-action" onclick="showToast('success','Deploy','Configurações publicadas com sucesso')">
+          <i class="fa-solid fa-rocket"></i> Deploy Rápido
+        </div>
+        <div class="status-live" style="margin-left:auto">
+          <div class="pulse-dot"></div> Sistema Online
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid mb-24">
+        <div class="stat-card orange">
+          <div class="stat-header">
+            <div class="stat-label">Workflows Ativos</div>
+            <div class="stat-icon orange"><i class="fa-solid fa-diagram-project"></i></div>
+          </div>
+          <div class="stat-value">12</div>
+          <div class="stat-delta up"><i class="fa-solid fa-arrow-trend-up"></i> +3 esta semana</div>
+        </div>
+
+        <div class="stat-card green">
+          <div class="stat-header">
+            <div class="stat-label">Execuções Hoje</div>
+            <div class="stat-icon green"><i class="fa-solid fa-bolt"></i></div>
+          </div>
+          <div class="stat-value">1.847</div>
+          <div class="stat-delta up"><i class="fa-solid fa-arrow-trend-up"></i> +18% vs ontem</div>
+        </div>
+
+        <div class="stat-card green">
+          <div class="stat-header">
+            <div class="stat-label">Taxa de Sucesso</div>
+            <div class="stat-icon green"><i class="fa-solid fa-circle-check"></i></div>
+          </div>
+          <div class="stat-value">98.2%</div>
+          <div class="stat-delta up"><i class="fa-solid fa-arrow-trend-up"></i> +0.4% vs ontem</div>
+        </div>
+
+        <div class="stat-card red">
+          <div class="stat-header">
+            <div class="stat-label">Erros (24h)</div>
+            <div class="stat-icon red"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          </div>
+          <div class="stat-value">33</div>
+          <div class="stat-delta down"><i class="fa-solid fa-arrow-trend-down"></i> -8 vs ontem</div>
+        </div>
+      </div>
+
+      <!-- Chart + Activity -->
+      <div class="grid-3-1 mb-24">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Execuções por Hora</div>
+              <div class="card-subtitle">Últimas 24 horas</div>
+            </div>
+            <div style="display:flex;gap:16px;align-items:center">
+              <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--green)">
+                <div style="width:10px;height:10px;border-radius:50%;background:var(--green)"></div> Sucesso
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--red)">
+                <div style="width:10px;height:10px;border-radius:50%;background:var(--red)"></div> Erros
+              </div>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="execChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Atividade Recente</div>
+            <div class="card-action" onclick="navigate('executions', document.querySelectorAll('.nav-item')[3])">Ver todas →</div>
+          </div>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-dot success"></div>
+              <div class="activity-info">
+                <div class="activity-name">WhatsApp → CRM Sync</div>
+                <div class="activity-meta">Trigger: Mensagem recebida</div>
+              </div>
+              <div class="activity-time">há 2min</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot error"></div>
+              <div class="activity-info">
+                <div class="activity-name">Stripe → HubSpot</div>
+                <div class="activity-meta">Erro: Timeout na API</div>
+              </div>
+              <div class="activity-time">há 5min</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot success"></div>
+              <div class="activity-info">
+                <div class="activity-name">Lead Qualifier AI</div>
+                <div class="activity-meta">27 leads qualificados</div>
+              </div>
+              <div class="activity-time">há 11min</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot pending"></div>
+              <div class="activity-info">
+                <div class="activity-name">Email Campaign</div>
+                <div class="activity-meta">Aguardando envio em lote</div>
+              </div>
+              <div class="activity-time">há 18min</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot success"></div>
+              <div class="activity-info">
+                <div class="activity-name">Sheets → PostgreSQL</div>
+                <div class="activity-meta">1.240 registros sincronizados</div>
+              </div>
+              <div class="activity-time">há 32min</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mini table + usage -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Top Workflows</div>
+            <div class="card-action">Gerenciar →</div>
+          </div>
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Workflow</th>
+                <th>Execuções</th>
+                <th>Sucesso</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>WhatsApp → IA → CRM</td>
+                <td class="font-mono">4.291</td>
+                <td><span style="color:var(--green);font-family:var(--font-mono);font-weight:700">99.1%</span></td>
+                <td><span class="badge active"><i class="fa-solid fa-circle" style="font-size:6px"></i> Ativo</span></td>
+              </tr>
+              <tr>
+                <td>Lead Qualifier AI</td>
+                <td class="font-mono">2.847</td>
+                <td><span style="color:var(--green);font-family:var(--font-mono);font-weight:700">97.8%</span></td>
+                <td><span class="badge active"><i class="fa-solid fa-circle" style="font-size:6px"></i> Ativo</span></td>
+              </tr>
+              <tr>
+                <td>Stripe → HubSpot</td>
+                <td class="font-mono">1.523</td>
+                <td><span style="color:var(--orange);font-family:var(--font-mono);font-weight:700">94.2%</span></td>
+                <td><span class="badge active"><i class="fa-solid fa-circle" style="font-size:6px"></i> Ativo</span></td>
+              </tr>
+              <tr>
+                <td>Email Campaign</td>
+                <td class="font-mono">892</td>
+                <td><span style="color:var(--muted);font-family:var(--font-mono);font-weight:700">—</span></td>
+                <td><span class="badge paused"><i class="fa-solid fa-pause" style="font-size:8px"></i> Pausado</span></td>
+              </tr>
+              <tr>
+                <td>Sheets → PostgreSQL</td>
+                <td class="font-mono">611</td>
+                <td><span style="color:var(--green);font-family:var(--font-mono);font-weight:700">100%</span></td>
+                <td><span class="badge active"><i class="fa-solid fa-circle" style="font-size:6px"></i> Ativo</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Uso do Plano Pro</div>
+            <div class="card-action" onclick="navigate('plans', document.querySelectorAll('.nav-item')[5])">Upgrade →</div>
+          </div>
+
+          <div style="margin-bottom:16px">
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+              <span style="color:var(--muted)">Execuções mensais</span>
+              <span style="color:var(--text);font-family:var(--font-mono);font-weight:600">42.847 / 100.000</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill green" style="width:42.8%"></div>
+            </div>
+          </div>
+
+          <div style="margin-bottom:16px">
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+              <span style="color:var(--muted)">Workflows ativos</span>
+              <span style="color:var(--text);font-family:var(--font-mono);font-weight:600">12 / 50</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill orange" style="width:24%"></div>
+            </div>
+          </div>
+
+          <div style="margin-bottom:16px">
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+              <span style="color:var(--muted)">Conectores ativos</span>
+              <span style="color:var(--text);font-family:var(--font-mono);font-weight:600">5 / 20</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill blue" style="width:25%"></div>
+            </div>
+          </div>
+
+          <div style="margin-bottom:16px">
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+              <span style="color:var(--muted)">Armazenamento de logs</span>
+              <span style="color:var(--text);font-family:var(--font-mono);font-weight:600">1.2 GB / 5 GB</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill blue" style="width:24%"></div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-size:12px;color:var(--muted)">Próxima renovação</div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);font-family:var(--font-mono);margin-top:2px">15 Mar 2026</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:12px;color:var(--muted)">Plano atual</div>
+              <div style="font-size:13px;font-weight:700;color:var(--orange);margin-top:2px">Pro — R$297/mês</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /sec-dashboard -->
+
+    <!-- ======================================================
+         SECTION 2 — WORKFLOWS
+    ====================================================== -->
+    <div class="section" id="sec-workflows">
+      <div class="workflows-header">
+        <div>
+          <div class="section-title">Meus Workflows</div>
+          <div class="section-desc">12 workflows configurados — 10 ativos, 2 pausados</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <div class="filter-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Buscar workflow..." />
+          </div>
+          <button class="topbar-btn ghost">
+            <i class="fa-solid fa-sliders"></i> Filtrar
+          </button>
+          <button class="topbar-btn primary" onclick="showToast('success','Criado','Novo workflow criado no editor')">
+            <i class="fa-solid fa-plus"></i> Novo
+          </button>
+        </div>
+      </div>
+
+      <div class="exec-filters mb-16">
+        <button class="filter-btn active">Todos (12)</button>
+        <button class="filter-btn" onclick="filterBtns(this)">Ativos (10)</button>
+        <button class="filter-btn" onclick="filterBtns(this)">Pausados (2)</button>
+        <button class="filter-btn" onclick="filterBtns(this)">Mais recentes</button>
+        <button class="filter-btn" onclick="filterBtns(this)">Mais execuções</button>
+      </div>
+
+      <div class="workflows-grid">
+
+        <!-- WF 1 -->
+        <div class="workflow-card" onclick="navigate('editor', document.querySelectorAll(\'.nav-item\')[2])">
+          <div class="workflow-card-header">
+            <div>
+              <div class="workflow-icon orange"><i class="fa-brands fa-whatsapp"></i></div>
+            </div>
+            <span class="badge active"><i class="fa-solid fa-circle" style="font-size:6px"></i> Ativo</span>
+          </div>
+          <div class="workflow-name">WhatsApp → IA → CRM</div>
+          <div class="workflow-trigger"><i class="fa-solid fa-bolt"></i> Trigger: Mensagem WhatsApp</div>
+          <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+            <span class="tag whatsapp"><i class="fa-brands fa-whatsapp"></i> WhatsApp</span>
+            <span class="tag openai">OpenAI</span>
+            <span class="tag hubspot">HubSpot</span>
+          </div>
+          <div class="workflow-stats">
+            <div class="wf-stat">
+              <div class="wf-stat-value">4.291</div>
+              <div class="wf-stat-label">Execuções</div>
+            </div>
+            <div class="wf-stat">
+              <div class="wf-stat-value" style="color:var(--green)">99.1%</div>
+              <div class="wf-stat-label">Sucesso</div>
+            </div>
+            <div class="wf-stat">
+              <div class="wf-stat-value">1.2s</div>
+              <div class="wf-stat-label">Tempo médio</div>
+            </div>
+          </div>
+          <div class="workflow-footer">
+            <div class="workflow-last">há 2 minutos</div>
+            <label class="toggle" onclick="event.stopPropagation();toggleWorkflow(this)">
+              <input type="checkbox" checked />
+              <div class="toggle-slider"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- WF 2 -->
+        <div class="workflow-card">
+          <div class="workflow-card-header">
+            <div class="workflow-icon purple"><i class="fa-solid fa-brain"></i></div>
+            <span class="badge active"><i class="fa-solid fa-circle" style="font-size:6px"></i> Ativo</span>
+          </div>
+          <div class="workflow-name">Lead Qualifier AI</div>
+          <div class="workflow-trigger"><i class="fa-solid fa-bolt"></i> Trigger: Novo formulário</div>
+          <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+            <span class="tag openai">OpenAI</span>
+            <span class="tag sheets">Sheets</span>
+            <span class="tag hubspot">HubSpot</span>
+          </div>
+          <div class="workflow-stats">
+            <div class="wf-stat">
+              <div class="wf-stat-value">2.847</div>
+              <div class="wf-stat-label">Execuções</div>
+            </div>
+            <div class="wf-stat">
+              <div class="wf-stat-value" style="color:var(--green)">97.8%</div>
+              <div class="wf-stat-label">Sucesso</div>
+            </div>
+            <div class="wf-stat">
+              <div class="wf-stat-value">3.4s</div>
+              <div class="wf-stat-label">Tempo médio</div>
+            </div>
+          </div>
+          <div class="workflow-footer">
+            <div class="workflow-last">há 11 minutos</div>
+            <label class="toggle" onclick="event.stopPropagation();toggleWorkflow(this)">
+              <input type="checkbox" checked />
+              <div class="toggle-slider"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- WF 3 -->
+        <div class="workflow-card">
+          <div class="workflow-card-header">
+            <div class="workflow-icon green"><i class="fa-brands fa-stripe"></i></div>
+            <span class="badge active"><i class="fa-solid fa-circle" style="font-size:6px"></i> Ativo</span>
+          </div>
+          <div class="workflow-name">Stripe → HubSpot Sync</div>
+          <div class="workflow-trigger"><i class="fa-solid fa-bolt"></i> Trigger: Pagamento Stripe</div>
+          <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+            <span class="tag stripe">Stripe</span>
+            <span class="tag hubspot">HubSpot</span>
+            <span class="tag postgres">PostgreSQL</span>
+          </div>
+          <div class="workflow-stats">
+            <div class="wf-stat">
+              <div class="wf-stat-value">1.523</div>
+              <div class="wf-stat-label">Execuções</div>
+            </div>
+            <div class="wf-stat">
+              <div class="wf-stat-value" style="color:var(--orange)">94.2%</div>
+              <div class="wf-stat-label">Sucesso</div>
+            </div>
+            <div class="wf-stat">
+              <div class="wf-stat-value">0.8s</div>
+              <div class="wf-stat-label">Tempo médio</div>
+            </div>
+          </div>
+          <div class="workflow-footer">
+            <div class="workflow-last">há 1 hora</div>
+            <label class="toggle" onclick="event.stopPropagation();toggleWorkflow(this)">
+              <input type="checkbox" checked />
+              <div class="toggle-slider"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- WF 4 -->
+        <div class="workflow-card">
+          <div class="workflow-card-header">
+            <div class="workflow-icon red"><i class="fa-solid fa-envelope-open-text"></i></div>
+            <span class="badge paused"><i class="fa-solid fa-pause" style="font-size:8px"></i> Pausado</span>
+          </div>
+          <div class="workflow-name">Email Campaign Blast</div>
+          <div class="workflow-trigger"><i class="fa-solid fa-clock"></i> Trigger: Agendado (08:00)</div>
+          <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+            <span class="tag sheets">Sheets</span>
+            <span class="tag hubspot">HubSpot</span>
+          </div>
+          <div class="workflow-stats">
+            <div class="wf-stat">
+              <div class="wf-stat-value">892</div>
+              <div class="wf-stat-label">Execuções</div>
+            </div>
+            <div class="wf-stat">
+              <div class="wf-stat-value" style="color:var(--muted)">—</div>
+              <div class="wf-stat-label">Sucesso</div>
+            </div>
+            <div class="wf-stat">
+              <div class="wf-stat-value">12s</div>
+              <div class="wf-stat-label">Tempo médio</div>
+            </div>
+          </div>
+          <div class="workflow-footer">
+            <div class="workflow-last">há 3 dias</div>
+            <label class="toggle" onclick="event.stopPropagation();toggleWorkflow(this)">
+              <input type="checkbox" />
+              <div class="toggle-slider"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- WF 5 -->
+        <div class="workflow-card">
+          <div class="workflow-card-header">
+            <div class="workflow-icon blue"><i class="fa-brands fa-slack"></i></div>
+            <span class="badge active"><i class="fa-solid fa-circle" style="font-size:6px"></i> Ativo</span>
+          </div>
+          <div class="workflow-name">Slack Alerts Monitor</div>
+          <div class="workflow-trigger"><i class="fa-solid fa-bolt"></i> Trigger: Webhook HTTP</div>
+          <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+            <span class="tag slack">Slack</span>
+            <span class="tag postgres">PostgreSQL</span>
+          </div>
+          <div class="workflow-stats">
+            <div class="wf-stat">
+              <div class="wf-stat-value">611</div>
+              <div class="wf-stat-label">Execuções</div>
+            </div>
+            <div class="wf-stat">
+              <div class="wf-stat-value" style="color:var(--green)">100%</div>
+              <div class="wf-stat-label">Sucesso</div>
+            </div>
+            <div class="wf-stat">
+              <div class="wf-stat-value">0.3s</div>
+              <div class="wf-stat-label">Tempo médio</div>
+            </div>
+          </div>
+          <div class="workflow-footer">
+            <div class="workflow-last">há 45 min</div>
+            <label class="toggle" onclick="event.stopPropagation();toggleWorkflow(this)">
+              <input type="checkbox" checked />
+              <div class="toggle-slider"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- WF 6 -->
+        <div class="workflow-card">
+          <div class="workflow-card-header">
+            <div class="workflow-icon green"><i class="fa-solid fa-table"></i></div>
+            <span class="badge active"><i class="fa-solid fa-circle" style="font-size:6px"></i> Ativo</span>
+          </div>
+          <div class="workflow-name">Sheets → PostgreSQL ETL</div>
+          <div class="workflow-trigger"><i class="fa-solid fa-clock"></i> Trigger: A cada 15 min</div>
+          <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+            <span class="tag sheets">Sheets</span>
+            <span class="tag postgres">PostgreSQL</span>
+          </div>
+          <div class="workflow-stats">
+            <div class="wf-stat">
+              <div class="wf-stat-value">288</div>
+              <div class="wf-stat-label">Execuções</div>
+            </div>
+            <div class="wf-stat">
+              <div class="wf-stat-value" style="color:var(--green)">100%</div>
+              <div class="wf-stat-label">Sucesso</div>
+            </div>
+            <div class="wf-stat">
+              <div class="wf-stat-value">4.1s</div>
+              <div class="wf-stat-label">Tempo médio</div>
+            </div>
+          </div>
+          <div class="workflow-footer">
+            <div class="workflow-last">há 7 min</div>
+            <label class="toggle" onclick="event.stopPropagation();toggleWorkflow(this)">
+              <input type="checkbox" checked />
+              <div class="toggle-slider"></div>
+            </label>
+          </div>
+        </div>
+
+      </div><!-- /workflows-grid -->
+    </div><!-- /sec-workflows -->
+
+    <!-- ======================================================
+         SECTION 3 — EDITOR VISUAL
+    ====================================================== -->
+    <div class="section" id="sec-editor">
+      <div style="margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div class="section-title">Editor Visual</div>
+          <div class="section-desc">WhatsApp → IA → CRM → Responder — Arraste nodes para conectar</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="topbar-btn ghost"><i class="fa-solid fa-undo"></i> Desfazer</button>
+          <button class="topbar-btn ghost"><i class="fa-solid fa-redo"></i> Refazer</button>
+          <button class="run-btn" onclick="runWorkflow()"><i class="fa-solid fa-play"></i> Executar</button>
+          <button class="topbar-btn primary" onclick="showToast('success','Salvo','Workflow salvo com sucesso')"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
+        </div>
+      </div>
+
+      <div class="editor-layout" id="editorLayout">
+        <!-- LEFT: Nodes Panel -->
+        <div class="editor-panel">
+          <div class="editor-panel-title">Componentes</div>
+
+          <div style="font-size:10px;font-weight:600;color:var(--muted);letter-spacing:0.5px;margin-bottom:8px;margin-top:4px">TRIGGERS</div>
+          <div class="node-template" onclick="showToast('info','Node adicionado','Trigger WhatsApp inserido no canvas')">
+            <div class="node-template-icon" style="background:rgba(37,211,102,0.15);color:#25D366"><i class="fa-brands fa-whatsapp"></i></div>
+            <div>
+              <div class="node-template-name">WhatsApp</div>
+              <div class="node-template-type">Trigger</div>
+            </div>
+          </div>
+          <div class="node-template" onclick="showToast('info','Node adicionado','Trigger Telegram inserido')">
+            <div class="node-template-icon" style="background:rgba(0,136,204,0.15);color:#0088cc"><i class="fa-brands fa-telegram"></i></div>
+            <div>
+              <div class="node-template-name">Telegram</div>
+              <div class="node-template-type">Trigger</div>
+            </div>
+          </div>
+          <div class="node-template" onclick="showToast('info','Node adicionado','Webhook HTTP inserido')">
+            <div class="node-template-icon" style="background:rgba(72,52,212,0.15);color:var(--blue)"><i class="fa-solid fa-webhook"></i></div>
+            <div>
+              <div class="node-template-name">Webhook HTTP</div>
+              <div class="node-template-type">Trigger</div>
+            </div>
+          </div>
+          <div class="node-template" onclick="showToast('info','Node adicionado','Agendador inserido')">
+            <div class="node-template-icon" style="background:rgba(255,107,53,0.15);color:var(--orange)"><i class="fa-solid fa-clock"></i></div>
+            <div>
+              <div class="node-template-name">Agendador</div>
+              <div class="node-template-type">Trigger</div>
+            </div>
+          </div>
+
+          <div style="font-size:10px;font-weight:600;color:var(--muted);letter-spacing:0.5px;margin-bottom:8px;margin-top:12px">AÇÕES</div>
+          <div class="node-template" onclick="showToast('info','Node adicionado','OpenAI GPT inserido')">
+            <div class="node-template-icon" style="background:rgba(124,58,237,0.15);color:var(--purple)"><i class="fa-solid fa-brain"></i></div>
+            <div>
+              <div class="node-template-name">OpenAI GPT</div>
+              <div class="node-template-type">IA</div>
+            </div>
+          </div>
+          <div class="node-template" onclick="showToast('info','Node adicionado','HubSpot CRM inserido')">
+            <div class="node-template-icon" style="background:rgba(255,122,0,0.15);color:#FF7A00"><i class="fa-solid fa-users-rectangle"></i></div>
+            <div>
+              <div class="node-template-name">HubSpot CRM</div>
+              <div class="node-template-type">CRM</div>
+            </div>
+          </div>
+          <div class="node-template" onclick="showToast('info','Node adicionado','Google Sheets inserido')">
+            <div class="node-template-icon" style="background:rgba(14,157,88,0.15);color:#0E9D58"><i class="fa-solid fa-table"></i></div>
+            <div>
+              <div class="node-template-name">Google Sheets</div>
+              <div class="node-template-type">Dados</div>
+            </div>
+          </div>
+          <div class="node-template" onclick="showToast('info','Node adicionado','PostgreSQL inserido')">
+            <div class="node-template-icon" style="background:rgba(51,103,145,0.15);color:#336791"><i class="fa-solid fa-database"></i></div>
+            <div>
+              <div class="node-template-name">PostgreSQL</div>
+              <div class="node-template-type">Banco de Dados</div>
+            </div>
+          </div>
+
+          <div style="font-size:10px;font-weight:600;color:var(--muted);letter-spacing:0.5px;margin-bottom:8px;margin-top:12px">LÓGICA</div>
+          <div class="node-template">
+            <div class="node-template-icon" style="background:rgba(255,71,87,0.15);color:var(--red)"><i class="fa-solid fa-code-branch"></i></div>
+            <div>
+              <div class="node-template-name">Condição IF</div>
+              <div class="node-template-type">Lógica</div>
+            </div>
+          </div>
+          <div class="node-template">
+            <div class="node-template-icon" style="background:rgba(255,107,53,0.15);color:var(--orange)"><i class="fa-solid fa-rotate"></i></div>
+            <div>
+              <div class="node-template-name">Loop</div>
+              <div class="node-template-type">Lógica</div>
+            </div>
+          </div>
+          <div class="node-template">
+            <div class="node-template-icon" style="background:rgba(255,107,53,0.15);color:var(--orange)"><i class="fa-solid fa-hourglass-half"></i></div>
+            <div>
+              <div class="node-template-name">Delay</div>
+              <div class="node-template-type">Lógica</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CENTER: Canvas -->
+        <div class="editor-canvas" id="editorCanvas">
+          <div class="canvas-toolbar">
+            <button class="canvas-tool active"><i class="fa-solid fa-arrow-pointer"></i> Selecionar</button>
+            <button class="canvas-tool" onclick="canvasTool(this)"><i class="fa-solid fa-hand"></i> Mover</button>
+            <button class="canvas-tool" onclick="canvasTool(this)"><i class="fa-solid fa-bezier-curve"></i> Conectar</button>
+            <div style="width:1px;background:var(--border);margin:0 4px"></div>
+            <button class="canvas-tool" onclick="showToast('info','Zoom','100%')"><i class="fa-solid fa-search-plus"></i></button>
+            <button class="canvas-tool" onclick="showToast('info','Modo','Grade ativada')"><i class="fa-solid fa-border-all"></i></button>
+            <button class="canvas-tool" onclick="showToast('info','Minimap','Minimap ativado')"><i class="fa-solid fa-map"></i></button>
+          </div>
+
+          <!-- SVG connections -->
+          <svg class="canvas-svg" id="canvasSvg">
+            <defs>
+              <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="rgba(255,107,53,0.7)" />
+              </marker>
+              <marker id="arrow-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="rgba(0,214,143,0.7)" />
+              </marker>
+              <marker id="arrow-purple" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="rgba(124,58,237,0.7)" />
+              </marker>
+              <marker id="arrow-blue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L8,3 z" fill="rgba(72,52,212,0.7)" />
+              </marker>
+            </defs>
+          </svg>
+
+          <!-- Flow Nodes -->
+          <div class="flow-node trigger" id="node1" style="top:120px;left:50px" onclick="selectNode('node1','Trigger WhatsApp','Trigger','green')">
+            <div class="node-port in" style="display:none"></div>
+            <div class="node-header-inner">
+              <div class="node-icon-wrap green"><i class="fa-brands fa-whatsapp"></i></div>
+              <div>
+                <div class="node-title">Trigger WhatsApp</div>
+                <div class="node-sub">Mensagem recebida</div>
+              </div>
+            </div>
+            <span class="node-tag trigger">Trigger</span>
+            <div class="node-port out"></div>
+          </div>
+
+          <div class="flow-node ai" id="node2" style="top:120px;left:280px" onclick="selectNode('node2','OpenAI GPT-4','IA','purple')">
+            <div class="node-port in"></div>
+            <div class="node-header-inner">
+              <div class="node-icon-wrap purple"><i class="fa-solid fa-brain"></i></div>
+              <div>
+                <div class="node-title">OpenAI GPT-4</div>
+                <div class="node-sub">Classificar intenção</div>
+              </div>
+            </div>
+            <span class="node-tag ai-tag">IA</span>
+            <div class="node-port out"></div>
+          </div>
+
+          <div class="flow-node crm" id="node3" style="top:120px;left:510px" onclick="selectNode('node3','HubSpot CRM','CRM','blue')">
+            <div class="node-port in"></div>
+            <div class="node-header-inner">
+              <div class="node-icon-wrap blue"><i class="fa-solid fa-users-rectangle"></i></div>
+              <div>
+                <div class="node-title">HubSpot CRM</div>
+                <div class="node-sub">Criar/atualizar contato</div>
+              </div>
+            </div>
+            <span class="node-tag crm-tag">CRM</span>
+            <div class="node-port out"></div>
+          </div>
+
+          <div class="flow-node action" id="node4" style="top:120px;left:740px" onclick="selectNode('node4','Responder WhatsApp','Ação','orange')">
+            <div class="node-port in"></div>
+            <div class="node-header-inner">
+              <div class="node-icon-wrap orange"><i class="fa-solid fa-reply"></i></div>
+              <div>
+                <div class="node-title">Responder</div>
+                <div class="node-sub">Enviar resposta ao usuário</div>
+              </div>
+            </div>
+            <span class="node-tag action-tag">Ação</span>
+            <div class="node-port out" style="display:none"></div>
+          </div>
+
+          <!-- Extra nodes below -->
+          <div class="flow-node condition" id="node5" style="top:280px;left:280px" onclick="selectNode('node5','Condição IF','Lógica','red')">
+            <div class="node-port in"></div>
+            <div class="node-header-inner">
+              <div class="node-icon-wrap red"><i class="fa-solid fa-code-branch"></i></div>
+              <div>
+                <div class="node-title">Condição IF</div>
+                <div class="node-sub">Lead score > 70</div>
+              </div>
+            </div>
+            <span class="node-tag condition-tag">Condição</span>
+            <div class="node-port out"></div>
+          </div>
+
+          <div class="flow-node" id="node6" style="top:280px;left:510px;border-color:var(--blue)" onclick="selectNode('node6','PostgreSQL','Banco de Dados','blue')">
+            <div class="node-port in"></div>
+            <div class="node-header-inner">
+              <div class="node-icon-wrap blue"><i class="fa-solid fa-database"></i></div>
+              <div>
+                <div class="node-title">PostgreSQL</div>
+                <div class="node-sub">Salvar lead qualificado</div>
+              </div>
+            </div>
+            <span class="node-tag crm-tag">Banco de Dados</span>
+            <div class="node-port out"></div>
+          </div>
+
+          <!-- Zoom buttons -->
+          <div class="canvas-zoom">
+            <div class="zoom-btn" onclick="showToast('info','Zoom','+10%')"><i class="fa-solid fa-plus"></i></div>
+            <div class="zoom-btn" style="font-size:10px;font-family:var(--font-mono);color:var(--muted);width:auto;padding:0 8px">100%</div>
+            <div class="zoom-btn" onclick="showToast('info','Zoom','-10%')"><i class="fa-solid fa-minus"></i></div>
+            <div class="zoom-btn" onclick="showToast('info','Ajustar','Canvas ajustado à tela')"><i class="fa-solid fa-expand"></i></div>
+          </div>
+        </div><!-- /editor-canvas -->
+
+        <!-- RIGHT: Properties -->
+        <div class="editor-props" id="editorProps">
+          <div class="editor-panel-title">Propriedades</div>
+
+          <div class="props-empty" id="propsEmpty">
+            <i class="fa-solid fa-arrow-left"></i>
+            <p>Clique em um node<br/>para editar propriedades</p>
+          </div>
+
+          <div id="propsContent" style="display:none">
+            <div class="props-node-header">
+              <div class="node-icon-wrap green" id="propsNodeIcon" style="width:36px;height:36px"><i class="fa-brands fa-whatsapp" id="propsNodeIconI"></i></div>
+              <div>
+                <div class="props-node-title" id="propsNodeTitle">Trigger WhatsApp</div>
+                <div class="props-node-type" id="propsNodeType">Trigger</div>
+              </div>
+            </div>
+
+            <div class="prop-group">
+              <div class="prop-label">Nome do node</div>
+              <input class="prop-input" id="propName" type="text" value="Trigger WhatsApp" />
+            </div>
+
+            <div class="prop-group">
+              <div class="prop-label">Descrição</div>
+              <input class="prop-input" type="text" placeholder="Descreva o node..." />
+            </div>
+
+            <div class="prop-group">
+              <div class="prop-label">Credencial</div>
+              <select class="prop-select">
+                <option>WhatsApp Business API</option>
+                <option>WhatsApp Cloud API</option>
+                <option>Twilio WhatsApp</option>
+              </select>
+            </div>
+
+            <div class="prop-group">
+              <div class="prop-label">Evento</div>
+              <select class="prop-select">
+                <option>Mensagem recebida</option>
+                <option>Status de leitura</option>
+                <option>Reação à mensagem</option>
+              </select>
+            </div>
+
+            <div class="prop-group">
+              <div class="prop-label">Retry em erro</div>
+              <select class="prop-select">
+                <option>3 tentativas</option>
+                <option>1 tentativa</option>
+                <option>5 tentativas</option>
+                <option>Sem retry</option>
+              </select>
+            </div>
+
+            <div class="divider"></div>
+
+            <div style="display:flex;gap:8px">
+              <button class="topbar-btn ghost" style="flex:1;justify-content:center;font-size:12px"><i class="fa-solid fa-trash"></i> Excluir</button>
+              <button class="topbar-btn primary" style="flex:1;justify-content:center;font-size:12px" onclick="showToast('success','Salvo','Propriedades do node salvas')"><i class="fa-solid fa-check"></i> Aplicar</button>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="prop-label" style="margin-bottom:8px">Saída de teste</div>
+            <div style="background:var(--bg);border-radius:var(--radius-sm);padding:12px;font-family:var(--font-mono);font-size:11px;color:var(--green);border:1px solid var(--border)">
+              {<br>
+              &nbsp;&nbsp;"from": "+5511999999999",<br>
+              &nbsp;&nbsp;"body": "Olá, quero saber mais",<br>
+              &nbsp;&nbsp;"timestamp": 1708532847,<br>
+              &nbsp;&nbsp;"type": "text"<br>
+              }
+            </div>
+          </div>
+        </div><!-- /editor-props -->
+      </div><!-- /editor-layout -->
+
+      <!-- mini bottom bar -->
+      <div class="mini-stat-bar" style="margin-top:8px;border-radius:var(--radius-sm)">
+        <div class="mini-stat-item"><i class="fa-solid fa-circle-nodes"></i> Nodes: <strong>6</strong></div>
+        <div class="mini-stat-item"><i class="fa-solid fa-bezier-curve"></i> Conexões: <strong>5</strong></div>
+        <div class="mini-stat-item"><i class="fa-solid fa-clock"></i> Última execução: <strong>há 2 min</strong></div>
+        <div class="mini-stat-item" style="margin-left:auto"><span class="badge active"><i class="fa-solid fa-circle" style="font-size:6px"></i> Workflow ativo</span></div>
+      </div>
+    </div><!-- /sec-editor -->
+
+    <!-- ======================================================
+         SECTION 4 — EXECUTIONS
+    ====================================================== -->
+    <div class="section" id="sec-executions">
+      <div style="margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div class="section-title">Histórico de Execuções</div>
+          <div class="section-desc">1.847 execuções nas últimas 24h — Taxa de sucesso: 98.2%</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="topbar-btn ghost"><i class="fa-solid fa-file-export"></i> Exportar CSV</button>
+          <button class="topbar-btn ghost"><i class="fa-solid fa-filter"></i> Filtros</button>
+        </div>
+      </div>
+
+      <div class="exec-filters mb-16">
+        <button class="filter-btn active">Todas</button>
+        <button class="filter-btn" onclick="filterBtns(this)">Sucesso</button>
+        <button class="filter-btn" onclick="filterBtns(this)">Erro</button>
+        <button class="filter-btn" onclick="filterBtns(this)">Pendente</button>
+        <button class="filter-btn" onclick="filterBtns(this)">Hoje</button>
+        <button class="filter-btn" onclick="filterBtns(this)">7 dias</button>
+      </div>
+
+      <div class="exec-table">
+        <div class="exec-table-header">
+          <div>#</div>
+          <div>Workflow</div>
+          <div>Horário</div>
+          <div>Status</div>
+          <div>Duração</div>
+          <div>Dados</div>
+          <div>Ações</div>
+        </div>
+
+        <!-- Row 1 -->
+        <div class="exec-row" onclick="toggleLog('log1')">
+          <div class="exec-id">#4291</div>
+          <div>
+            <div class="exec-workflow">WhatsApp → IA → CRM</div>
+            <div class="exec-sub">Trigger: Mensagem recebida</div>
+          </div>
+          <div class="exec-time">21/02 09:14:32</div>
+          <div><span class="badge success"><i class="fa-solid fa-circle-check"></i> Sucesso</span></div>
+          <div class="exec-duration">1.24s</div>
+          <div class="exec-data">4 items</div>
+          <div><button class="topbar-btn ghost" style="padding:4px 10px;font-size:11px"><i class="fa-solid fa-eye"></i></button></div>
+        </div>
+        <div class="log-entry" id="log1">
+          <div class="log-line"><span class="log-time">09:14:32.001</span><span class="log-level info">[INFO]</span><span class="log-msg">Trigger ativado — from: +5511999888777</span></div>
+          <div class="log-line"><span class="log-time">09:14:32.143</span><span class="log-level info">[INFO]</span><span class="log-msg">Enviando para OpenAI GPT-4...</span></div>
+          <div class="log-line"><span class="log-time">09:14:33.020</span><span class="log-level ok">[OK]</span><span class="log-msg">Intenção classificada: SUPORTE — confiança 0.92</span></div>
+          <div class="log-line"><span class="log-time">09:14:33.101</span><span class="log-level info">[INFO]</span><span class="log-msg">Atualizando HubSpot contact ID: 18472...</span></div>
+          <div class="log-line"><span class="log-time">09:14:33.240</span><span class="log-level ok">[OK]</span><span class="log-msg">Contato atualizado com sucesso</span></div>
+          <div class="log-line"><span class="log-time">09:14:33.256</span><span class="log-level ok">[OK]</span><span class="log-msg">Resposta enviada via WhatsApp — execução concluída em 1.24s</span></div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="exec-row" onclick="toggleLog('log2')">
+          <div class="exec-id">#4290</div>
+          <div>
+            <div class="exec-workflow">Stripe → HubSpot Sync</div>
+            <div class="exec-sub">Trigger: payment.succeeded</div>
+          </div>
+          <div class="exec-time">21/02 09:10:18</div>
+          <div><span class="badge error"><i class="fa-solid fa-circle-xmark"></i> Erro</span></div>
+          <div class="exec-duration">8.02s</div>
+          <div class="exec-data">1 item</div>
+          <div><button class="topbar-btn ghost" style="padding:4px 10px;font-size:11px"><i class="fa-solid fa-eye"></i></button></div>
+        </div>
+        <div class="log-entry" id="log2">
+          <div class="log-line"><span class="log-time">09:10:18.003</span><span class="log-level info">[INFO]</span><span class="log-msg">Stripe webhook recebido — event: payment.succeeded</span></div>
+          <div class="log-line"><span class="log-time">09:10:18.210</span><span class="log-level info">[INFO]</span><span class="log-msg">Tentando criar deal no HubSpot...</span></div>
+          <div class="log-line"><span class="log-time">09:10:23.115</span><span class="log-level warn">[WARN]</span><span class="log-msg">Timeout na requisição (5000ms) — tentativa 1/3</span></div>
+          <div class="log-line"><span class="log-time">09:10:26.001</span><span class="log-level err">[ERR]</span><span class="log-msg">HubSpot API: 503 Service Unavailable — abortando</span></div>
+          <div class="log-line"><span class="log-time">09:10:26.003</span><span class="log-level err">[ERR]</span><span class="log-msg">Execução falhou após 3 tentativas — dados em fila de reprocessamento</span></div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="exec-row" onclick="toggleLog('log3')">
+          <div class="exec-id">#4289</div>
+          <div>
+            <div class="exec-workflow">Lead Qualifier AI</div>
+            <div class="exec-sub">Trigger: Form submission</div>
+          </div>
+          <div class="exec-time">21/02 09:08:44</div>
+          <div><span class="badge success"><i class="fa-solid fa-circle-check"></i> Sucesso</span></div>
+          <div class="exec-duration">3.44s</div>
+          <div class="exec-data">27 items</div>
+          <div><button class="topbar-btn ghost" style="padding:4px 10px;font-size:11px"><i class="fa-solid fa-eye"></i></button></div>
+        </div>
+        <div class="log-entry" id="log3">
+          <div class="log-line"><span class="log-time">09:08:44.001</span><span class="log-level info">[INFO]</span><span class="log-msg">Recebidos 27 leads do formulário #82</span></div>
+          <div class="log-line"><span class="log-time">09:08:44.500</span><span class="log-level info">[INFO]</span><span class="log-msg">Enviando lote para OpenAI GPT-4 Turbo...</span></div>
+          <div class="log-line"><span class="log-time">09:08:47.100</span><span class="log-level ok">[OK]</span><span class="log-msg">21/27 leads qualificados (score > 70)</span></div>
+          <div class="log-line"><span class="log-time">09:08:47.200</span><span class="log-level info">[INFO]</span><span class="log-msg">Salvando em Google Sheets e HubSpot...</span></div>
+          <div class="log-line"><span class="log-time">09:08:47.440</span><span class="log-level ok">[OK]</span><span class="log-msg">Pipeline concluído em 3.44s — 27 processados, 0 erros</span></div>
+        </div>
+
+        <!-- Row 4 -->
+        <div class="exec-row" onclick="showToast('info','Pendente','Execução aguardando disponibilidade da API')">
+          <div class="exec-id">#4288</div>
+          <div>
+            <div class="exec-workflow">Email Campaign Blast</div>
+            <div class="exec-sub">Trigger: Agendado 08:00</div>
+          </div>
+          <div class="exec-time">21/02 08:00:00</div>
+          <div><span class="badge pending"><i class="fa-solid fa-clock"></i> Pendente</span></div>
+          <div class="exec-duration">—</div>
+          <div class="exec-data">—</div>
+          <div><button class="topbar-btn ghost" style="padding:4px 10px;font-size:11px"><i class="fa-solid fa-eye"></i></button></div>
+        </div>
+
+        <!-- Row 5 -->
+        <div class="exec-row" onclick="toggleLog('log5')">
+          <div class="exec-id">#4287</div>
+          <div>
+            <div class="exec-workflow">Sheets → PostgreSQL ETL</div>
+            <div class="exec-sub">Trigger: A cada 15 min</div>
+          </div>
+          <div class="exec-time">21/02 09:00:00</div>
+          <div><span class="badge success"><i class="fa-solid fa-circle-check"></i> Sucesso</span></div>
+          <div class="exec-duration">4.12s</div>
+          <div class="exec-data">1.240 rows</div>
+          <div><button class="topbar-btn ghost" style="padding:4px 10px;font-size:11px"><i class="fa-solid fa-eye"></i></button></div>
+        </div>
+        <div class="log-entry" id="log5">
+          <div class="log-line"><span class="log-time">09:00:00.001</span><span class="log-level info">[INFO]</span><span class="log-msg">Iniciando ETL — Google Sheets → PostgreSQL</span></div>
+          <div class="log-line"><span class="log-time">09:00:01.200</span><span class="log-level info">[INFO]</span><span class="log-msg">Lendo 1.240 linhas da planilha...</span></div>
+          <div class="log-line"><span class="log-time">09:00:02.800</span><span class="log-level info">[INFO]</span><span class="log-msg">Transformando e validando dados...</span></div>
+          <div class="log-line"><span class="log-time">09:00:04.100</span><span class="log-level ok">[OK]</span><span class="log-msg">1.240 linhas inseridas/atualizadas no PostgreSQL com sucesso</span></div>
+          <div class="log-line"><span class="log-time">09:00:04.120</span><span class="log-level ok">[OK]</span><span class="log-msg">ETL concluído em 4.12s — sem erros</span></div>
+        </div>
+
+        <!-- Row 6 -->
+        <div class="exec-row" onclick="toggleLog('log6')">
+          <div class="exec-id">#4286</div>
+          <div>
+            <div class="exec-workflow">Slack Alerts Monitor</div>
+            <div class="exec-sub">Trigger: Webhook HTTP</div>
+          </div>
+          <div class="exec-time">21/02 08:55:12</div>
+          <div><span class="badge success"><i class="fa-solid fa-circle-check"></i> Sucesso</span></div>
+          <div class="exec-duration">0.34s</div>
+          <div class="exec-data">1 item</div>
+          <div><button class="topbar-btn ghost" style="padding:4px 10px;font-size:11px"><i class="fa-solid fa-eye"></i></button></div>
+        </div>
+        <div class="log-entry" id="log6">
+          <div class="log-line"><span class="log-time">08:55:12.001</span><span class="log-level info">[INFO]</span><span class="log-msg">Webhook recebido de monitor.skymed.com.br</span></div>
+          <div class="log-line"><span class="log-time">08:55:12.200</span><span class="log-level warn">[WARN]</span><span class="log-msg">Alerta: CPU > 85% no servidor de produção</span></div>
+          <div class="log-line"><span class="log-time">08:55:12.310</span><span class="log-level ok">[OK]</span><span class="log-msg">Notificação enviada para #alertas-infra no Slack</span></div>
+          <div class="log-line"><span class="log-time">08:55:12.340</span><span class="log-level ok">[OK]</span><span class="log-msg">Execução concluída em 340ms</span></div>
+        </div>
+
+        <!-- Row 7 -->
+        <div class="exec-row" onclick="toggleLog('log7')">
+          <div class="exec-id">#4285</div>
+          <div>
+            <div class="exec-workflow">WhatsApp → IA → CRM</div>
+            <div class="exec-sub">Trigger: Mensagem recebida</div>
+          </div>
+          <div class="exec-time">21/02 08:52:04</div>
+          <div><span class="badge error"><i class="fa-solid fa-circle-xmark"></i> Erro</span></div>
+          <div class="exec-duration">5.01s</div>
+          <div class="exec-data">2 items</div>
+          <div><button class="topbar-btn ghost" style="padding:4px 10px;font-size:11px"><i class="fa-solid fa-eye"></i></button></div>
+        </div>
+        <div class="log-entry" id="log7">
+          <div class="log-line"><span class="log-time">08:52:04.001</span><span class="log-level info">[INFO]</span><span class="log-msg">Trigger ativado — from: +5521988776655</span></div>
+          <div class="log-line"><span class="log-time">08:52:04.210</span><span class="log-level info">[INFO]</span><span class="log-msg">Enviando para OpenAI...</span></div>
+          <div class="log-line"><span class="log-time">08:52:09.001</span><span class="log-level err">[ERR]</span><span class="log-msg">OpenAI API: RateLimitError — quota excedida</span></div>
+          <div class="log-line"><span class="log-time">08:52:09.010</span><span class="log-level err">[ERR]</span><span class="log-msg">Falha após 1 tentativa — adicionando à fila de retry</span></div>
+        </div>
+
+      </div><!-- /exec-table -->
+
+      <!-- Execution Timeline Card -->
+      <div class="card mt-16">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Timeline: Execução #4291</div>
+            <div class="card-subtitle">WhatsApp → IA → CRM • 1.24s total</div>
+          </div>
+          <span class="badge success"><i class="fa-solid fa-circle-check"></i> Sucesso</span>
+        </div>
+        <div class="exec-timeline">
+          <div class="timeline-node">
+            <div class="timeline-icon success"><i class="fa-brands fa-whatsapp"></i></div>
+            <div class="timeline-label">Trigger<br><span style="color:var(--green);font-family:var(--font-mono);font-size:10px">0ms</span></div>
+          </div>
+          <div class="timeline-line success"></div>
+          <div class="timeline-node">
+            <div class="timeline-icon success"><i class="fa-solid fa-brain"></i></div>
+            <div class="timeline-label">OpenAI<br><span style="color:var(--green);font-family:var(--font-mono);font-size:10px">877ms</span></div>
+          </div>
+          <div class="timeline-line success"></div>
+          <div class="timeline-node">
+            <div class="timeline-icon success"><i class="fa-solid fa-users-rectangle"></i></div>
+            <div class="timeline-label">HubSpot<br><span style="color:var(--green);font-family:var(--font-mono);font-size:10px">139ms</span></div>
+          </div>
+          <div class="timeline-line success"></div>
+          <div class="timeline-node">
+            <div class="timeline-icon success"><i class="fa-solid fa-reply"></i></div>
+            <div class="timeline-label">Responder<br><span style="color:var(--green);font-family:var(--font-mono);font-size:10px">16ms</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /sec-executions -->
+
+    <!-- ======================================================
+         SECTION 5 — CONNECTORS
+    ====================================================== -->
+    <div class="section" id="sec-connectors">
+      <div style="margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div class="section-title">Conectores</div>
+          <div class="section-desc">5 conectores ativos de 8 disponíveis — Clique para configurar</div>
+        </div>
+        <button class="topbar-btn primary" onclick="showToast('info','Buscar','Explore mais de 200 conectores no marketplace')">
+          <i class="fa-solid fa-store"></i> Marketplace
+        </button>
+      </div>
+
+      <div class="exec-filters mb-16">
+        <button class="filter-btn active">Todos (8)</button>
+        <button class="filter-btn" onclick="filterBtns(this)">Conectados (5)</button>
+        <button class="filter-btn" onclick="filterBtns(this)">Disponíveis (3)</button>
+        <button class="filter-btn" onclick="filterBtns(this)">Mensageria</button>
+        <button class="filter-btn" onclick="filterBtns(this)">Dados</button>
+        <button class="filter-btn" onclick="filterBtns(this)">IA</button>
+      </div>
+
+      <div class="connectors-grid">
+
+        <!-- WhatsApp -->
+        <div class="connector-card connected" onclick="openConnectorModal('WhatsApp Business','fa-brands fa-whatsapp','#25D366','Conectado','Receba e envie mensagens via WhatsApp Business API ou Cloud API.')">
+          <div class="connector-status-dot connected"></div>
+          <div class="connector-logo" style="background:rgba(37,211,102,0.12)">
+            <i class="fa-brands fa-whatsapp" style="color:#25D366"></i>
+          </div>
+          <div class="connector-name">WhatsApp Business</div>
+          <div class="connector-desc">Mensageria • Trigger + Ação</div>
+          <div class="connector-tag connected"><i class="fa-solid fa-circle" style="font-size:6px"></i> Conectado</div>
+          <button class="connector-btn connected-btn"><i class="fa-solid fa-gear"></i> Configurar</button>
+        </div>
+
+        <!-- Telegram -->
+        <div class="connector-card connected" onclick="openConnectorModal('Telegram Bot','fa-brands fa-telegram','#0088cc','Conectado','Bot do Telegram para automação de mensagens e notificações.')">
+          <div class="connector-status-dot connected"></div>
+          <div class="connector-logo" style="background:rgba(0,136,204,0.12)">
+            <i class="fa-brands fa-telegram" style="color:#0088cc"></i>
+          </div>
+          <div class="connector-name">Telegram</div>
+          <div class="connector-desc">Mensageria • Trigger + Ação</div>
+          <div class="connector-tag connected"><i class="fa-solid fa-circle" style="font-size:6px"></i> Conectado</div>
+          <button class="connector-btn connected-btn"><i class="fa-solid fa-gear"></i> Configurar</button>
+        </div>
+
+        <!-- Google Sheets -->
+        <div class="connector-card connected" onclick="openConnectorModal('Google Sheets','fa-solid fa-table','#0E9D58','Conectado','Leia, escreva e monitore planilhas do Google em tempo real.')">
+          <div class="connector-status-dot connected"></div>
+          <div class="connector-logo" style="background:rgba(14,157,88,0.12)">
+            <i class="fa-solid fa-table" style="color:#0E9D58"></i>
+          </div>
+          <div class="connector-name">Google Sheets</div>
+          <div class="connector-desc">Dados • Trigger + Ação</div>
+          <div class="connector-tag connected"><i class="fa-solid fa-circle" style="font-size:6px"></i> Conectado</div>
+          <button class="connector-btn connected-btn"><i class="fa-solid fa-gear"></i> Configurar</button>
+        </div>
+
+        <!-- PostgreSQL -->
+        <div class="connector-card connected" onclick="openConnectorModal('PostgreSQL','fa-solid fa-database','#336791','Conectado','Conecte-se ao seu banco de dados PostgreSQL para leitura e escrita.')">
+          <div class="connector-status-dot connected"></div>
+          <div class="connector-logo" style="background:rgba(51,103,145,0.12)">
+            <i class="fa-solid fa-database" style="color:#336791"></i>
+          </div>
+          <div class="connector-name">PostgreSQL</div>
+          <div class="connector-desc">Banco de Dados • Ação</div>
+          <div class="connector-tag connected"><i class="fa-solid fa-circle" style="font-size:6px"></i> Conectado</div>
+          <button class="connector-btn connected-btn"><i class="fa-solid fa-gear"></i> Configurar</button>
+        </div>
+
+        <!-- OpenAI -->
+        <div class="connector-card connected" onclick="openConnectorModal('OpenAI','fa-solid fa-brain','#7C3AED','Conectado','Use GPT-4, DALL-E e Whisper nos seus workflows de automação.')">
+          <div class="connector-status-dot connected"></div>
+          <div class="connector-logo" style="background:rgba(124,58,237,0.12)">
+            <i class="fa-solid fa-brain" style="color:#7C3AED"></i>
+          </div>
+          <div class="connector-name">OpenAI</div>
+          <div class="connector-desc">IA • Ação</div>
+          <div class="connector-tag connected"><i class="fa-solid fa-circle" style="font-size:6px"></i> Conectado</div>
+          <button class="connector-btn connected-btn"><i class="fa-solid fa-gear"></i> Configurar</button>
+        </div>
+
+        <!-- Stripe -->
+        <div class="connector-card" onclick="openConnectorModal('Stripe','fa-brands fa-stripe','#635BFF','Disponível','Processe pagamentos, assinaturas e webhooks do Stripe.')">
+          <div class="connector-status-dot disconnected"></div>
+          <div class="connector-logo" style="background:rgba(99,91,255,0.12)">
+            <i class="fa-brands fa-stripe" style="color:#635BFF"></i>
+          </div>
+          <div class="connector-name">Stripe</div>
+          <div class="connector-desc">Pagamentos • Trigger + Ação</div>
+          <div class="connector-tag disconnected"><i class="fa-solid fa-circle" style="font-size:6px"></i> Não conectado</div>
+          <button class="connector-btn"><i class="fa-solid fa-plug"></i> Conectar</button>
+        </div>
+
+        <!-- HubSpot -->
+        <div class="connector-card" onclick="openConnectorModal('HubSpot CRM','fa-solid fa-users-rectangle','#FF7A00','Disponível','CRM completo: contatos, deals, pipelines e automações de marketing.')">
+          <div class="connector-status-dot disconnected"></div>
+          <div class="connector-logo" style="background:rgba(255,122,0,0.12)">
+            <i class="fa-solid fa-users-rectangle" style="color:#FF7A00"></i>
+          </div>
+          <div class="connector-name">HubSpot CRM</div>
+          <div class="connector-desc">CRM • Trigger + Ação</div>
+          <div class="connector-tag disconnected"><i class="fa-solid fa-circle" style="font-size:6px"></i> Não conectado</div>
+          <button class="connector-btn"><i class="fa-solid fa-plug"></i> Conectar</button>
+        </div>
+
+        <!-- Slack -->
+        <div class="connector-card" onclick="openConnectorModal('Slack','fa-brands fa-slack','#4A154B','Disponível','Envie mensagens, crie canais e automatize fluxos no Slack.')">
+          <div class="connector-status-dot disconnected"></div>
+          <div class="connector-logo" style="background:rgba(74,21,75,0.12)">
+            <i class="fa-brands fa-slack" style="color:#4A154B"></i>
+          </div>
+          <div class="connector-name">Slack</div>
+          <div class="connector-desc">Mensageria • Ação</div>
+          <div class="connector-tag disconnected"><i class="fa-solid fa-circle" style="font-size:6px"></i> Não conectado</div>
+          <button class="connector-btn"><i class="fa-solid fa-plug"></i> Conectar</button>
+        </div>
+
+      </div><!-- /connectors-grid -->
+    </div><!-- /sec-connectors -->
+
+    <!-- ======================================================
+         SECTION 6 — PLANS
+    ====================================================== -->
+    <div class="section" id="sec-plans">
+      <div class="plans-header">
+        <div class="plans-title">Escolha seu <span>Plano</span></div>
+        <div class="plans-subtitle">
+          Automatize seu negócio sem limites. Cancele quando quiser, sem burocracia.
+        </div>
+        <div class="plans-toggle">
+          <span class="toggle-label active">Mensal</span>
+          <label class="toggle" onclick="toggleBilling()">
+            <input type="checkbox" id="billingToggle" />
+            <div class="toggle-slider"></div>
+          </label>
+          <span class="toggle-label" id="annualLabel">Anual <span style="color:var(--green);font-size:11px;font-weight:700">-20%</span></span>
+        </div>
+      </div>
+
+      <div class="plans-grid">
+
+        <!-- Starter -->
+        <div class="plan-card">
+          <div class="plan-name">Starter</div>
+          <div class="plan-price">
+            <span class="plan-currency">R$</span>
+            <span class="plan-amount" id="price-starter">97</span>
+            <span class="plan-period">/mês</span>
+          </div>
+          <div class="plan-desc">Ideal para freelancers e pequenas equipes que estão começando com automação.</div>
+
+          <div class="plan-features">
+            <div class="plan-feature"><i class="fa-solid fa-check"></i> 5 workflows ativos</div>
+            <div class="plan-feature"><i class="fa-solid fa-check"></i> 10.000 execuções/mês</div>
+            <div class="plan-feature"><i class="fa-solid fa-check"></i> 5 conectores</div>
+            <div class="plan-feature"><i class="fa-solid fa-check"></i> Editor Visual</div>
+            <div class="plan-feature"><i class="fa-solid fa-check"></i> Logs por 7 dias</div>
+            <div class="plan-feature"><i class="fa-solid fa-check"></i> Suporte via email</div>
+            <div class="plan-feature missing"><i class="fa-solid fa-xmark"></i> IA integrada</div>
+            <div class="plan-feature missing"><i class="fa-solid fa-xmark"></i> Webhooks avançados</div>
+            <div class="plan-feature missing"><i class="fa-solid fa-xmark"></i> Multi-usuário</div>
+          </div>
+
+          <button class="plan-cta outline" onclick="showToast('info','Starter','Redirecionando para checkout...')">
+            Começar Grátis por 14 dias
+          </button>
+        </div>
+
+        <!-- Pro (featured) -->
+        <div class="plan-card featured">
+          <div class="plan-badge">⚡ Mais Popular</div>
+          <div class="plan-name" style="color:var(--orange)">Pro</div>
+          <div class="plan-price">
+            <span class="plan-currency">R$</span>
+            <span class="plan-amount" id="price-pro">297</span>
+            <span class="plan-period">/mês</span>
+          </div>
+          <div class="plan-desc">Para equipes em crescimento que precisam de poder e confiabilidade sem limites.</div>
+
+          <div class="plan-features">
+            <div class="plan-feature"><i class="fa-solid fa-check"></i> 50 workflows ativos</div>
+            <div class="plan-feature"><i class="fa-solid fa-check"></i> 100.000 execuções/mês</div>
+            <div class="plan-feature"><i class="fa-solid fa-check"></i> 20 conectores</div>
+            <div class="plan-feature"><i class="fa-solid fa-check"></i> Editor Visual avançado</div>
+            <div class="plan-feature"><i class="fa-solid fa-check"></i> IA integrada (GPT-4)</div>
+            <div class="plan-feature"><i class="fa-solid fa-check"></i> Logs por 30 dias</div>
+            <div class="plan-feature"><i class="fa-solid fa-check"></i> Webhooks avançados</div>
+            <div class="plan-feature"><i class="fa-solid fa-check"></i> 5 GB armazenamento</div>
+            <div class="plan-feature missing"><i class="fa-solid fa-xmark"></i> SLA garantido</div>
+          </div>
+
+          <button class="plan-cta filled" onclick="showToast('success','Pro','Você já está no plano Pro! ✨')">
+            Plano Atual ✓
+          </button>
+        </div>
+
+        <!-- Enterprise -->
+        <div class="plan-card">
+          <div class="plan-name">Enterprise</div>
+          <div class="plan-price">
+            <span class="plan-currency">R$</span>
+            <span class="plan-amount" id="price-enterprise">697</span>
+            <span class="plan-period">/mês</span>
+          </div>
+          <div class="plan-desc">Para empresas que precisam de escala infinita, compliance e suporte dedicado.</div>
+
+          <div class="plan-features">
+            <div class="plan-feature"><i class="fa-solid fa-check"></i> Workflows ilimitados</div>
+            <div class="plan-feature"><i class="fa-solid fa-check"></i> Execuções ilimitadas</div>
+            <div class="plan-feature"><i class="fa-solid fa-check"></i> Todos os conectores</div>
+            <div class="plan-feature"><i class="fa-solid fa-check"></i> IA customizada (fine-tune)</div>
+            <div class="plan-feature"><i class="fa-solid fa-check"></i> Logs por 90 dias</div>
+            <div class="plan-feature"><i class="fa-solid fa-check"></i> SLA 99.99% garantido</div>
+            <div class="plan-feature"><i class="fa-solid fa-check"></i> SSO + RBAC</div>
+            <div class="plan-feature"><i class="fa-solid fa-check"></i> Deploy on-premise</div>
+            <div class="plan-feature"><i class="fa-solid fa-check"></i> Suporte dedicado 24/7</div>
+          </div>
+
+          <button class="plan-cta dark" onclick="showToast('info','Enterprise','Nossa equipe entrará em contato em até 24h')">
+            Falar com Vendas
+          </button>
+        </div>
+
+      </div><!-- /plans-grid -->
+
+      <div class="plan-trust">
+        <div class="trust-item">
+          <div class="trust-value">+2.400</div>
+          <div class="trust-label">Empresas ativas</div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-value">98.7%</div>
+          <div class="trust-label">Satisfação</div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-value">99.9%</div>
+          <div class="trust-label">Uptime SLA</div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-value">180M+</div>
+          <div class="trust-label">Execuções / mês</div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-value">14 dias</div>
+          <div class="trust-label">Trial grátis</div>
+        </div>
+      </div>
+
+    </div><!-- /sec-plans -->
+
+  </div><!-- /content -->
+</main>
+
+<!-- ============================================================
+     CONNECTOR MODAL
+============================================================ -->
+<div class="modal-overlay" id="connectorModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+      <div class="connector-logo" id="modalIcon" style="background:rgba(37,211,102,0.12);margin:0;width:52px;height:52px;border-radius:14px;font-size:22px">
+        <i class="fa-brands fa-whatsapp" id="modalIconI"></i>
+      </div>
+      <div>
+        <div style="font-size:18px;font-weight:800;color:var(--text)" id="modalName">WhatsApp Business</div>
+        <div id="modalStatus" style="font-size:12px;color:var(--green);margin-top:2px"><i class="fa-solid fa-circle" style="font-size:7px"></i> Conectado</div>
+      </div>
+    </div>
+    <p id="modalDesc" style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px">
+      Receba e envie mensagens via WhatsApp Business API ou Cloud API.
+    </p>
+
+    <div class="prop-group">
+      <div class="prop-label">API Token</div>
+      <input class="prop-input" type="password" value="••••••••••••••••••••••" />
+    </div>
+    <div class="prop-group">
+      <div class="prop-label">Phone Number ID</div>
+      <input class="prop-input" type="text" placeholder="123456789012345" />
+    </div>
+    <div class="prop-group">
+      <div class="prop-label">Webhook Verify Token</div>
+      <input class="prop-input" type="text" placeholder="meu_token_secreto" />
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button class="topbar-btn ghost" style="flex:1;justify-content:center" onclick="showToast('info','Teste','Testando conexão...');closeModal()">
+        <i class="fa-solid fa-plug"></i> Testar
+      </button>
+      <button class="topbar-btn primary" style="flex:1;justify-content:center" onclick="showToast('success','Salvo','Conector atualizado com sucesso');closeModal()">
+        <i class="fa-solid fa-floppy-disk"></i> Salvar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TOAST CONTAINER
+============================================================ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+<script>
+  // ============================================================
+  // NAVIGATION
+  // ============================================================
+  const sections = {
+    dashboard:  { title: 'Dashboard',         sub: 'Visão geral da automação',      cta: 'Novo Workflow' },
+    workflows:  { title: 'Meus Workflows',    sub: 'Gerencie suas automações',      cta: 'Novo Workflow' },
+    editor:     { title: 'Editor Visual',     sub: 'Edição de nós e conexões',      cta: 'Salvar Workflow' },
+    executions: { title: 'Execuções',         sub: 'Histórico e logs em tempo real',cta: 'Atualizar' },
+    connectors: { title: 'Conectores',        sub: 'Integrações e credenciais',     cta: 'Adicionar Conector' },
+    plans:      { title: 'Planos & Preços',   sub: 'Gerencie sua assinatura',       cta: 'Ver Planos' },
+  };
+
+  let currentSection = 'dashboard';
+
+  function navigate(id, navEl) {
+    // Hide all
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+    // Show target
+    const sec = document.getElementById('sec-' + id);
+    if (sec) sec.classList.add('active');
+    if (navEl) navEl.classList.add('active');
+
+    // Update topbar
+    const meta = sections[id] || { title: id, sub: '', cta: 'Ação' };
+    document.getElementById('topbar-title').textContent = meta.title;
+    document.getElementById('topbar-sub').textContent   = meta.sub;
+    document.getElementById('topbar-cta').innerHTML     = `<i class="fa-solid fa-plus"></i> ${meta.cta}`;
+
+    currentSection = id;
+
+    // Draw SVG connections on editor
+    if (id === 'editor') {
+      setTimeout(drawConnections, 80);
+    }
+  }
+
+  function handleTopCta() {
+    const msgs = {
+      dashboard:  ['success', 'Novo Workflow', 'Abrindo editor visual...'],
+      workflows:  ['success', 'Novo Workflow', 'Criando workflow em branco...'],
+      editor:     ['success', 'Workflow Salvo', 'Todas as alterações foram salvas'],
+      executions: ['info',    'Atualizado',     'Log atualizado com dados mais recentes'],
+      connectors: ['info',    'Conector',       'Abrindo marketplace de conectores...'],
+      plans:      ['info',    'Planos',          'Veja nossos planos e escolha o ideal'],
+    };
+    const [type, title, msg] = msgs[currentSection] || ['info', 'Ação', ''];
+    showToast(type, title, msg);
+  }
+
+  // ============================================================
+  // FILTER BUTTONS (tab style)
+  // ============================================================
+  function filterBtns(btn) {
+    const parent = btn.parentElement;
+    parent.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // ============================================================
+  // TOGGLE WORKFLOW
+  // ============================================================
+  function toggleWorkflow(label) {
+    const chk = label.querySelector('input');
+    const card = label.closest('.workflow-card');
+    const badge = card.querySelector('.badge');
+
+    setTimeout(() => {
+      if (chk.checked) {
+        badge.className = 'badge active';
+        badge.innerHTML = '<i class="fa-solid fa-circle" style="font-size:6px"></i> Ativo';
+        showToast('success', 'Workflow Ativado', 'O workflow foi ativado com sucesso');
+      } else {
+        badge.className = 'badge paused';
+        badge.innerHTML = '<i class="fa-solid fa-pause" style="font-size:8px"></i> Pausado';
+        showToast('info', 'Workflow Pausado', 'O workflow foi pausado');
+      }
+    }, 10);
+  }
+
+  // ============================================================
+  // EDITOR — SELECT NODE
+  // ============================================================
+  function selectNode(id, name, type, colorKey) {
+    document.querySelectorAll('.flow-node').forEach(n => n.classList.remove('selected'));
+    document.getElementById(id).classList.add('selected');
+
+    document.getElementById('propsEmpty').style.display = 'none';
+    document.getElementById('propsContent').style.display = 'block';
+    document.getElementById('propsNodeTitle').textContent = name;
+    document.getElementById('propsNodeType').textContent  = type;
+    document.getElementById('propName').value             = name;
+
+    const iconWrap = document.getElementById('propsNodeIcon');
+    iconWrap.className = `node-icon-wrap ${colorKey}`;
+    iconWrap.style.width = '36px';
+    iconWrap.style.height = '36px';
+
+    const iconMap = {
+      'node1': 'fa-brands fa-whatsapp',
+      'node2': 'fa-solid fa-brain',
+      'node3': 'fa-solid fa-users-rectangle',
+      'node4': 'fa-solid fa-reply',
+      'node5': 'fa-solid fa-code-branch',
+      'node6': 'fa-solid fa-database',
+    };
+    document.getElementById('propsNodeIconI').className = iconMap[id] || 'fa-solid fa-circle-nodes';
+  }
+
+  // ============================================================
+  // EDITOR — DRAW SVG CONNECTIONS
+  // ============================================================
+  function drawConnections() {
+    const svg = document.getElementById('canvasSvg');
+    if (!svg) return;
+
+    // Clear old
+    svg.querySelectorAll('.edge').forEach(e => e.remove());
+
+    const canvas = document.getElementById('editorCanvas');
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+
+    const connections = [
+      { from: 'node1', to: 'node2', color: 'rgba(0,214,143,0.6)',  marker: 'url(#arrow-green)', animated: true },
+      { from: 'node2', to: 'node3', color: 'rgba(124,58,237,0.6)', marker: 'url(#arrow-purple)', animated: true },
+      { from: 'node3', to: 'node4', color: 'rgba(72,52,212,0.6)',  marker: 'url(#arrow-blue)',   animated: true },
+      { from: 'node2', to: 'node5', color: 'rgba(255,71,87,0.5)',  marker: 'url(#arrow)',         animated: false },
+      { from: 'node5', to: 'node6', color: 'rgba(72,52,212,0.5)',  marker: 'url(#arrow-blue)',   animated: false },
+    ];
+
+    connections.forEach(c => {
+      const fromEl = document.getElementById(c.from);
+      const toEl   = document.getElementById(c.to);
+      if (!fromEl || !toEl) return;
+
+      const fromR = fromEl.getBoundingClientRect();
+      const toR   = toEl.getBoundingClientRect();
+
+      const x1 = fromR.right  - rect.left;
+      const y1 = fromR.top + fromR.height / 2 - rect.top;
+      const x2 = toR.left     - rect.left;
+      const y2 = toR.top + toR.height / 2 - rect.top;
+
+      const cx1 = x1 + (x2 - x1) * 0.5;
+      const cx2 = x2 - (x2 - x1) * 0.5;
+
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', `M ${x1} ${y1} C ${cx1} ${y1}, ${cx2} ${y2}, ${x2} ${y2}`);
+      path.setAttribute('stroke', c.color);
+      path.setAttribute('stroke-width', '2.5');
+      path.setAttribute('fill', 'none');
+      path.setAttribute('marker-end', c.marker);
+      if (c.animated) path.classList.add('flow-line');
+      path.classList.add('edge');
+
+      svg.appendChild(path);
+    });
+  }
+
+  // ============================================================
+  // EDITOR — CANVAS TOOL
+  // ============================================================
+  function canvasTool(btn) {
+    document.querySelectorAll('.canvas-tool').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // ============================================================
+  // RUN WORKFLOW ANIMATION
+  // ============================================================
+  function runWorkflow() {
+    const nodes = ['node1','node2','node3','node4'];
+    let i = 0;
+
+    showToast('info', 'Executando', 'Workflow iniciado com dados de teste...');
+
+    nodes.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.remove('selected');
+        el.style.opacity = '0.4';
+      }
+    });
+
+    const interval = setInterval(() => {
+      if (i > 0 && nodes[i-1]) {
+        const prev = document.getElementById(nodes[i-1]);
+        if (prev) prev.style.opacity = '1';
+      }
+      if (i >= nodes.length) {
+        clearInterval(interval);
+        showToast('success', 'Execução concluída', 'Workflow executado em 1.24s com sucesso');
+        nodes.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.opacity = '1';
+        });
+        return;
+      }
+      const el = document.getElementById(nodes[i]);
+      if (el) {
+        el.style.opacity = '1';
+        selectNode(nodes[i], el.querySelector('.node-title').textContent, '', 'green');
+      }
+      i++;
+    }, 600);
+  }
+
+  // ============================================================
+  // TOGGLE LOG
+  // ============================================================
+  function toggleLog(id) {
+    const log = document.getElementById(id);
+    if (!log) return;
+    log.classList.toggle('visible');
+  }
+
+  // ============================================================
+  // CONNECTOR MODAL
+  // ============================================================
+  function openConnectorModal(name, iconClass, color, status, desc) {
+    document.getElementById('modalName').textContent   = name;
+    document.getElementById('modalDesc').textContent   = desc;
+    document.getElementById('modalIconI').className    = iconClass;
+
+    const iconWrap = document.getElementById('modalIcon');
+    iconWrap.style.background = hexToRgba(color, 0.12);
+
+    const iconEl = iconWrap.querySelector('i');
+    iconEl.style.color = color;
+
+    const statusEl = document.getElementById('modalStatus');
+    if (status === 'Conectado') {
+      statusEl.innerHTML = `<i class="fa-solid fa-circle" style="font-size:7px;color:var(--green)"></i> <span style="color:var(--green)">Conectado</span>`;
+    } else {
+      statusEl.innerHTML = `<i class="fa-solid fa-circle" style="font-size:7px;color:var(--muted)"></i> <span style="color:var(--muted)">Não conectado</span>`;
+    }
+
+    document.getElementById('connectorModal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('connectorModal').classList.remove('open');
+  }
+
+  function hexToRgba(hex, alpha) {
+    if (!hex.startsWith('#')) return `rgba(128,128,128,${alpha})`;
+    const r = parseInt(hex.slice(1,3), 16);
+    const g = parseInt(hex.slice(3,5), 16);
+    const b = parseInt(hex.slice(5,7), 16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+
+  document.getElementById('connectorModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // ============================================================
+  // BILLING TOGGLE
+  // ============================================================
+  function toggleBilling() {
+    const tog = document.getElementById('billingToggle');
+    const lbl = document.getElementById('annualLabel');
+    const annual = tog.checked;
+
+    const prices = annual
+      ? { starter: 78, pro: 238, enterprise: 558 }
+      : { starter: 97, pro: 297, enterprise: 697 };
+
+    animateNum('price-starter',    prices.starter);
+    animateNum('price-pro',        prices.pro);
+    animateNum('price-enterprise', prices.enterprise);
+
+    lbl.style.color = annual ? 'var(--text)' : 'var(--muted)';
+    document.querySelector('.plans-toggle .toggle-label').style.color = annual ? 'var(--muted)' : 'var(--text)';
+
+    showToast('info', annual ? 'Plano Anual' : 'Plano Mensal', annual ? '20% de desconto aplicado!' : 'Exibindo preços mensais');
+  }
+
+  function animateNum(id, target) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const start = parseInt(el.textContent) || 0;
+    const duration = 350;
+    const startTime = performance.now();
+
+    function step(now) {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(start + (target - start) * ease);
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  // ============================================================
+  // TOAST
+  // ============================================================
+  const iconMap = {
+    success: 'fa-solid fa-circle-check',
+    error:   'fa-solid fa-circle-xmark',
+    info:    'fa-solid fa-circle-info',
+  };
+
+  function showToast(type, title, msg) {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+      <i class="${iconMap[type] || iconMap.info}"></i>
+      <div>
+        <div class="toast-msg">${title}</div>
+        <div class="toast-sub">${msg}</div>
+      </div>
+    `;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transition = 'opacity 0.3s';
+      setTimeout(() => toast.remove(), 300);
+    }, 3500);
+  }
+
+  // ============================================================
+  // CHART.JS — EXECUTIONS CHART
+  // ============================================================
+  function initChart() {
+    const ctx = document.getElementById('execChart');
+    if (!ctx) return;
+
+    const labels = Array.from({ length: 24 }, (_, i) => {
+      const h = (new Date().getHours() - 23 + i + 24) % 24;
+      return `${String(h).padStart(2,'0')}h`;
+    });
+
+    const success = [42,38,51,44,29,18,12,8,14,28,55,72,88,76,91,84,97,105,112,98,87,93,108,76];
+    const errors  = [2,1,3,2,1,0,1,0,0,2,3,4,2,5,3,2,4,3,2,4,3,2,5,2];
+
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Sucesso',
+            data: success,
+            backgroundColor: 'rgba(0,214,143,0.25)',
+            borderColor: '#00D68F',
+            borderWidth: 1.5,
+            borderRadius: 4,
+            borderSkipped: false,
+          },
+          {
+            label: 'Erros',
+            data: errors,
+            backgroundColor: 'rgba(255,71,87,0.2)',
+            borderColor: '#FF4757',
+            borderWidth: 1.5,
+            borderRadius: 4,
+            borderSkipped: false,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 800, easing: 'easeInOutQuart' },
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#1A1A2E',
+            borderColor: '#252540',
+            borderWidth: 1,
+            titleColor: '#E8E8F0',
+            bodyColor: '#6B6B8A',
+            padding: 12,
+            callbacks: {
+              label: ctx => ` ${ctx.dataset.label}: ${ctx.raw}`
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: 'rgba(255,255,255,0.03)', drawBorder: false },
+            ticks: { color: '#6B6B8A', font: { size: 10, family: 'JetBrains Mono' }, maxTicksLimit: 8 },
+            border: { display: false }
+          },
+          y: {
+            grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
+            ticks: { color: '#6B6B8A', font: { size: 10, family: 'JetBrains Mono' } },
+            border: { display: false }
+          }
+        }
+      }
+    });
+  }
+
+  // ============================================================
+  // REALTIME COUNTER ANIMATION
+  // ============================================================
+  function animateCounters() {
+    const counters = [
+      { el: document.querySelector('.stat-card.orange .stat-value'), target: 12, duration: 800 },
+      { el: document.querySelector('.stat-card.green:first-of-type .stat-value'), target: 1847, duration: 1200 },
+      { el: document.querySelector('.stat-card.red .stat-value'), target: 33, duration: 600 },
+    ];
+
+    counters.forEach(({ el, target, duration }) => {
+      if (!el) return;
+      const start = 0;
+      const startTime = performance.now();
+      function step(now) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 4);
+        const val = Math.round(start + (target - start) * ease);
+        el.textContent = val.toLocaleString('pt-BR');
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }
+
+  // ============================================================
+  // SIMULATE LIVE EXECUTION COUNT
+  // ============================================================
+  let execCount = 1847;
+
+  function simulateLive() {
+    setInterval(() => {
+      if (currentSection === 'dashboard') {
+        const r = Math.random();
+        if (r > 0.3) {
+          execCount += Math.floor(Math.random() * 3) + 1;
+          const el = document.querySelector('.stat-card.green .stat-value');
+          if (el) el.textContent = execCount.toLocaleString('pt-BR');
+        }
+      }
+    }, 4000);
+  }
+
+  // ============================================================
+  // PROGRESS BAR ANIMATION
+  // ============================================================
+  function animateProgressBars() {
+    document.querySelectorAll('.progress-fill').forEach(bar => {
+      const width = bar.style.width;
+      bar.style.width = '0';
+      setTimeout(() => { bar.style.width = width; }, 200);
+    });
+  }
+
+  // ============================================================
+  // INIT
+  // ============================================================
+  document.addEventListener('DOMContentLoaded', () => {
+    initChart();
+    animateCounters();
+    animateProgressBars();
+    simulateLive();
+    setTimeout(drawConnections, 100);
+  });
+
+  // Redraw connections on window resize
+  window.addEventListener('resize', () => {
+    if (currentSection === 'editor') drawConnections();
+  });
+
+  // ============================================================
+  // KEYBOARD SHORTCUTS
+  // ============================================================
+  document.addEventListener('keydown', e => {
+    if (e.ctrlKey || e.metaKey) {
+      if (e.key === 's') {
+        e.preventDefault();
+        showToast('success', 'Salvo', 'Workflow salvo via Ctrl+S');
+      }
+      if (e.key === 'z') {
+        e.preventDefault();
+        showToast('info', 'Desfazer', 'Última ação desfeita');
+      }
+    }
+    if (e.key === 'Escape') {
+      closeModal();
+    }
+  });
+</script>
+
+</body>
+</html>
