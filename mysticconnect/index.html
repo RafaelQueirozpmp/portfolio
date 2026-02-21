@@ -1,0 +1,2750 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MysticConnect — Sua vitrine espiritual</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #D4A0A0;
+      --primary-dark: #C4787A;
+      --gold: #C9A96E;
+      --gold-light: #E8D5B0;
+      --cream1: #F5E6E0;
+      --cream2: #FFF0EB;
+      --cream3: #FFF8F5;
+      --white: #FFFFFF;
+      --text-dark: #3D2B35;
+      --text-gray: #8B7080;
+      --text-light: #B0929D;
+      --shadow: 0 2px 20px rgba(61,43,53,.08);
+      --shadow-md: 0 4px 30px rgba(61,43,53,.12);
+      --shadow-lg: 0 8px 40px rgba(61,43,53,.16);
+      --radius-card: 16px;
+      --radius-btn: 12px;
+      --radius-sm: 8px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text-dark);
+      background: var(--cream3);
+      min-height: 100vh;
+    }
+
+    h1, h2, h3, h4, h5 {
+      font-family: 'Playfair Display', serif;
+      color: var(--text-dark);
+    }
+
+    /* ── TOPNAV ── */
+    .topnav {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255,248,245,.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(212,160,160,.2);
+      padding: 0 24px;
+    }
+
+    .topnav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 64px;
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-right: auto;
+      letter-spacing: -.3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .logo span { color: var(--primary-dark); }
+    .logo-icon { color: var(--gold); font-size: 1.1rem; }
+
+    .nav-btn {
+      font-family: 'Inter', sans-serif;
+      font-size: .8rem;
+      font-weight: 500;
+      padding: 7px 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--text-gray);
+      background: transparent;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+
+    .nav-btn:hover { background: var(--cream1); color: var(--text-dark); }
+    .nav-btn.active { background: var(--primary); color: var(--white); }
+
+    .nav-cta {
+      font-family: 'Inter', sans-serif;
+      font-size: .8rem;
+      font-weight: 600;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: var(--primary-dark);
+      color: var(--white);
+      transition: all .2s;
+      margin-left: 4px;
+    }
+
+    .nav-cta:hover { background: var(--text-dark); }
+
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      color: var(--text-dark);
+      cursor: pointer;
+      margin-left: auto;
+    }
+
+    /* ── SECTIONS ── */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* ──────────────────────────────────────────
+       LANDING
+    ────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, #FFF8F5 0%, #F5E6E0 40%, #FFF0EB 100%);
+      padding: 80px 24px 60px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(212,160,160,.18) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -40px; left: -40px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(201,169,110,.12) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--white);
+      color: var(--gold);
+      font-size: .78rem;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: 100px;
+      border: 1px solid var(--gold-light);
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 16px;
+      max-width: 680px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--primary-dark);
+    }
+
+    .hero-sub {
+      font-size: 1.05rem;
+      color: var(--text-gray);
+      max-width: 480px;
+      margin: 0 auto 36px;
+      line-height: 1.6;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 56px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: var(--primary-dark);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-btn);
+      font-family: 'Inter', sans-serif;
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .25s;
+      box-shadow: 0 4px 16px rgba(196,120,122,.35);
+    }
+
+    .btn-primary:hover {
+      background: var(--text-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(61,43,53,.25);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: var(--white);
+      color: var(--text-dark);
+      border: 1.5px solid var(--primary);
+      border-radius: var(--radius-btn);
+      font-family: 'Inter', sans-serif;
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .25s;
+    }
+
+    .btn-secondary:hover {
+      background: var(--cream1);
+      border-color: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      flex-wrap: wrap;
+    }
+
+    .stat-item { text-align: center; }
+
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      display: block;
+    }
+
+    .stat-label {
+      font-size: .8rem;
+      color: var(--text-gray);
+      margin-top: 2px;
+    }
+
+    /* Featured consultants */
+    .featured {
+      padding: 60px 24px;
+      background: var(--white);
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .section-label {
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 8px;
+    }
+
+    .section-header h2 {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 600;
+    }
+
+    .section-header p {
+      color: var(--text-gray);
+      margin-top: 8px;
+      font-size: .95rem;
+    }
+
+    .cards-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .consultant-card {
+      background: var(--white);
+      border-radius: var(--radius-card);
+      padding: 24px 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(212,160,160,.15);
+      transition: all .25s;
+      cursor: pointer;
+    }
+
+    .consultant-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary);
+    }
+
+    .card-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--cream1), var(--primary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto 12px;
+      position: relative;
+    }
+
+    .badge-online {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 14px;
+      height: 14px;
+      background: #4CAF50;
+      border: 2px solid var(--white);
+      border-radius: 50%;
+    }
+
+    .card-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .card-specialty {
+      font-size: .82rem;
+      color: var(--text-gray);
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .card-location {
+      font-size: .78rem;
+      color: var(--text-light);
+      text-align: center;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .stars {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      color: var(--gold);
+      font-size: .85rem;
+      margin-bottom: 14px;
+    }
+
+    .stars span {
+      font-family: 'Inter', sans-serif;
+      font-size: .78rem;
+      color: var(--text-gray);
+      margin-left: 4px;
+    }
+
+    .plan-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: .72rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 100px;
+    }
+
+    .badge-premium {
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      color: #7A5A20;
+    }
+
+    .badge-destaque {
+      background: var(--cream1);
+      color: var(--primary-dark);
+      border: 1px solid var(--primary);
+    }
+
+    .badge-essencial {
+      background: #f0f0f0;
+      color: var(--text-gray);
+    }
+
+    .card-footer {
+      margin-top: 12px;
+      text-align: center;
+    }
+
+    .btn-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 20px;
+      background: var(--cream2);
+      color: var(--primary-dark);
+      border: 1px solid var(--primary);
+      border-radius: 10px;
+      font-size: .82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-card:hover {
+      background: var(--primary-dark);
+      color: var(--white);
+      border-color: var(--primary-dark);
+    }
+
+    /* Landing how it works */
+    .how-it-works {
+      padding: 64px 24px;
+      background: var(--cream3);
+    }
+
+    .steps-grid {
+      max-width: 900px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+
+    .step {
+      text-align: center;
+      padding: 28px 20px;
+      background: var(--white);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(212,160,160,.12);
+    }
+
+    .step-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--cream1), #FFF0EB);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      color: var(--primary-dark);
+      margin: 0 auto 16px;
+    }
+
+    .step h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .step p {
+      font-size: .85rem;
+      color: var(--text-gray);
+      line-height: 1.6;
+    }
+
+    /* CTA strip */
+    .cta-strip {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      padding: 56px 24px;
+      text-align: center;
+    }
+
+    .cta-strip h2 {
+      color: var(--white);
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      margin-bottom: 12px;
+    }
+
+    .cta-strip p {
+      color: rgba(255,255,255,.85);
+      margin-bottom: 28px;
+      font-size: .95rem;
+    }
+
+    .btn-white {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: var(--white);
+      color: var(--primary-dark);
+      border: none;
+      border-radius: var(--radius-btn);
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .25s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-white:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.15); }
+
+    /* ──────────────────────────────────────────
+       EXPLORAR
+    ────────────────────────────────────────── */
+    .explorar-header {
+      background: linear-gradient(135deg, #FFF8F5 0%, #F5E6E0 100%);
+      padding: 40px 24px;
+    }
+
+    .explorar-header h1 {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      margin-bottom: 4px;
+    }
+
+    .explorar-header p { color: var(--text-gray); font-size: .9rem; }
+
+    .search-bar {
+      max-width: 1200px;
+      margin: 24px auto 0;
+      display: flex;
+      gap: 0;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+
+    .search-bar input {
+      flex: 1;
+      padding: 16px 20px;
+      border: 1.5px solid rgba(212,160,160,.3);
+      border-right: none;
+      border-radius: 14px 0 0 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: .95rem;
+      color: var(--text-dark);
+      background: var(--white);
+      outline: none;
+    }
+
+    .search-bar input:focus { border-color: var(--primary); }
+
+    .search-bar input::placeholder { color: var(--text-light); }
+
+    .search-bar button {
+      padding: 16px 24px;
+      background: var(--primary-dark);
+      color: var(--white);
+      border: none;
+      border-radius: 0 14px 14px 0;
+      font-family: 'Inter', sans-serif;
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .search-bar button:hover { background: var(--text-dark); }
+
+    .explorar-body {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 28px;
+    }
+
+    .filters-panel {
+      background: var(--white);
+      border-radius: var(--radius-card);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(212,160,160,.15);
+      height: fit-content;
+    }
+
+    .filter-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filter-group { margin-bottom: 20px; }
+
+    .filter-group label {
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--text-gray);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .chip {
+      padding: 5px 12px;
+      border: 1.5px solid rgba(212,160,160,.35);
+      border-radius: 100px;
+      font-size: .78rem;
+      font-weight: 500;
+      color: var(--text-gray);
+      cursor: pointer;
+      transition: all .2s;
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .chip:hover, .chip.active {
+      background: var(--primary);
+      color: var(--white);
+      border-color: var(--primary);
+    }
+
+    .filter-select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid rgba(212,160,160,.35);
+      border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif;
+      font-size: .85rem;
+      color: var(--text-dark);
+      background: var(--white);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .filter-select:focus { border-color: var(--primary); }
+
+    .range-slider {
+      width: 100%;
+      accent-color: var(--primary-dark);
+    }
+
+    .results-area { }
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .results-count {
+      font-size: .9rem;
+      color: var(--text-gray);
+    }
+
+    .results-count strong { color: var(--text-dark); }
+
+    .sort-select {
+      padding: 8px 14px;
+      border: 1.5px solid rgba(212,160,160,.35);
+      border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif;
+      font-size: .85rem;
+      color: var(--text-dark);
+      background: var(--white);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .explorar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 16px;
+    }
+
+    /* ──────────────────────────────────────────
+       PERFIL
+    ────────────────────────────────────────── */
+    .perfil-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    .perfil-hero {
+      background: linear-gradient(135deg, var(--cream1) 0%, var(--cream2) 100%);
+      border-radius: 20px;
+      padding: 36px;
+      display: flex;
+      gap: 28px;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      border: 1px solid rgba(212,160,160,.2);
+    }
+
+    .perfil-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      flex-shrink: 0;
+      border: 4px solid var(--white);
+      box-shadow: var(--shadow-md);
+      position: relative;
+    }
+
+    .perfil-info { flex: 1; }
+
+    .perfil-info h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .perfil-specialty {
+      font-size: 1rem;
+      color: var(--primary-dark);
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .perfil-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: .85rem;
+      color: var(--text-gray);
+    }
+
+    .meta-item i { color: var(--gold); }
+
+    .perfil-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .tag {
+      padding: 4px 12px;
+      background: var(--white);
+      border: 1px solid rgba(212,160,160,.4);
+      border-radius: 100px;
+      font-size: .78rem;
+      color: var(--text-dark);
+      font-weight: 500;
+    }
+
+    .perfil-btns {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-whatsapp {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 24px;
+      background: #25D366;
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-btn);
+      font-family: 'Inter', sans-serif;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .25s;
+      box-shadow: 0 4px 14px rgba(37,211,102,.3);
+    }
+
+    .btn-whatsapp:hover { background: #1ebe5c; transform: translateY(-1px); }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 24px;
+      background: transparent;
+      color: var(--primary-dark);
+      border: 1.5px solid var(--primary);
+      border-radius: var(--radius-btn);
+      font-family: 'Inter', sans-serif;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .25s;
+    }
+
+    .btn-outline:hover { background: var(--cream1); }
+
+    .perfil-body {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 24px;
+    }
+
+    .perfil-main > * { margin-bottom: 20px; }
+
+    .card-section {
+      background: var(--white);
+      border-radius: var(--radius-card);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(212,160,160,.12);
+    }
+
+    .card-section h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-section h3 i { color: var(--gold); }
+
+    .bio-text {
+      font-size: .9rem;
+      color: var(--text-gray);
+      line-height: 1.75;
+    }
+
+    /* Gallery */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .gallery-item {
+      aspect-ratio: 1;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--cream1), var(--cream2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      cursor: pointer;
+      transition: all .2s;
+      border: 1px solid rgba(212,160,160,.2);
+    }
+
+    .gallery-item:hover { transform: scale(1.03); box-shadow: var(--shadow); }
+
+    /* Reviews */
+    .review-item {
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(212,160,160,.15);
+    }
+
+    .review-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+    .review-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .reviewer-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--cream1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+
+    .reviewer-info .name {
+      font-size: .88rem;
+      font-weight: 600;
+    }
+
+    .reviewer-info .date {
+      font-size: .75rem;
+      color: var(--text-light);
+    }
+
+    .review-stars { color: var(--gold); font-size: .8rem; margin-bottom: 4px; }
+
+    .review-text {
+      font-size: .85rem;
+      color: var(--text-gray);
+      line-height: 1.6;
+    }
+
+    /* Sidebar card */
+    .perfil-sidebar > * { margin-bottom: 16px; }
+
+    .plan-card {
+      background: linear-gradient(135deg, var(--gold-light) 0%, #F5DDB0 100%);
+      border-radius: var(--radius-card);
+      padding: 20px;
+      border: 1px solid var(--gold-light);
+    }
+
+    .plan-card h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .plan-name {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: .85rem;
+      color: #7A5A20;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    /* ──────────────────────────────────────────
+       DASHBOARD
+    ────────────────────────────────────────── */
+    .dashboard-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    .dashboard-header {
+      background: linear-gradient(135deg, var(--cream1) 0%, var(--cream2) 100%);
+      border-radius: 20px;
+      padding: 28px 32px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid rgba(212,160,160,.2);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .dashboard-welcome h2 { font-size: 1.4rem; margin-bottom: 4px; }
+    .dashboard-welcome p { font-size: .85rem; color: var(--text-gray); }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .metric-card {
+      background: var(--white);
+      border-radius: var(--radius-card);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(212,160,160,.12);
+    }
+
+    .metric-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+    }
+
+    .metric-icon.pink { background: rgba(212,160,160,.15); color: var(--primary-dark); }
+    .metric-icon.gold { background: rgba(201,169,110,.15); color: var(--gold); }
+    .metric-icon.green { background: rgba(76,175,80,.12); color: #4CAF50; }
+    .metric-icon.rose { background: rgba(196,120,122,.15); color: var(--primary-dark); }
+
+    .metric-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .metric-label {
+      font-size: .78rem;
+      color: var(--text-gray);
+      margin-top: 2px;
+    }
+
+    .metric-delta {
+      font-size: .75rem;
+      color: #4CAF50;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+
+    .chart-card {
+      background: var(--white);
+      border-radius: var(--radius-card);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(212,160,160,.12);
+    }
+
+    .chart-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chart-card h3 i { color: var(--gold); }
+
+    .plan-status-card {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      border-radius: var(--radius-card);
+      padding: 24px;
+      color: var(--white);
+    }
+
+    .plan-status-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+
+    .plan-status-name {
+      font-size: 1.5rem;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .plan-feature {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .85rem;
+      color: rgba(255,255,255,.9);
+      margin-bottom: 8px;
+    }
+
+    .plan-feature i { color: var(--gold-light); font-size: .75rem; }
+
+    .btn-upgrade {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 20px;
+      background: var(--white);
+      color: var(--primary-dark);
+      border: none;
+      border-radius: var(--radius-btn);
+      font-family: 'Inter', sans-serif;
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 16px;
+      transition: all .2s;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .btn-upgrade:hover { background: var(--cream2); }
+
+    .reviews-list .review-item { padding: 12px 0; }
+
+    /* ──────────────────────────────────────────
+       PREÇOS
+    ────────────────────────────────────────── */
+    .precos-section {
+      background: var(--cream3);
+      padding: 60px 24px;
+    }
+
+    .precos-section .section-header { margin-bottom: 48px; }
+
+    .pricing-grid {
+      max-width: 960px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .pricing-card {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 32px 28px;
+      box-shadow: var(--shadow);
+      border: 1.5px solid rgba(212,160,160,.15);
+      transition: all .25s;
+      position: relative;
+      overflow: visible;
+    }
+
+    .pricing-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .pricing-card.popular {
+      border-color: var(--primary);
+      box-shadow: 0 8px 40px rgba(196,120,122,.18);
+      transform: scale(1.03);
+    }
+
+    .pricing-card.popular:hover { transform: scale(1.03) translateY(-4px); }
+
+    .popular-badge {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: var(--white);
+      font-size: .75rem;
+      font-weight: 700;
+      padding: 5px 18px;
+      border-radius: 100px;
+      white-space: nowrap;
+      box-shadow: 0 3px 10px rgba(196,120,122,.35);
+    }
+
+    .plan-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: 16px;
+    }
+
+    .plan-icon.essencial { background: #f0f0f0; color: var(--text-gray); }
+    .plan-icon.destaque { background: rgba(212,160,160,.15); color: var(--primary-dark); }
+    .plan-icon.premium { background: rgba(201,169,110,.15); color: var(--gold); }
+
+    .plan-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .plan-subtitle { font-size: .82rem; color: var(--text-gray); margin-bottom: 20px; }
+
+    .price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 2px;
+      margin-bottom: 24px;
+    }
+
+    .price-currency { font-size: .95rem; color: var(--text-dark); font-weight: 600; margin-right: 2px; }
+
+    .price-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      line-height: 1;
+    }
+
+    .price-period { font-size: .82rem; color: var(--text-gray); margin-left: 2px; }
+
+    .pricing-features { margin-bottom: 28px; }
+
+    .pricing-feature {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: .87rem;
+      color: var(--text-gray);
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(212,160,160,.1);
+    }
+
+    .pricing-feature:last-child { border-bottom: none; }
+
+    .pricing-feature i {
+      color: #4CAF50;
+      font-size: .8rem;
+      margin-top: 3px;
+      flex-shrink: 0;
+    }
+
+    .pricing-feature i.fa-times { color: #ccc; }
+
+    .btn-plan {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 13px;
+      border-radius: var(--radius-btn);
+      font-family: 'Inter', sans-serif;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .25s;
+      width: 100%;
+      border: none;
+    }
+
+    .btn-plan.essencial {
+      background: var(--cream2);
+      color: var(--text-dark);
+      border: 1.5px solid rgba(212,160,160,.35);
+    }
+
+    .btn-plan.essencial:hover { background: var(--cream1); }
+
+    .btn-plan.destaque {
+      background: var(--primary-dark);
+      color: var(--white);
+      box-shadow: 0 4px 14px rgba(196,120,122,.35);
+    }
+
+    .btn-plan.destaque:hover { background: var(--text-dark); }
+
+    .btn-plan.premium {
+      background: linear-gradient(135deg, var(--gold), #B8924A);
+      color: var(--white);
+      box-shadow: 0 4px 14px rgba(201,169,110,.35);
+    }
+
+    .btn-plan.premium:hover { opacity: .9; }
+
+    /* Precos FAQ */
+    .precos-faq {
+      max-width: 700px;
+      margin: 48px auto 0;
+      background: var(--white);
+      border-radius: var(--radius-card);
+      padding: 32px;
+      box-shadow: var(--shadow);
+    }
+
+    .precos-faq h3 {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+    }
+
+    .faq-item { padding: 14px 0; border-bottom: 1px solid rgba(212,160,160,.15); }
+    .faq-item:last-child { border-bottom: none; }
+
+    .faq-q {
+      font-size: .9rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .faq-q i { color: var(--gold); font-size: .8rem; }
+
+    .faq-a {
+      font-size: .85rem;
+      color: var(--text-gray);
+      line-height: 1.65;
+    }
+
+    /* ──────────────────────────────────────────
+       ADMIN
+    ────────────────────────────────────────── */
+    .admin-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    .admin-header {
+      background: linear-gradient(135deg, var(--text-dark) 0%, #5a3e4a 100%);
+      border-radius: 20px;
+      padding: 28px 32px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .admin-header h2 { color: var(--white); font-size: 1.4rem; }
+    .admin-header p { color: rgba(255,255,255,.7); font-size: .85rem; }
+
+    .admin-badge {
+      background: rgba(255,255,255,.12);
+      color: var(--white);
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: .78rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .admin-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .admin-metric {
+      background: var(--white);
+      border-radius: var(--radius-card);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(212,160,160,.12);
+    }
+
+    .admin-metric .label {
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--text-gray);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .admin-metric .label i { color: var(--gold); }
+
+    .admin-metric .value {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .admin-metric .sub {
+      font-size: .75rem;
+      color: var(--text-light);
+      margin-top: 4px;
+    }
+
+    /* Table */
+    .table-card {
+      background: var(--white);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(212,160,160,.12);
+      overflow: hidden;
+    }
+
+    .table-header {
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(212,160,160,.15);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .table-header h3 {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .table-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1.5px solid rgba(212,160,160,.3);
+      border-radius: 8px;
+      padding: 8px 12px;
+      background: var(--cream3);
+    }
+
+    .table-search input {
+      border: none;
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+      font-size: .85rem;
+      color: var(--text-dark);
+      outline: none;
+      width: 180px;
+    }
+
+    .table-search i { color: var(--text-light); font-size: .85rem; }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    th {
+      background: var(--cream3);
+      padding: 12px 20px;
+      text-align: left;
+      font-size: .75rem;
+      font-weight: 700;
+      color: var(--text-gray);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      border-bottom: 1px solid rgba(212,160,160,.15);
+    }
+
+    td {
+      padding: 14px 20px;
+      font-size: .87rem;
+      color: var(--text-dark);
+      border-bottom: 1px solid rgba(212,160,160,.08);
+      vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    tr:hover td { background: var(--cream3); }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: .75rem;
+      font-weight: 600;
+    }
+
+    .status-ativo { background: rgba(76,175,80,.12); color: #388E3C; }
+    .status-pendente { background: rgba(255,193,7,.15); color: #B8860B; }
+    .status-inativo { background: rgba(176,146,157,.15); color: var(--text-gray); }
+
+    .actions-cell {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      cursor: pointer;
+      font-size: .8rem;
+      transition: all .2s;
+    }
+
+    .action-btn.edit { background: rgba(212,160,160,.15); color: var(--primary-dark); }
+    .action-btn.edit:hover { background: var(--primary); color: var(--white); }
+    .action-btn.view { background: rgba(201,169,110,.12); color: var(--gold); }
+    .action-btn.view:hover { background: var(--gold); color: var(--white); }
+    .action-btn.block { background: rgba(176,146,157,.12); color: var(--text-gray); }
+    .action-btn.block:hover { background: #e57373; color: var(--white); }
+
+    /* ── FOOTER ── */
+    .footer {
+      background: var(--text-dark);
+      color: rgba(255,255,255,.7);
+      padding: 32px 24px 20px;
+      margin-top: 60px;
+    }
+
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      color: var(--white);
+      font-weight: 700;
+    }
+
+    .footer-logo span { color: var(--primary); }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .footer-links a {
+      font-size: .82rem;
+      color: rgba(255,255,255,.6);
+      text-decoration: none;
+      transition: color .2s;
+    }
+
+    .footer-links a:hover { color: var(--primary); }
+
+    .footer-copy {
+      width: 100%;
+      text-align: center;
+      font-size: .78rem;
+      color: rgba(255,255,255,.4);
+      margin-top: 20px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding-top: 16px;
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      .nav-btn { display: none; }
+      .hamburger { display: block; }
+      .mobile-menu {
+        display: flex;
+        flex-direction: column;
+        padding: 12px 24px 16px;
+        background: var(--cream3);
+        border-bottom: 1px solid rgba(212,160,160,.2);
+        gap: 4px;
+      }
+      .mobile-menu .nav-btn { display: block; text-align: left; }
+      .mobile-menu { display: none; }
+      .mobile-menu.open { display: flex; }
+      .nav-cta { display: none; }
+
+      .hero { padding: 50px 20px 40px; }
+
+      .hero-stats { gap: 24px; }
+
+      .cards-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .explorar-body { grid-template-columns: 1fr; }
+      .filters-panel { display: none; }
+      .perfil-hero { flex-direction: column; align-items: center; text-align: center; }
+      .perfil-body { grid-template-columns: 1fr; }
+      .perfil-btns { justify-content: center; }
+      .perfil-meta { justify-content: center; }
+      .metrics-grid { grid-template-columns: 1fr 1fr; }
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .pricing-card.popular { transform: none; }
+      .pricing-card.popular:hover { transform: translateY(-4px); }
+      .admin-metrics { grid-template-columns: 1fr 1fr; }
+      .steps-grid { grid-template-columns: 1fr; }
+      .search-bar { flex-direction: column; border-radius: var(--radius-card); }
+      .search-bar input { border-radius: 14px 14px 0 0; border-right: 1.5px solid rgba(212,160,160,.3); border-bottom: none; }
+      .search-bar button { border-radius: 0 0 14px 14px; justify-content: center; }
+      table { font-size: .82rem; }
+      th, td { padding: 10px 12px; }
+      .gallery-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      .cards-grid { grid-template-columns: 1fr; }
+      .metrics-grid { grid-template-columns: 1fr 1fr; }
+      .admin-metrics { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════ TOPNAV ═══════════════════════════ -->
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a class="logo" onclick="showSection('landing')">
+      <i class="fa-solid fa-moon logo-icon"></i>
+      Mystic<span>Connect</span>
+    </a>
+    <button class="nav-btn active" onclick="showSection('landing')" id="btn-landing">Landing</button>
+    <button class="nav-btn" onclick="showSection('explorar')" id="btn-explorar">Explorar</button>
+    <button class="nav-btn" onclick="showSection('perfil')" id="btn-perfil">Perfil</button>
+    <button class="nav-btn" onclick="showSection('dashboard')" id="btn-dashboard">Dashboard</button>
+    <button class="nav-btn" onclick="showSection('precos')" id="btn-precos">Preços</button>
+    <button class="nav-btn" onclick="showSection('admin')" id="btn-admin">Admin</button>
+    <button class="nav-cta" onclick="showSection('precos')"><i class="fa-solid fa-star"></i> Seja consultor(a)</button>
+    <button class="hamburger" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <button class="nav-btn" onclick="showSection('landing');toggleMenu()">🏠 Landing</button>
+    <button class="nav-btn" onclick="showSection('explorar');toggleMenu()">🔍 Explorar</button>
+    <button class="nav-btn" onclick="showSection('perfil');toggleMenu()">👤 Perfil</button>
+    <button class="nav-btn" onclick="showSection('dashboard');toggleMenu()">📊 Dashboard</button>
+    <button class="nav-btn" onclick="showSection('precos');toggleMenu()">💳 Preços</button>
+    <button class="nav-btn" onclick="showSection('admin');toggleMenu()">⚙️ Admin</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════ LANDING ═══════════════════════════ -->
+<section class="section active" id="section-landing">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">
+      <i class="fa-solid fa-sparkles"></i> Plataforma verificada de consultores espirituais
+    </div>
+    <h1>Encontre seu <em>guia espiritual</em></h1>
+    <p class="hero-sub">Descubra tarôlogos, astrólogos e oraculistas verificados prontos para te orientar com sensibilidade e profissionalismo.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="showSection('explorar')">
+        <i class="fa-solid fa-compass"></i> Explorar consultores
+      </button>
+      <button class="btn-secondary" onclick="showSection('precos')">
+        <i class="fa-solid fa-star"></i> Sou consultor(a)
+      </button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-num">3.2K</span>
+        <span class="stat-label">Consultores ativos</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">45K</span>
+        <span class="stat-label">Consultas realizadas</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">4.9 ★</span>
+        <span class="stat-label">Avaliação média</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURED CONSULTANTS -->
+  <div class="featured">
+    <div class="section-header">
+      <div class="section-label"><i class="fa-solid fa-fire-flame-curved"></i> Em destaque</div>
+      <h2>Consultores verificados</h2>
+      <p>Profissionais avaliados pela nossa comunidade</p>
+    </div>
+    <div class="cards-grid">
+
+      <div class="consultant-card" onclick="showSection('perfil')">
+        <div class="card-avatar">🌙
+          <span class="badge-online"></span>
+        </div>
+        <div class="card-name">Ana Beatriz Luz</div>
+        <div class="card-specialty">Tarô Terapêutico</div>
+        <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><span>5.0 (148)</span></div>
+        <div class="card-location"><i class="fa-solid fa-location-dot"></i> São Paulo, SP</div>
+        <div style="text-align:center;margin-bottom:10px"><span class="plan-badge badge-premium"><i class="fa-solid fa-crown"></i> Premium</span></div>
+        <div class="card-footer">
+          <button class="btn-card" onclick="event.stopPropagation();showSection('perfil')"><i class="fa-solid fa-eye"></i> Ver perfil</button>
+        </div>
+      </div>
+
+      <div class="consultant-card" onclick="showSection('perfil')">
+        <div class="card-avatar">⭐
+          <span class="badge-online"></span>
+        </div>
+        <div class="card-name">Carla Mendonça</div>
+        <div class="card-specialty">Astrologia Evolutiva</div>
+        <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i><span>4.9 (203)</span></div>
+        <div class="card-location"><i class="fa-solid fa-location-dot"></i> Rio de Janeiro, RJ</div>
+        <div style="text-align:center;margin-bottom:10px"><span class="plan-badge badge-destaque"><i class="fa-solid fa-medal"></i> Destaque</span></div>
+        <div class="card-footer">
+          <button class="btn-card"><i class="fa-solid fa-eye"></i> Ver perfil</button>
+        </div>
+      </div>
+
+      <div class="consultant-card" onclick="showSection('perfil')">
+        <div class="card-avatar">🌸</div>
+        <div class="card-name">Renata Oliveira</div>
+        <div class="card-specialty">Numerologia &amp; Runas</div>
+        <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><span>4.8 (97)</span></div>
+        <div class="card-location"><i class="fa-solid fa-location-dot"></i> Belo Horizonte, MG</div>
+        <div style="text-align:center;margin-bottom:10px"><span class="plan-badge badge-premium"><i class="fa-solid fa-crown"></i> Premium</span></div>
+        <div class="card-footer">
+          <button class="btn-card"><i class="fa-solid fa-eye"></i> Ver perfil</button>
+        </div>
+      </div>
+
+      <div class="consultant-card" onclick="showSection('perfil')">
+        <div class="card-avatar">🔮
+          <span class="badge-online"></span>
+        </div>
+        <div class="card-name">Luciana Ferreira</div>
+        <div class="card-specialty">Mediunidade &amp; Oráculos</div>
+        <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i><span>4.7 (61)</span></div>
+        <div class="card-location"><i class="fa-solid fa-location-dot"></i> Curitiba, PR</div>
+        <div style="text-align:center;margin-bottom:10px"><span class="plan-badge badge-destaque"><i class="fa-solid fa-medal"></i> Destaque</span></div>
+        <div class="card-footer">
+          <button class="btn-card"><i class="fa-solid fa-eye"></i> Ver perfil</button>
+        </div>
+      </div>
+
+    </div>
+    <div style="text-align:center;margin-top:32px">
+      <button class="btn-secondary" onclick="showSection('explorar')">
+        <i class="fa-solid fa-grid-2"></i> Ver todos os consultores
+      </button>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="how-it-works">
+    <div class="section-header">
+      <div class="section-label"><i class="fa-solid fa-wand-magic-sparkles"></i> Como funciona</div>
+      <h2>Simples e gratuito para quem busca</h2>
+    </div>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+        <h3>Explore os perfis</h3>
+        <p>Navegue gratuitamente pela vitrine de consultores verificados e filtre por especialidade, cidade ou avaliação.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon"><i class="fa-solid fa-heart"></i></div>
+        <h3>Escolha o seu guia</h3>
+        <p>Leia as avaliações, conheça a bio e a especialidade de cada profissional com calma e sem pressão.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon"><i class="fa-brands fa-whatsapp"></i></div>
+        <h3>Entre em contato</h3>
+        <p>Clique em "Contatar via WhatsApp" e negocie diretamente com o consultor. Sem intermediários.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA STRIP -->
+  <div class="cta-strip">
+    <h2>Você é consultora(o) espiritual?</h2>
+    <p>Crie sua vitrine digital e alcance novos clientes todos os dias. Planos a partir de R$20/mês.</p>
+    <button class="btn-white" onclick="showSection('precos')">
+      <i class="fa-solid fa-rocket"></i> Ver planos e assinar
+    </button>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">Mystic<span>Connect</span></div>
+      <div class="footer-links">
+        <a href="#">Termos de Uso</a>
+        <a href="#">Privacidade</a>
+        <a href="#">Contato</a>
+        <a href="#">Para consultores</a>
+      </div>
+    </div>
+    <div class="footer-inner footer-copy">
+      © 2025 MysticConnect · Sua vitrine espiritual · Todos os direitos reservados
+    </div>
+  </footer>
+
+</section>
+
+<!-- ═══════════════════════════ EXPLORAR ═══════════════════════════ -->
+<section class="section" id="section-explorar">
+
+  <div class="explorar-header">
+    <div style="max-width:1200px;margin:0 auto">
+      <h1>Explorar consultores</h1>
+      <p>Encontre o profissional ideal para sua jornada espiritual</p>
+    </div>
+    <div class="search-bar" style="max-width:1200px;margin:24px auto 0">
+      <input type="text" placeholder="Buscar por nome, especialidade, cidade..." />
+      <button><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
+    </div>
+  </div>
+
+  <div class="explorar-body">
+
+    <!-- Filters -->
+    <aside class="filters-panel">
+      <div class="filter-title"><i class="fa-solid fa-sliders" style="color:var(--gold)"></i> Filtros</div>
+
+      <div class="filter-group">
+        <label>Especialidade</label>
+        <div class="filter-chips">
+          <button class="chip active">Todas</button>
+          <button class="chip">Tarô</button>
+          <button class="chip">Astrologia</button>
+          <button class="chip">Numerologia</button>
+          <button class="chip">Mediunidade</button>
+          <button class="chip">Runas</button>
+          <button class="chip">Quiromancia</button>
+          <button class="chip">Terapias Holísticas</button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label>Estado</label>
+        <select class="filter-select">
+          <option>Todos os estados</option>
+          <option>São Paulo</option>
+          <option>Rio de Janeiro</option>
+          <option>Minas Gerais</option>
+          <option>Paraná</option>
+          <option>Santa Catarina</option>
+          <option>Bahia</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Avaliação mínima</label>
+        <div class="filter-chips">
+          <button class="chip">Qualquer</button>
+          <button class="chip active">4.0+</button>
+          <button class="chip">4.5+</button>
+          <button class="chip">5.0</button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label>Plano</label>
+        <div class="filter-chips">
+          <button class="chip active">Todos</button>
+          <button class="chip">Destaque</button>
+          <button class="chip">Premium</button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label>Disponibilidade</label>
+        <div class="filter-chips">
+          <button class="chip">Todos</button>
+          <button class="chip active">Online agora</button>
+        </div>
+      </div>
+
+      <button class="btn-primary" style="width:100%;justify-content:center;margin-top:8px;font-size:.85rem;padding:11px">
+        <i class="fa-solid fa-check"></i> Aplicar filtros
+      </button>
+    </aside>
+
+    <!-- Results -->
+    <div class="results-area">
+      <div class="results-header">
+        <div class="results-count">Mostrando <strong>28</strong> consultores</div>
+        <select class="sort-select">
+          <option>Mais relevantes</option>
+          <option>Melhor avaliados</option>
+          <option>Mais recentes</option>
+          <option>Plano Premium primeiro</option>
+        </select>
+      </div>
+
+      <div class="explorar-grid">
+
+        <div class="consultant-card" onclick="showSection('perfil')">
+          <div class="card-avatar">🌙<span class="badge-online"></span></div>
+          <div class="card-name">Ana Beatriz Luz</div>
+          <div class="card-specialty">Tarô Terapêutico</div>
+          <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><span>5.0</span></div>
+          <div class="card-location"><i class="fa-solid fa-location-dot"></i> São Paulo, SP</div>
+          <div style="text-align:center;margin-bottom:10px"><span class="plan-badge badge-premium"><i class="fa-solid fa-crown"></i> Premium</span></div>
+          <div class="card-footer"><button class="btn-card"><i class="fa-solid fa-eye"></i> Ver perfil</button></div>
+        </div>
+
+        <div class="consultant-card" onclick="showSection('perfil')">
+          <div class="card-avatar">⭐<span class="badge-online"></span></div>
+          <div class="card-name">Carla Mendonça</div>
+          <div class="card-specialty">Astrologia Evolutiva</div>
+          <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i><span>4.9</span></div>
+          <div class="card-location"><i class="fa-solid fa-location-dot"></i> Rio de Janeiro, RJ</div>
+          <div style="text-align:center;margin-bottom:10px"><span class="plan-badge badge-destaque"><i class="fa-solid fa-medal"></i> Destaque</span></div>
+          <div class="card-footer"><button class="btn-card"><i class="fa-solid fa-eye"></i> Ver perfil</button></div>
+        </div>
+
+        <div class="consultant-card" onclick="showSection('perfil')">
+          <div class="card-avatar">🌸</div>
+          <div class="card-name">Renata Oliveira</div>
+          <div class="card-specialty">Numerologia &amp; Runas</div>
+          <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><span>4.8</span></div>
+          <div class="card-location"><i class="fa-solid fa-location-dot"></i> Belo Horizonte, MG</div>
+          <div style="text-align:center;margin-bottom:10px"><span class="plan-badge badge-premium"><i class="fa-solid fa-crown"></i> Premium</span></div>
+          <div class="card-footer"><button class="btn-card"><i class="fa-solid fa-eye"></i> Ver perfil</button></div>
+        </div>
+
+        <div class="consultant-card" onclick="showSection('perfil')">
+          <div class="card-avatar">🔮<span class="badge-online"></span></div>
+          <div class="card-name">Luciana Ferreira</div>
+          <div class="card-specialty">Mediunidade</div>
+          <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i><span>4.7</span></div>
+          <div class="card-location"><i class="fa-solid fa-location-dot"></i> Curitiba, PR</div>
+          <div style="text-align:center;margin-bottom:10px"><span class="plan-badge badge-destaque"><i class="fa-solid fa-medal"></i> Destaque</span></div>
+          <div class="card-footer"><button class="btn-card"><i class="fa-solid fa-eye"></i> Ver perfil</button></div>
+        </div>
+
+        <div class="consultant-card" onclick="showSection('perfil')">
+          <div class="card-avatar">🌺</div>
+          <div class="card-name">Fernanda Costa</div>
+          <div class="card-specialty">Quiromancia</div>
+          <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i><span>4.5</span></div>
+          <div class="card-location"><i class="fa-solid fa-location-dot"></i> Florianópolis, SC</div>
+          <div style="text-align:center;margin-bottom:10px"><span class="plan-badge badge-essencial">Essencial</span></div>
+          <div class="card-footer"><button class="btn-card"><i class="fa-solid fa-eye"></i> Ver perfil</button></div>
+        </div>
+
+        <div class="consultant-card" onclick="showSection('perfil')">
+          <div class="card-avatar">✨<span class="badge-online"></span></div>
+          <div class="card-name">Marina Santos</div>
+          <div class="card-specialty">Terapias Holísticas</div>
+          <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i><span>4.6</span></div>
+          <div class="card-location"><i class="fa-solid fa-location-dot"></i> Salvador, BA</div>
+          <div style="text-align:center;margin-bottom:10px"><span class="plan-badge badge-destaque"><i class="fa-solid fa-medal"></i> Destaque</span></div>
+          <div class="card-footer"><button class="btn-card"><i class="fa-solid fa-eye"></i> Ver perfil</button></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════ PERFIL ═══════════════════════════ -->
+<section class="section" id="section-perfil">
+  <div class="perfil-container">
+
+    <!-- Hero do perfil -->
+    <div class="perfil-hero">
+      <div class="perfil-avatar">🌙
+        <span class="badge-online" style="width:18px;height:18px;bottom:4px;right:4px;"></span>
+      </div>
+      <div class="perfil-info">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px">
+          <h1>Ana Beatriz Luz</h1>
+          <span class="plan-badge badge-premium" style="font-size:.8rem;padding:4px 12px"><i class="fa-solid fa-crown"></i> Premium</span>
+        </div>
+        <div class="perfil-specialty"><i class="fa-solid fa-moon" style="color:var(--gold)"></i> Tarô Terapêutico &amp; Astrologia</div>
+        <div class="perfil-meta">
+          <span class="meta-item"><i class="fa-solid fa-location-dot"></i> São Paulo, SP</span>
+          <span class="meta-item"><i class="fa-solid fa-star"></i> 5.0 (148 avaliações)</span>
+          <span class="meta-item"><i class="fa-solid fa-circle" style="color:#4CAF50;font-size:.6rem"></i> Online agora</span>
+          <span class="meta-item"><i class="fa-solid fa-calendar"></i> Membro desde Jan/2024</span>
+        </div>
+        <div class="perfil-tags">
+          <span class="tag">Tarô</span>
+          <span class="tag">Astrologia</span>
+          <span class="tag">Oráculos</span>
+          <span class="tag">Terapia</span>
+          <span class="tag">Autoconhecimento</span>
+        </div>
+        <div class="perfil-btns">
+          <button class="btn-whatsapp">
+            <i class="fa-brands fa-whatsapp"></i> Contatar via WhatsApp
+          </button>
+          <button class="btn-outline">
+            <i class="fa-solid fa-envelope"></i> Enviar mensagem
+          </button>
+          <button class="btn-outline" style="padding:13px 18px">
+            <i class="fa-regular fa-heart"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Corpo do perfil -->
+    <div class="perfil-body">
+      <div class="perfil-main">
+
+        <!-- Bio -->
+        <div class="card-section">
+          <h3><i class="fa-solid fa-pen-nib"></i> Sobre mim</h3>
+          <p class="bio-text">
+            Olá! Sou Ana Beatriz, taróloga terapêutica com mais de 8 anos de experiência. Minha jornada com o Tarô começou como caminho de autoconhecimento e hoje é minha missão ajudar pessoas a encontrarem clareza, propósito e equilíbrio em suas vidas.<br><br>
+            Trabalho com uma abordagem integrativa, combinando Tarô, Astrologia e técnicas de terapia. Cada consulta é um espaço seguro, sem julgamentos, onde você pode explorar suas questões mais profundas. Atendo de forma remota (vídeo ou áudio) e presencialmente em São Paulo.<br><br>
+            Especialidades: relacionamentos, carreira, espiritualidade e autoconhecimento. Aguardo você! 🌙
+          </p>
+        </div>
+
+        <!-- Galeria -->
+        <div class="card-section">
+          <h3><i class="fa-solid fa-images"></i> Galeria</h3>
+          <div class="gallery-grid">
+            <div class="gallery-item">🌙</div>
+            <div class="gallery-item">⭐</div>
+            <div class="gallery-item">🔮</div>
+            <div class="gallery-item">🌸</div>
+            <div class="gallery-item">✨</div>
+            <div class="gallery-item">🌺</div>
+          </div>
+        </div>
+
+        <!-- Avaliações -->
+        <div class="card-section">
+          <h3><i class="fa-solid fa-star"></i> Avaliações</h3>
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid rgba(212,160,160,.15)">
+            <div style="text-align:center">
+              <div style="font-family:'Playfair Display',serif;font-size:3rem;font-weight:700;color:var(--text-dark);line-height:1">5.0</div>
+              <div style="color:var(--gold);font-size:1rem;margin:4px 0"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+              <div style="font-size:.78rem;color:var(--text-gray)">148 avaliações</div>
+            </div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                <span style="font-size:.75rem;color:var(--text-gray);width:14px">5</span>
+                <div style="flex:1;height:6px;background:var(--cream1);border-radius:3px;overflow:hidden"><div style="width:85%;height:100%;background:var(--gold);border-radius:3px"></div></div>
+                <span style="font-size:.75rem;color:var(--text-gray)">85%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                <span style="font-size:.75rem;color:var(--text-gray);width:14px">4</span>
+                <div style="flex:1;height:6px;background:var(--cream1);border-radius:3px;overflow:hidden"><div style="width:12%;height:100%;background:var(--gold);border-radius:3px"></div></div>
+                <span style="font-size:.75rem;color:var(--text-gray)">12%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:.75rem;color:var(--text-gray);width:14px">3</span>
+                <div style="flex:1;height:6px;background:var(--cream1);border-radius:3px;overflow:hidden"><div style="width:3%;height:100%;background:var(--gold);border-radius:3px"></div></div>
+                <span style="font-size:.75rem;color:var(--text-gray)">3%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="review-item">
+            <div class="review-header">
+              <div class="reviewer-avatar">😊</div>
+              <div class="reviewer-info">
+                <div class="name">Juliana M.</div>
+                <div class="date">Fevereiro 2025</div>
+              </div>
+            </div>
+            <div class="review-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+            <p class="review-text">Ana é incrível! A consulta foi extremamente esclarecedora e ela tem um dom especial para conectar o que as cartas dizem com a nossa realidade. Me senti acolhida do início ao fim. Já indiquei para várias amigas! ✨</p>
+          </div>
+
+          <div class="review-item">
+            <div class="review-header">
+              <div class="reviewer-avatar">🌷</div>
+              <div class="reviewer-info">
+                <div class="name">Patricia S.</div>
+                <div class="date">Janeiro 2025</div>
+              </div>
+            </div>
+            <div class="review-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+            <p class="review-text">Sessão transformadora! A Ana tem uma abordagem muito respeitosa e profissional. Saí da consulta com muito mais clareza sobre minha vida profissional. Super recomendo!</p>
+          </div>
+
+          <div class="review-item">
+            <div class="review-header">
+              <div class="reviewer-avatar">🌸</div>
+              <div class="reviewer-info">
+                <div class="name">Camila R.</div>
+                <div class="date">Dezembro 2024</div>
+              </div>
+            </div>
+            <div class="review-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+            <p class="review-text">Já é minha segunda consulta com a Ana e continua sendo fantástica. Ela é muito empática e profissional. As leituras são detalhadas e muito certeiras.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="perfil-sidebar">
+
+        <div class="plan-card">
+          <h4>Plano atual</h4>
+          <div class="plan-name"><i class="fa-solid fa-crown"></i> Premium</div>
+          <div style="font-size:.82rem;color:#7A5A20">
+            <div style="margin-bottom:4px"><i class="fa-solid fa-check" style="color:#8B7040;margin-right:6px"></i>Topo dos resultados</div>
+            <div style="margin-bottom:4px"><i class="fa-solid fa-check" style="color:#8B7040;margin-right:6px"></i>Categorias ilimitadas</div>
+            <div style="margin-bottom:4px"><i class="fa-solid fa-check" style="color:#8B7040;margin-right:6px"></i>Galeria de fotos</div>
+            <div><i class="fa-solid fa-check" style="color:#8B7040;margin-right:6px"></i>Suporte VIP</div>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <h3><i class="fa-solid fa-chart-simple"></i> Estatísticas</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="text-align:center;padding:12px;background:var(--cream3);border-radius:10px">
+              <div style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--text-dark)">342</div>
+              <div style="font-size:.72rem;color:var(--text-gray);margin-top:2px">Visitas/mês</div>
+            </div>
+            <div style="text-align:center;padding:12px;background:var(--cream3);border-radius:10px">
+              <div style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--text-dark)">47</div>
+              <div style="font-size:.72rem;color:var(--text-gray);margin-top:2px">Contatos WA</div>
+            </div>
+            <div style="text-align:center;padding:12px;background:var(--cream3);border-radius:10px">
+              <div style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--text-dark)">89</div>
+              <div style="font-size:.72rem;color:var(--text-gray);margin-top:2px">Favoritos</div>
+            </div>
+            <div style="text-align:center;padding:12px;background:var(--cream3);border-radius:10px">
+              <div style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--text-dark)">148</div>
+              <div style="font-size:.72rem;color:var(--text-gray);margin-top:2px">Avaliações</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <h3><i class="fa-solid fa-circle-info"></i> Informações</h3>
+          <div style="font-size:.85rem;color:var(--text-gray)">
+            <div style="padding:8px 0;border-bottom:1px solid rgba(212,160,160,.12);display:flex;justify-content:space-between">
+              <span>Atendimento</span>
+              <span style="color:var(--text-dark);font-weight:500">Online e Presencial</span>
+            </div>
+            <div style="padding:8px 0;border-bottom:1px solid rgba(212,160,160,.12);display:flex;justify-content:space-between">
+              <span>Idioma</span>
+              <span style="color:var(--text-dark);font-weight:500">Português</span>
+            </div>
+            <div style="padding:8px 0;display:flex;justify-content:space-between">
+              <span>Membro desde</span>
+              <span style="color:var(--text-dark);font-weight:500">Jan 2024</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-whatsapp" style="width:100%;justify-content:center;font-size:.92rem">
+          <i class="fa-brands fa-whatsapp"></i> Contatar via WhatsApp
+        </button>
+
+      </aside>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════ DASHBOARD ═══════════════════════════ -->
+<section class="section" id="section-dashboard">
+  <div class="dashboard-container">
+
+    <div class="dashboard-header">
+      <div class="dashboard-welcome">
+        <h2>Olá, Ana Beatriz ✨</h2>
+        <p>Aqui está o resumo do seu perfil — últimos 30 dias</p>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn-secondary" style="font-size:.85rem;padding:10px 16px">
+          <i class="fa-solid fa-pen"></i> Editar perfil
+        </button>
+        <button class="btn-primary" style="font-size:.85rem;padding:10px 16px" onclick="showSection('precos')">
+          <i class="fa-solid fa-arrow-up"></i> Upgrade de plano
+        </button>
+      </div>
+    </div>
+
+    <!-- Metrics -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-icon pink"><i class="fa-solid fa-eye"></i></div>
+        <div class="metric-value">342</div>
+        <div class="metric-label">Visitas ao perfil</div>
+        <div class="metric-delta"><i class="fa-solid fa-arrow-up"></i> +18% vs mês anterior</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon green"><i class="fa-brands fa-whatsapp"></i></div>
+        <div class="metric-value">47</div>
+        <div class="metric-label">Cliques no WhatsApp</div>
+        <div class="metric-delta"><i class="fa-solid fa-arrow-up"></i> +23% vs mês anterior</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon gold"><i class="fa-solid fa-heart"></i></div>
+        <div class="metric-value">89</div>
+        <div class="metric-label">Favoritos</div>
+        <div class="metric-delta"><i class="fa-solid fa-arrow-up"></i> +7 novos</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon rose"><i class="fa-solid fa-star"></i></div>
+        <div class="metric-value">148</div>
+        <div class="metric-label">Avaliações recebidas</div>
+        <div class="metric-delta" style="color:var(--gold)"><i class="fa-solid fa-star"></i> Média 5.0</div>
+      </div>
+    </div>
+
+    <!-- Chart + Plan -->
+    <div class="dashboard-grid">
+
+      <div class="chart-card">
+        <h3><i class="fa-solid fa-chart-line"></i> Visitas ao perfil — últimos 7 dias</h3>
+        <canvas id="visitsChart" height="100"></canvas>
+      </div>
+
+      <div>
+        <div class="plan-status-card" style="margin-bottom:16px">
+          <h3>Seu plano atual</h3>
+          <div class="plan-status-name">✨ Premium</div>
+          <div class="plan-feature"><i class="fa-solid fa-circle-check"></i> Topo dos resultados de busca</div>
+          <div class="plan-feature"><i class="fa-solid fa-circle-check"></i> Categorias ilimitadas</div>
+          <div class="plan-feature"><i class="fa-solid fa-circle-check"></i> Galeria de fotos ativa</div>
+          <div class="plan-feature"><i class="fa-solid fa-circle-check"></i> Banner promocional</div>
+          <div class="plan-feature"><i class="fa-solid fa-circle-check"></i> Suporte VIP</div>
+          <div style="margin-top:16px;padding:10px 14px;background:rgba(255,255,255,.12);border-radius:10px;font-size:.82rem">
+            <span style="color:rgba(255,255,255,.7)">Próxima renovação:</span>
+            <span style="color:var(--white);font-weight:600;margin-left:6px">20 Mar 2025</span>
+          </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="chart-card">
+          <h3><i class="fa-solid fa-bolt"></i> Ações rápidas</h3>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button class="btn-secondary" style="justify-content:flex-start;gap:10px;font-size:.85rem;padding:11px 14px;border-radius:10px">
+              <i class="fa-solid fa-pen" style="color:var(--gold)"></i> Editar bio e informações
+            </button>
+            <button class="btn-secondary" style="justify-content:flex-start;gap:10px;font-size:.85rem;padding:11px 14px;border-radius:10px">
+              <i class="fa-solid fa-images" style="color:var(--primary-dark)"></i> Gerenciar galeria de fotos
+            </button>
+            <button class="btn-secondary" style="justify-content:flex-start;gap:10px;font-size:.85rem;padding:11px 14px;border-radius:10px">
+              <i class="fa-brands fa-whatsapp" style="color:#25D366"></i> Atualizar link do WhatsApp
+            </button>
+            <button class="btn-secondary" onclick="showSection('perfil')" style="justify-content:flex-start;gap:10px;font-size:.85rem;padding:11px 14px;border-radius:10px">
+              <i class="fa-solid fa-eye" style="color:var(--text-gray)"></i> Visualizar meu perfil
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Recent reviews -->
+    <div class="chart-card" style="margin-top:20px">
+      <h3><i class="fa-solid fa-star"></i> Avaliações recentes</h3>
+      <div class="reviews-list">
+        <div class="review-item">
+          <div class="review-header">
+            <div class="reviewer-avatar">😊</div>
+            <div class="reviewer-info">
+              <div class="name">Juliana M.</div>
+              <div class="date">Fevereiro 2025 · <span style="color:var(--gold)"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span></div>
+            </div>
+          </div>
+          <p class="review-text">Ana é incrível! A consulta foi extremamente esclarecedora. Me senti acolhida do início ao fim. ✨</p>
+        </div>
+        <div class="review-item">
+          <div class="review-header">
+            <div class="reviewer-avatar">🌷</div>
+            <div class="reviewer-info">
+              <div class="name">Patricia S.</div>
+              <div class="date">Janeiro 2025 · <span style="color:var(--gold)"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span></div>
+            </div>
+          </div>
+          <p class="review-text">Sessão transformadora! Saí com muito mais clareza sobre minha vida profissional. Super recomendo!</p>
+        </div>
+        <div class="review-item">
+          <div class="review-header">
+            <div class="reviewer-avatar">🌸</div>
+            <div class="reviewer-info">
+              <div class="name">Camila R.</div>
+              <div class="date">Dezembro 2024 · <span style="color:var(--gold)"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span></div>
+            </div>
+          </div>
+          <p class="review-text">Já é minha segunda consulta com a Ana e continua sendo fantástica. As leituras são detalhadas e muito certeiras.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════ PREÇOS ═══════════════════════════ -->
+<section class="section" id="section-precos">
+  <div class="precos-section">
+
+    <div class="section-header">
+      <div class="section-label"><i class="fa-solid fa-tag"></i> Planos e preços</div>
+      <h2>Escolha o plano ideal para sua vitrine</h2>
+      <p>Sem taxa de intermediação. Você conecta diretamente com seus clientes.</p>
+    </div>
+
+    <div class="pricing-grid">
+
+      <!-- Essencial -->
+      <div class="pricing-card">
+        <div class="plan-icon essencial"><i class="fa-solid fa-seedling"></i></div>
+        <div class="plan-title">Essencial</div>
+        <div class="plan-subtitle">Para começar sua presença online</div>
+        <div class="price-row">
+          <span class="price-currency">R$</span>
+          <span class="price-value">20</span>
+          <span class="price-period">/mês</span>
+        </div>
+        <div class="pricing-features">
+          <div class="pricing-feature"><i class="fa-solid fa-check"></i> Perfil básico completo</div>
+          <div class="pricing-feature"><i class="fa-solid fa-check"></i> 1 categoria de especialidade</div>
+          <div class="pricing-feature"><i class="fa-solid fa-check"></i> Link direto para WhatsApp</div>
+          <div class="pricing-feature"><i class="fa-solid fa-check"></i> Listado nas buscas</div>
+          <div class="pricing-feature"><i class="fa-solid fa-check"></i> Foto de perfil</div>
+          <div class="pricing-feature"><i class="fa-solid fa-times" style="color:#ddd"></i> <span style="color:var(--text-light)">Destaque nas buscas</span></div>
+          <div class="pricing-feature"><i class="fa-solid fa-times" style="color:#ddd"></i> <span style="color:var(--text-light)">Galeria de fotos</span></div>
+          <div class="pricing-feature"><i class="fa-solid fa-times" style="color:#ddd"></i> <span style="color:var(--text-light)">Métricas de acesso</span></div>
+        </div>
+        <button class="btn-plan essencial"><i class="fa-solid fa-seedling"></i> Assinar Essencial</button>
+      </div>
+
+      <!-- Destaque -->
+      <div class="pricing-card popular">
+        <div class="popular-badge">⭐ Mais popular</div>
+        <div class="plan-icon destaque"><i class="fa-solid fa-medal"></i></div>
+        <div class="plan-title">Destaque</div>
+        <div class="plan-subtitle">Para quem quer crescer mais rápido</div>
+        <div class="price-row">
+          <span class="price-currency">R$</span>
+          <span class="price-value">50</span>
+          <span class="price-period">/mês</span>
+        </div>
+        <div class="pricing-features">
+          <div class="pricing-feature"><i class="fa-solid fa-check"></i> Tudo do Essencial</div>
+          <div class="pricing-feature"><i class="fa-solid fa-check"></i> Destaque nas buscas</div>
+          <div class="pricing-feature"><i class="fa-solid fa-check"></i> Até 3 categorias</div>
+          <div class="pricing-feature"><i class="fa-solid fa-check"></i> Selo verificado</div>
+          <div class="pricing-feature"><i class="fa-solid fa-check"></i> Métricas de acesso</div>
+          <div class="pricing-feature"><i class="fa-solid fa-check"></i> Galeria de até 6 fotos</div>
+          <div class="pricing-feature"><i class="fa-solid fa-check"></i> Receber avaliações</div>
+          <div class="pricing-feature"><i class="fa-solid fa-times" style="color:#ddd"></i> <span style="color:var(--text-light)">Topo dos resultados</span></div>
+        </div>
+        <button class="btn-plan destaque"><i class="fa-solid fa-medal"></i> Assinar Destaque</button>
+      </div>
+
+      <!-- Premium -->
+      <div class="pricing-card">
+        <div class="plan-icon premium"><i class="fa-solid fa-crown"></i></div>
+        <div class="plan-title">Premium</div>
+        <div class="plan-subtitle">Máxima visibilidade e recursos</div>
+        <div class="price-row">
+          <span class="price-currency">R$</span>
+          <span class="price-value">70</span>
+          <span class="price-period">/mês</span>
+        </div>
+        <div class="pricing-features">
+          <div class="pricing-feature"><i class="fa-solid fa-check"></i> Tudo do Destaque</div>
+          <div class="pricing-feature"><i class="fa-solid fa-check"></i> Topo dos resultados</div>
+          <div class="pricing-feature"><i class="fa-solid fa-check"></i> Categorias ilimitadas</div>
+          <div class="pricing-feature"><i class="fa-solid fa-check"></i> Banner promocional</div>
+          <div class="pricing-feature"><i class="fa-solid fa-check"></i> Galeria ilimitada de fotos</div>
+          <div class="pricing-feature"><i class="fa-solid fa-check"></i> Suporte VIP prioritário</div>
+          <div class="pricing-feature"><i class="fa-solid fa-check"></i> Perfil em destaque na landing</div>
+          <div class="pricing-feature"><i class="fa-solid fa-check"></i> Relatórios avançados</div>
+        </div>
+        <button class="btn-plan premium"><i class="fa-solid fa-crown"></i> Assinar Premium</button>
+      </div>
+
+    </div>
+
+    <!-- Nota sem intermediação -->
+    <div style="max-width:600px;margin:32px auto 0;text-align:center;padding:20px 24px;background:var(--white);border-radius:14px;box-shadow:var(--shadow);border:1px solid rgba(212,160,160,.15)">
+      <i class="fa-solid fa-shield-halved" style="font-size:1.4rem;color:var(--gold);margin-bottom:8px;display:block"></i>
+      <strong style="font-size:.9rem;color:var(--text-dark)">Sem intermediação de pagamento</strong>
+      <p style="font-size:.83rem;color:var(--text-gray);margin-top:4px;line-height:1.6">O cliente entra em contato diretamente com você. Você acerta o pagamento como preferir — Pix, transferência ou qualquer outro método. A MysticConnect não cobra nada sobre suas consultas.</p>
+    </div>
+
+    <!-- FAQ -->
+    <div class="precos-faq">
+      <h3>Perguntas frequentes</h3>
+      <div class="faq-item">
+        <div class="faq-q"><i class="fa-solid fa-diamond"></i> Posso cancelar meu plano a qualquer momento?</div>
+        <div class="faq-a">Sim! Não há fidelidade. Você pode cancelar quando quiser pelo painel. O acesso continua até o fim do período pago.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><i class="fa-solid fa-diamond"></i> Como recebo os clientes?</div>
+        <div class="faq-a">O cliente vê seu perfil e clica no botão de WhatsApp ou envia uma mensagem diretamente. Você acerta todos os detalhes com ele, sem intermediários.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><i class="fa-solid fa-diamond"></i> Como faço o pagamento do plano?</div>
+        <div class="faq-a">O pagamento da assinatura é feito mensalmente via Pix ou cartão de crédito. Você receberá um lembrete antes do vencimento.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><i class="fa-solid fa-diamond"></i> Posso mudar de plano depois?</div>
+        <div class="faq-a">Claro! Você pode fazer upgrade ou downgrade do seu plano a qualquer momento pelo Dashboard.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════ ADMIN ═══════════════════════════ -->
+<section class="section" id="section-admin">
+  <div class="admin-container">
+
+    <div class="admin-header">
+      <div>
+        <h2>Painel Administrativo</h2>
+        <p>Gerenciamento de consultores e métricas da plataforma</p>
+      </div>
+      <div class="admin-badge"><i class="fa-solid fa-lock"></i> Acesso restrito</div>
+    </div>
+
+    <!-- Admin metrics -->
+    <div class="admin-metrics">
+      <div class="admin-metric">
+        <div class="label"><i class="fa-solid fa-users"></i> Total de consultores</div>
+        <div class="value">3.247</div>
+        <div class="sub">2.891 ativos · 356 pendentes</div>
+      </div>
+      <div class="admin-metric">
+        <div class="label"><i class="fa-solid fa-sack-dollar"></i> Receita MRR</div>
+        <div class="value">R$ 87.4K</div>
+        <div class="sub">+12% vs mês anterior</div>
+      </div>
+      <div class="admin-metric">
+        <div class="label"><i class="fa-solid fa-user-plus"></i> Novos este mês</div>
+        <div class="value">143</div>
+        <div class="sub">Meta: 150 · 95% atingido</div>
+      </div>
+      <div class="admin-metric">
+        <div class="label"><i class="fa-solid fa-star"></i> Avaliação média</div>
+        <div class="value">4.85</div>
+        <div class="sub">Baseado em 12.4K reviews</div>
+      </div>
+    </div>
+
+    <!-- Distribuição por plano -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
+      <div style="background:var(--white);border-radius:var(--radius-card);padding:20px;box-shadow:var(--shadow);border:1px solid rgba(212,160,160,.12);text-align:center">
+        <div style="font-size:.78rem;font-weight:700;color:var(--text-gray);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Plano Essencial</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--text-dark)">1.842</div>
+        <div style="font-size:.75rem;color:var(--text-light);margin-top:4px">R$ 36.840/mês</div>
+        <div style="margin-top:12px;height:5px;background:var(--cream1);border-radius:3px;overflow:hidden"><div style="width:57%;height:100%;background:var(--text-light);border-radius:3px"></div></div>
+      </div>
+      <div style="background:var(--white);border-radius:var(--radius-card);padding:20px;box-shadow:var(--shadow);border:1px solid rgba(212,160,160,.3);text-align:center">
+        <div style="font-size:.78rem;font-weight:700;color:var(--primary-dark);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Plano Destaque</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--text-dark)">1.021</div>
+        <div style="font-size:.75rem;color:var(--text-light);margin-top:4px">R$ 51.050/mês</div>
+        <div style="margin-top:12px;height:5px;background:var(--cream1);border-radius:3px;overflow:hidden"><div style="width:32%;height:100%;background:var(--primary);border-radius:3px"></div></div>
+      </div>
+      <div style="background:var(--white);border-radius:var(--radius-card);padding:20px;box-shadow:var(--shadow);border:1px solid rgba(201,169,110,.3);text-align:center">
+        <div style="font-size:.78rem;font-weight:700;color:#8B6020;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Plano Premium</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--text-dark)">384</div>
+        <div style="font-size:.75rem;color:var(--text-light);margin-top:4px">R$ 26.880/mês</div>
+        <div style="margin-top:12px;height:5px;background:var(--cream1);border-radius:3px;overflow:hidden"><div style="width:12%;height:100%;background:var(--gold);border-radius:3px"></div></div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
+      <div class="table-header">
+        <h3>Consultores cadastrados</h3>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <div class="table-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Buscar consultor..." />
+          </div>
+          <select class="sort-select" style="font-size:.82rem">
+            <option>Todos os status</option>
+            <option>Ativo</option>
+            <option>Pendente</option>
+            <option>Inativo</option>
+          </select>
+          <button class="btn-primary" style="font-size:.82rem;padding:9px 14px">
+            <i class="fa-solid fa-download"></i> Exportar
+          </button>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Consultor</th>
+              <th>Especialidade</th>
+              <th>Cidade</th>
+              <th>Plano</th>
+              <th>Status</th>
+              <th>Cadastro</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--cream1),var(--primary));display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">🌙</div>
+                  <div>
+                    <div style="font-weight:600;font-size:.87rem">Ana Beatriz Luz</div>
+                    <div style="font-size:.75rem;color:var(--text-gray)">ana@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td>Tarô Terapêutico</td>
+              <td>São Paulo, SP</td>
+              <td><span class="plan-badge badge-premium" style="font-size:.7rem"><i class="fa-solid fa-crown"></i> Premium</span></td>
+              <td><span class="status-badge status-ativo"><i class="fa-solid fa-circle" style="font-size:.5rem"></i> Ativo</span></td>
+              <td style="color:var(--text-gray);font-size:.82rem">Jan 2024</td>
+              <td>
+                <div class="actions-cell">
+                  <button class="action-btn view" title="Ver perfil"><i class="fa-solid fa-eye"></i></button>
+                  <button class="action-btn edit" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                  <button class="action-btn block" title="Bloquear"><i class="fa-solid fa-ban"></i></button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--cream1),var(--primary));display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">⭐</div>
+                  <div>
+                    <div style="font-weight:600;font-size:.87rem">Carla Mendonça</div>
+                    <div style="font-size:.75rem;color:var(--text-gray)">carla@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td>Astrologia</td>
+              <td>Rio de Janeiro, RJ</td>
+              <td><span class="plan-badge badge-destaque" style="font-size:.7rem"><i class="fa-solid fa-medal"></i> Destaque</span></td>
+              <td><span class="status-badge status-ativo"><i class="fa-solid fa-circle" style="font-size:.5rem"></i> Ativo</span></td>
+              <td style="color:var(--text-gray);font-size:.82rem">Mar 2024</td>
+              <td>
+                <div class="actions-cell">
+                  <button class="action-btn view"><i class="fa-solid fa-eye"></i></button>
+                  <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
+                  <button class="action-btn block"><i class="fa-solid fa-ban"></i></button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--cream1),var(--primary));display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">🌸</div>
+                  <div>
+                    <div style="font-weight:600;font-size:.87rem">Renata Oliveira</div>
+                    <div style="font-size:.75rem;color:var(--text-gray)">renata@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td>Numerologia &amp; Runas</td>
+              <td>Belo Horizonte, MG</td>
+              <td><span class="plan-badge badge-premium" style="font-size:.7rem"><i class="fa-solid fa-crown"></i> Premium</span></td>
+              <td><span class="status-badge status-pendente"><i class="fa-solid fa-circle" style="font-size:.5rem"></i> Pendente</span></td>
+              <td style="color:var(--text-gray);font-size:.82rem">Fev 2025</td>
+              <td>
+                <div class="actions-cell">
+                  <button class="action-btn view"><i class="fa-solid fa-eye"></i></button>
+                  <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
+                  <button class="action-btn block"><i class="fa-solid fa-ban"></i></button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--cream1),var(--primary));display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">🔮</div>
+                  <div>
+                    <div style="font-weight:600;font-size:.87rem">Luciana Ferreira</div>
+                    <div style="font-size:.75mm;color:var(--text-gray)">luciana@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td>Mediunidade</td>
+              <td>Curitiba, PR</td>
+              <td><span class="plan-badge badge-destaque" style="font-size:.7rem"><i class="fa-solid fa-medal"></i> Destaque</span></td>
+              <td><span class="status-badge status-ativo"><i class="fa-solid fa-circle" style="font-size:.5rem"></i> Ativo</span></td>
+              <td style="color:var(--text-gray);font-size:.82rem">Jun 2024</td>
+              <td>
+                <div class="actions-cell">
+                  <button class="action-btn view"><i class="fa-solid fa-eye"></i></button>
+                  <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
+                  <button class="action-btn block"><i class="fa-solid fa-ban"></i></button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--cream1),var(--primary));display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">🌺</div>
+                  <div>
+                    <div style="font-weight:600;font-size:.87rem">Fernanda Costa</div>
+                    <div style="font-size:.75rem;color:var(--text-gray)">fernanda@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td>Quiromancia</td>
+              <td>Florianópolis, SC</td>
+              <td><span class="plan-badge badge-essencial" style="font-size:.7rem">Essencial</span></td>
+              <td><span class="status-badge status-inativo"><i class="fa-solid fa-circle" style="font-size:.5rem"></i> Inativo</span></td>
+              <td style="color:var(--text-gray);font-size:.82rem">Set 2024</td>
+              <td>
+                <div class="actions-cell">
+                  <button class="action-btn view"><i class="fa-solid fa-eye"></i></button>
+                  <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
+                  <button class="action-btn block"><i class="fa-solid fa-ban"></i></button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--cream1),var(--primary));display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">✨</div>
+                  <div>
+                    <div style="font-weight:600;font-size:.87rem">Marina Santos</div>
+                    <div style="font-size:.75rem;color:var(--text-gray)">marina@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td>Terapias Holísticas</td>
+              <td>Salvador, BA</td>
+              <td><span class="plan-badge badge-destaque" style="font-size:.7rem"><i class="fa-solid fa-medal"></i> Destaque</span></td>
+              <td><span class="status-badge status-ativo"><i class="fa-solid fa-circle" style="font-size:.5rem"></i> Ativo</span></td>
+              <td style="color:var(--text-gray);font-size:.82rem">Nov 2024</td>
+              <td>
+                <div class="actions-cell">
+                  <button class="action-btn view"><i class="fa-solid fa-eye"></i></button>
+                  <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
+                  <button class="action-btn block"><i class="fa-solid fa-ban"></i></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(212,160,160,.12);flex-wrap:wrap;gap:8px">
+        <div style="font-size:.82rem;color:var(--text-gray)">Mostrando 6 de 3.247 consultores</div>
+        <div style="display:flex;gap:6px">
+          <button style="padding:7px 14px;border:1.5px solid rgba(212,160,160,.3);border-radius:8px;background:var(--white);color:var(--text-gray);font-size:.82rem;cursor:pointer">← Anterior</button>
+          <button style="padding:7px 14px;border:1.5px solid var(--primary);border-radius:8px;background:var(--primary-dark);color:var(--white);font-size:.82rem;cursor:pointer">1</button>
+          <button style="padding:7px 14px;border:1.5px solid rgba(212,160,160,.3);border-radius:8px;background:var(--white);color:var(--text-gray);font-size:.82rem;cursor:pointer">2</button>
+          <button style="padding:7px 14px;border:1.5px solid rgba(212,160,160,.3);border-radius:8px;background:var(--white);color:var(--text-gray);font-size:.82rem;cursor:pointer">Próxima →</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════ JAVASCRIPT ═══════════════════════════ -->
+<script>
+  // ── Section navigation
+  function showSection(name) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    const section = document.getElementById('section-' + name);
+    const btn = document.getElementById('btn-' + name);
+    if (section) section.classList.add('active');
+    if (btn) btn.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (name === 'dashboard') initChart();
+  }
+
+  // ── Mobile menu
+  function toggleMenu() {
+    const m = document.getElementById('mobile-menu');
+    m.classList.toggle('open');
+  }
+
+  // ── Filter chips
+  document.querySelectorAll('.filter-chips').forEach(group => {
+    group.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        group.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+      });
+    });
+  });
+
+  // ── Chart.js
+  let chartInstance = null;
+  function initChart() {
+    const canvas = document.getElementById('visitsChart');
+    if (!canvas) return;
+    if (chartInstance) { chartInstance.destroy(); }
+    const ctx = canvas.getContext('2d');
+    chartInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+        datasets: [{
+          label: 'Visitas',
+          data: [38, 52, 45, 67, 71, 58, 63],
+          borderColor: '#C4787A',
+          backgroundColor: 'rgba(212,160,160,.12)',
+          borderWidth: 2.5,
+          pointBackgroundColor: '#C4787A',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 5,
+          tension: 0.4,
+          fill: true,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ${ctx.parsed.y} visitas`
+            },
+            backgroundColor: '#3D2B35',
+            titleColor: '#fff',
+            bodyColor: 'rgba(255,255,255,.85)',
+            padding: 10,
+            borderRadius: 8,
+          }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { color: '#8B7080', font: { family: 'Inter', size: 12 } },
+            border: { display: false }
+          },
+          y: {
+            grid: { color: 'rgba(212,160,160,.1)', drawBorder: false },
+            ticks: { color: '#8B7080', font: { family: 'Inter', size: 12 } },
+            border: { display: false }
+          }
+        }
+      }
+    });
+  }
+
+  // Close mobile menu on outside click
+  document.addEventListener('click', e => {
+    const menu = document.getElementById('mobile-menu');
+    const hamburger = document.querySelector('.hamburger');
+    if (!menu.contains(e.target) && !hamburger.contains(e.target)) {
+      menu.classList.remove('open');
+    }
+  });
+</script>
+</body>
+</html>
