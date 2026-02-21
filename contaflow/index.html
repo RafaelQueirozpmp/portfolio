@@ -1,0 +1,2081 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ContaFlow — Gestão para Escritórios de Contabilidade</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  /* =========================================
+     RESET & BASE
+  ========================================= */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 14px; scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #F8FAFC;
+    color: #1E293B;
+    display: flex;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  :root {
+    --blue:    #2563EB;
+    --blue-dk: #1D4ED8;
+    --blue-lt: #EFF6FF;
+    --green:   #10B981;
+    --yellow:  #F59E0B;
+    --red:     #EF4444;
+    --gray-50: #F8FAFC;
+    --gray-100:#F1F5F9;
+    --gray-200:#E2E8F0;
+    --gray-300:#CBD5E1;
+    --gray-400:#94A3B8;
+    --gray-500:#64748B;
+    --gray-600:#475569;
+    --gray-700:#334155;
+    --gray-800:#1E293B;
+    --gray-900:#0F172A;
+    --sidebar-w: 240px;
+    --header-h:  60px;
+    --radius:    10px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
+    --shadow:    0 4px 16px rgba(0,0,0,.09);
+    --shadow-md: 0 8px 24px rgba(0,0,0,.12);
+    --transition: .2s ease;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { cursor: pointer; font-family: inherit; border: none; background: none; }
+  ul { list-style: none; }
+  input, select, textarea { font-family: inherit; font-size: inherit; }
+
+  /* =========================================
+     SIDEBAR
+  ========================================= */
+  .sidebar {
+    width: var(--sidebar-w);
+    min-height: 100vh;
+    background: #fff;
+    border-right: 1px solid var(--gray-200);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 100;
+    transition: transform var(--transition);
+  }
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .sidebar-logo .logo-icon {
+    width: 36px; height: 36px;
+    background: var(--blue);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 16px; font-weight: 800; letter-spacing: -1px;
+    flex-shrink: 0;
+  }
+  .sidebar-logo .logo-text { line-height: 1.1; }
+  .sidebar-logo .logo-text span:first-child {
+    display: block; font-size: 15px; font-weight: 700; color: var(--gray-900);
+  }
+  .sidebar-logo .logo-text span:last-child {
+    font-size: 11px; color: var(--gray-400); font-weight: 400;
+  }
+  .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+  .nav-section-label {
+    font-size: 10px; font-weight: 600; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--gray-400);
+    padding: 12px 10px 4px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; border-radius: 8px;
+    font-size: 13px; font-weight: 500; color: var(--gray-600);
+    cursor: pointer; transition: all var(--transition);
+    margin-bottom: 2px;
+  }
+  .nav-item:hover { background: var(--gray-100); color: var(--gray-800); }
+  .nav-item.active { background: var(--blue-lt); color: var(--blue); font-weight: 600; }
+  .nav-item.active i { color: var(--blue); }
+  .nav-item i { width: 16px; text-align: center; font-size: 14px; color: var(--gray-400); transition: color var(--transition); }
+  .nav-item .badge {
+    margin-left: auto; font-size: 10px; font-weight: 700;
+    background: var(--red); color: #fff;
+    padding: 1px 6px; border-radius: 10px; min-width: 18px; text-align: center;
+  }
+  .nav-item .badge.yellow { background: var(--yellow); }
+  .sidebar-footer {
+    padding: 12px 14px 20px;
+    border-top: 1px solid var(--gray-100);
+  }
+  .sidebar-user {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .user-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, #2563EB, #7C3AED);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 12px; font-weight: 700; flex-shrink: 0;
+  }
+  .user-info .user-name { font-size: 12px; font-weight: 600; color: var(--gray-800); }
+  .user-info .user-role { font-size: 11px; color: var(--gray-400); }
+
+  /* =========================================
+     MAIN LAYOUT
+  ========================================= */
+  .main-wrap {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  .topbar {
+    height: var(--header-h);
+    background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex; align-items: center;
+    padding: 0 28px;
+    gap: 16px;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .topbar-title { font-size: 16px; font-weight: 700; color: var(--gray-900); flex: 1; }
+  .topbar-subtitle { font-size: 12px; color: var(--gray-400); font-weight: 400; margin-top: 1px; }
+  .topbar-actions { display: flex; align-items: center; gap: 10px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 8px 16px; border-radius: 8px;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: all var(--transition); border: none;
+  }
+  .btn-primary { background: var(--blue); color: #fff; }
+  .btn-primary:hover { background: var(--blue-dk); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,.3); }
+  .btn-outline { background: #fff; color: var(--gray-700); border: 1px solid var(--gray-200); }
+  .btn-outline:hover { background: var(--gray-50); border-color: var(--gray-300); }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+  .btn-icon {
+    width: 36px; height: 36px; padding: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 8px; background: var(--gray-100); color: var(--gray-600);
+    border: 1px solid var(--gray-200); transition: all var(--transition);
+  }
+  .btn-icon:hover { background: var(--gray-200); }
+  .content { padding: 28px; flex: 1; }
+
+  /* =========================================
+     SCREEN VISIBILITY
+  ========================================= */
+  .screen { display: none; animation: fadeIn .25s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* =========================================
+     CARDS
+  ========================================= */
+  .card {
+    background: #fff;
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--gray-100);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-title { font-size: 14px; font-weight: 700; color: var(--gray-800); }
+  .card-subtitle { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+  .card-body { padding: 20px; }
+
+  /* =========================================
+     STAT CARDS
+  ========================================= */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: #fff;
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    padding: 18px 20px;
+    display: flex; align-items: flex-start; gap: 14px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition);
+  }
+  .stat-card:hover { box-shadow: var(--shadow); }
+  .stat-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .stat-icon.blue   { background: #EFF6FF; color: var(--blue); }
+  .stat-icon.green  { background: #ECFDF5; color: var(--green); }
+  .stat-icon.yellow { background: #FFFBEB; color: var(--yellow); }
+  .stat-icon.red    { background: #FEF2F2; color: var(--red); }
+  .stat-body { flex: 1; min-width: 0; }
+  .stat-label { font-size: 12px; color: var(--gray-400); font-weight: 500; margin-bottom: 4px; }
+  .stat-value { font-size: 24px; font-weight: 800; color: var(--gray-900); line-height: 1; margin-bottom: 4px; }
+  .stat-change {
+    font-size: 11px; font-weight: 600;
+    display: flex; align-items: center; gap: 3px;
+  }
+  .stat-change.up   { color: var(--green); }
+  .stat-change.down { color: var(--red); }
+  .stat-change.neutral { color: var(--gray-400); }
+
+  /* =========================================
+     DASHBOARD GRID
+  ========================================= */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  .dashboard-grid .full-width { grid-column: 1 / -1; }
+  .chart-container {
+    position: relative;
+    height: 220px;
+  }
+
+  /* =========================================
+     TABLES
+  ========================================= */
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  thead th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .05em;
+    color: var(--gray-400);
+    border-bottom: 1px solid var(--gray-100);
+    background: var(--gray-50);
+    white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid var(--gray-100); transition: background var(--transition); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--gray-50); }
+  tbody td { padding: 12px 14px; color: var(--gray-700); vertical-align: middle; }
+  .td-bold { font-weight: 600; color: var(--gray-900); }
+  .td-mono { font-family: 'Courier New', monospace; font-size: 12px; }
+  .td-small { font-size: 11px; color: var(--gray-400); }
+  .td-actions { display: flex; gap: 6px; }
+
+  /* =========================================
+     BADGES / STATUS PILLS
+  ========================================= */
+  .badge-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 600; white-space: nowrap;
+  }
+  .badge-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .status-ok      { background: #ECFDF5; color: #059669; }
+  .status-ok::before      { background: #10B981; }
+  .status-pending { background: #FFFBEB; color: #D97706; }
+  .status-pending::before { background: #F59E0B; }
+  .status-late    { background: #FEF2F2; color: #DC2626; }
+  .status-late::before    { background: #EF4444; }
+  .status-blue    { background: #EFF6FF; color: #2563EB; }
+  .status-blue::before    { background: #2563EB; }
+  .status-gray    { background: var(--gray-100); color: var(--gray-500); }
+  .status-gray::before    { background: var(--gray-300); }
+
+  /* =========================================
+     FILTERS / SEARCH BAR
+  ========================================= */
+  .filters-bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--gray-100);
+    background: var(--gray-50);
+    flex-wrap: wrap;
+  }
+  .search-input {
+    display: flex; align-items: center; gap: 8px;
+    background: #fff; border: 1px solid var(--gray-200);
+    border-radius: 8px; padding: 8px 12px;
+    flex: 1; min-width: 180px;
+    transition: border-color var(--transition);
+  }
+  .search-input:focus-within { border-color: var(--blue); }
+  .search-input i { color: var(--gray-400); font-size: 13px; }
+  .search-input input {
+    border: none; outline: none; background: none;
+    font-size: 13px; color: var(--gray-700); flex: 1;
+  }
+  .filter-select {
+    padding: 8px 12px; border: 1px solid var(--gray-200);
+    border-radius: 8px; background: #fff;
+    font-size: 13px; color: var(--gray-700);
+    outline: none; cursor: pointer;
+    transition: border-color var(--transition);
+  }
+  .filter-select:focus { border-color: var(--blue); }
+
+  /* =========================================
+     QUICK ACTIVITY / TIMELINE
+  ========================================= */
+  .activity-list { display: flex; flex-direction: column; gap: 0; }
+  .activity-item {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 11px 0; border-bottom: 1px solid var(--gray-100);
+  }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    margin-top: 5px; flex-shrink: 0;
+  }
+  .activity-dot.blue   { background: var(--blue); }
+  .activity-dot.green  { background: var(--green); }
+  .activity-dot.yellow { background: var(--yellow); }
+  .activity-dot.red    { background: var(--red); }
+  .activity-text { font-size: 12px; color: var(--gray-600); line-height: 1.5; flex: 1; }
+  .activity-text strong { color: var(--gray-800); font-weight: 600; }
+  .activity-time { font-size: 11px; color: var(--gray-400); white-space: nowrap; }
+
+  /* =========================================
+     PROGRESS BARS
+  ========================================= */
+  .progress-bar {
+    width: 100%; height: 6px; background: var(--gray-100);
+    border-radius: 3px; overflow: hidden;
+  }
+  .progress-fill { height: 100%; border-radius: 3px; transition: width .4s ease; }
+  .progress-fill.blue   { background: var(--blue); }
+  .progress-fill.green  { background: var(--green); }
+  .progress-fill.yellow { background: var(--yellow); }
+  .progress-fill.red    { background: var(--red); }
+
+  /* =========================================
+     OBLIGATION CALENDAR
+  ========================================= */
+  .obrig-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+    padding: 20px;
+  }
+  .obrig-card {
+    border-radius: 10px;
+    border: 1px solid var(--gray-200);
+    padding: 14px 16px;
+    display: flex; flex-direction: column; gap: 8px;
+    transition: box-shadow var(--transition);
+    background: #fff;
+  }
+  .obrig-card:hover { box-shadow: var(--shadow); }
+  .obrig-card.late  { border-left: 3px solid var(--red); }
+  .obrig-card.pending { border-left: 3px solid var(--yellow); }
+  .obrig-card.ok    { border-left: 3px solid var(--green); }
+  .obrig-header { display: flex; align-items: center; justify-content: space-between; }
+  .obrig-name { font-size: 13px; font-weight: 700; color: var(--gray-900); }
+  .obrig-deadline { font-size: 11px; color: var(--gray-400); }
+  .obrig-client { font-size: 12px; color: var(--gray-500); }
+  .obrig-progress-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--gray-400); }
+
+  /* =========================================
+     DOCUMENT GRID
+  ========================================= */
+  .doc-section { margin-bottom: 28px; }
+  .doc-section-title {
+    font-size: 13px; font-weight: 700; color: var(--gray-700);
+    margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+  }
+  .doc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .doc-card {
+    background: #fff; border: 1px solid var(--gray-200);
+    border-radius: 10px; padding: 16px;
+    display: flex; flex-direction: column; gap: 8px;
+    transition: all var(--transition); cursor: pointer;
+  }
+  .doc-card:hover { box-shadow: var(--shadow); border-color: var(--blue); transform: translateY(-2px); }
+  .doc-icon {
+    width: 40px; height: 40px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .doc-icon.pdf  { background: #FEE2E2; color: #DC2626; }
+  .doc-icon.xml  { background: #ECFDF5; color: #059669; }
+  .doc-icon.xls  { background: #F0FDF4; color: #16A34A; }
+  .doc-icon.zip  { background: #FFF7ED; color: #EA580C; }
+  .doc-icon.txt  { background: #F0F9FF; color: #0284C7; }
+  .doc-name { font-size: 12px; font-weight: 600; color: var(--gray-800); line-height: 1.3; }
+  .doc-meta { font-size: 11px; color: var(--gray-400); }
+  .doc-size { font-size: 10px; color: var(--gray-300); }
+
+  /* =========================================
+     UPLOAD ZONE
+  ========================================= */
+  .upload-zone {
+    border: 2px dashed var(--gray-200);
+    border-radius: 12px; padding: 32px;
+    text-align: center; background: var(--gray-50);
+    transition: all var(--transition); cursor: pointer;
+    margin-bottom: 24px;
+  }
+  .upload-zone:hover { border-color: var(--blue); background: var(--blue-lt); }
+  .upload-zone i { font-size: 32px; color: var(--gray-300); margin-bottom: 10px; display: block; }
+  .upload-zone .upload-title { font-size: 14px; font-weight: 600; color: var(--gray-700); margin-bottom: 4px; }
+  .upload-zone .upload-sub { font-size: 12px; color: var(--gray-400); }
+
+  /* =========================================
+     FINANCIAL
+  ========================================= */
+  .fin-summary-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    margin-bottom: 24px;
+  }
+  .fin-summary-card {
+    background: #fff; border: 1px solid var(--gray-200);
+    border-radius: var(--radius); padding: 20px;
+    text-align: center;
+  }
+  .fin-summary-card .fin-label { font-size: 11px; color: var(--gray-400); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+  .fin-summary-card .fin-value { font-size: 28px; font-weight: 800; margin: 6px 0 2px; }
+  .fin-summary-card .fin-sub   { font-size: 12px; color: var(--gray-400); }
+  .fin-value.green { color: var(--green); }
+  .fin-value.red   { color: var(--red); }
+  .fin-value.blue  { color: var(--blue); }
+
+  /* =========================================
+     CLIENT PORTAL
+  ========================================= */
+  .portal-header {
+    background: linear-gradient(135deg, #1D4ED8 0%, #2563EB 50%, #3B82F6 100%);
+    padding: 32px 28px;
+    color: #fff;
+    border-radius: var(--radius);
+    margin-bottom: 24px;
+  }
+  .portal-company { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+  .portal-cnpj { font-size: 13px; opacity: .7; }
+  .portal-stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 16px; margin-top: 24px;
+  }
+  .portal-stat { text-align: center; }
+  .portal-stat .p-val { font-size: 26px; font-weight: 800; }
+  .portal-stat .p-lab { font-size: 11px; opacity: .7; margin-top: 2px; }
+  .portal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  /* =========================================
+     MODAL OVERLAY
+  ========================================= */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(15,23,42,.4); z-index: 200;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(3px);
+  }
+  .modal-overlay.open { display: flex; animation: fadeIn .2s ease; }
+  .modal {
+    background: #fff; border-radius: 14px;
+    box-shadow: var(--shadow-md); width: 480px; max-width: 95vw;
+    overflow: hidden; animation: slideUp .2s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-header {
+    padding: 20px 24px 14px;
+    border-bottom: 1px solid var(--gray-100);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .modal-title { font-size: 15px; font-weight: 700; }
+  .modal-close {
+    width: 30px; height: 30px; border-radius: 6px;
+    background: var(--gray-100); color: var(--gray-500);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 16px; transition: background var(--transition);
+  }
+  .modal-close:hover { background: var(--gray-200); }
+  .modal-body { padding: 20px 24px; }
+  .modal-footer { padding: 14px 24px 20px; display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid var(--gray-100); }
+  .form-group { margin-bottom: 16px; }
+  .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--gray-600); margin-bottom: 5px; }
+  .form-input {
+    width: 100%; padding: 9px 12px;
+    border: 1px solid var(--gray-200); border-radius: 8px;
+    font-size: 13px; color: var(--gray-800); outline: none;
+    transition: border-color var(--transition);
+  }
+  .form-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* =========================================
+     TOAST NOTIFICATION
+  ========================================= */
+  .toast-container {
+    position: fixed; bottom: 24px; right: 24px;
+    z-index: 500; display: flex; flex-direction: column; gap: 8px;
+  }
+  .toast {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--gray-900); color: #fff;
+    padding: 12px 18px; border-radius: 10px;
+    font-size: 13px; font-weight: 500;
+    box-shadow: var(--shadow-md);
+    animation: slideUp .3s ease;
+    max-width: 340px;
+  }
+  .toast.success { background: var(--green); }
+  .toast.error   { background: var(--red); }
+  .toast.warning { background: var(--yellow); color: var(--gray-900); }
+  .toast i { font-size: 16px; }
+
+  /* =========================================
+     TABS
+  ========================================= */
+  .tabs { display: flex; border-bottom: 2px solid var(--gray-100); padding: 0 20px; }
+  .tab-btn {
+    padding: 11px 16px; font-size: 13px; font-weight: 500;
+    color: var(--gray-500); border-bottom: 2px solid transparent;
+    margin-bottom: -2px; cursor: pointer; transition: all var(--transition);
+    white-space: nowrap;
+  }
+  .tab-btn:hover  { color: var(--gray-700); }
+  .tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 600; }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  /* =========================================
+     EMPTY STATE
+  ========================================= */
+  .empty-state {
+    text-align: center; padding: 48px 20px; color: var(--gray-400);
+  }
+  .empty-state i { font-size: 40px; margin-bottom: 12px; display: block; }
+  .empty-state p { font-size: 14px; font-weight: 500; }
+  .empty-state small { font-size: 12px; }
+
+  /* =========================================
+     RESPONSIVE
+  ========================================= */
+  @media (max-width: 1100px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .portal-stats { grid-template-columns: repeat(2, 1fr); }
+    .fin-summary-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 768px) {
+    :root { --sidebar-w: 0px; }
+    .sidebar { transform: translateX(-240px); }
+    .sidebar.open { transform: translateX(0); }
+    .main-wrap { margin-left: 0; }
+    .stats-grid { grid-template-columns: 1fr; }
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .portal-grid { grid-template-columns: 1fr; }
+    .fin-summary-grid { grid-template-columns: 1fr; }
+    .portal-stats { grid-template-columns: repeat(2, 1fr); }
+    .content { padding: 16px; }
+    .topbar { padding: 0 16px; }
+    .mobile-menu-btn { display: flex !important; }
+    .obrig-grid { grid-template-columns: 1fr; padding: 14px; }
+    .doc-grid { grid-template-columns: repeat(2, 1fr); }
+    .form-row { grid-template-columns: 1fr; }
+  }
+  .mobile-menu-btn {
+    display: none; width: 36px; height: 36px;
+    border-radius: 8px; background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    align-items: center; justify-content: center;
+    color: var(--gray-600); font-size: 16px; cursor: pointer;
+  }
+  .overlay-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.4); z-index: 99;
+  }
+  .overlay-backdrop.open { display: block; }
+
+  /* =========================================
+     SCROLLBAR
+  ========================================= */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--gray-300); }
+
+  /* =========================================
+     HONOR TABLE specifics
+  ========================================= */
+  .honor-row td:nth-child(3) { font-weight: 700; color: var(--gray-900); }
+  .delinquent-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 600; color: var(--red);
+  }
+
+  /* =========================================
+     CALENDAR HEADER
+  ========================================= */
+  .cal-nav {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 20px; border-bottom: 1px solid var(--gray-100);
+  }
+  .cal-month { font-size: 15px; font-weight: 700; color: var(--gray-900); flex: 1; text-align: center; }
+  .cal-legend { display: flex; gap: 16px; padding: 10px 20px; border-bottom: 1px solid var(--gray-100); flex-wrap: wrap; }
+  .cal-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--gray-500); }
+  .cal-legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+  /* =========================================
+     HORIZONTAL SCROLLABLE TABLE
+  ========================================= */
+  .sticky-col {
+    position: sticky; left: 0;
+    background: #fff; z-index: 2;
+    border-right: 1px solid var(--gray-200);
+  }
+  thead .sticky-col { background: var(--gray-50); }
+</style>
+</head>
+<body>
+
+<!-- Mobile Backdrop -->
+<div class="overlay-backdrop" id="backdrop" onclick="closeSidebar()"></div>
+
+<!-- ===================== SIDEBAR ===================== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">CF</div>
+    <div class="logo-text">
+      <span>ContaFlow</span>
+      <span>Gestão Contábil</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <p class="nav-section-label">Principal</p>
+    <div class="nav-item active" onclick="navigate('dashboard')" id="nav-dashboard">
+      <i class="fas fa-chart-pie"></i> Dashboard
+    </div>
+    <div class="nav-item" onclick="navigate('clientes')" id="nav-clientes">
+      <i class="fas fa-building"></i> Clientes
+      <span class="badge">23</span>
+    </div>
+
+    <p class="nav-section-label">Fiscal</p>
+    <div class="nav-item" onclick="navigate('obrigacoes')" id="nav-obrigacoes">
+      <i class="fas fa-calendar-check"></i> Obrigações Fiscais
+      <span class="badge yellow">5</span>
+    </div>
+    <div class="nav-item" onclick="navigate('documentos')" id="nav-documentos">
+      <i class="fas fa-folder-open"></i> Documentos
+    </div>
+
+    <p class="nav-section-label">Gestão</p>
+    <div class="nav-item" onclick="navigate('financeiro')" id="nav-financeiro">
+      <i class="fas fa-dollar-sign"></i> Financeiro
+    </div>
+    <div class="nav-item" onclick="navigate('portal')" id="nav-portal">
+      <i class="fas fa-user-circle"></i> Portal do Cliente
+    </div>
+
+    <p class="nav-section-label">Sistema</p>
+    <div class="nav-item">
+      <i class="fas fa-cog"></i> Configurações
+    </div>
+    <div class="nav-item">
+      <i class="fas fa-bell"></i> Notificações
+      <span class="badge">3</span>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="user-avatar">RS</div>
+      <div class="user-info">
+        <div class="user-name">Ricardo Santos</div>
+        <div class="user-role">Contador Responsável</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ===================== MAIN WRAP ===================== -->
+<div class="main-wrap">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <button class="mobile-menu-btn" id="menuBtn" onclick="openSidebar()">
+      <i class="fas fa-bars"></i>
+    </button>
+    <div class="topbar-title" id="topbarTitle">
+      Dashboard
+      <div class="topbar-subtitle" id="topbarSubtitle">Visão geral — Fevereiro 2026</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn-icon" title="Pesquisar"><i class="fas fa-search"></i></button>
+      <button class="btn-icon" title="Notificações" style="position:relative">
+        <i class="fas fa-bell"></i>
+        <span style="position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid #fff"></span>
+      </button>
+      <button class="btn btn-primary btn-sm" onclick="openModal('modal-novo-cliente')">
+        <i class="fas fa-plus"></i> Novo
+      </button>
+    </div>
+  </div>
+
+  <!-- CONTENT AREA -->
+  <div class="content">
+
+    <!-- =========================================
+         SCREEN 1: DASHBOARD
+    ========================================= -->
+    <div class="screen active" id="screen-dashboard">
+
+      <!-- STATS -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="fas fa-building"></i></div>
+          <div class="stat-body">
+            <div class="stat-label">Clientes Ativos</div>
+            <div class="stat-value">23</div>
+            <div class="stat-change up"><i class="fas fa-arrow-up"></i> +2 este mês</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon yellow"><i class="fas fa-calendar-check"></i></div>
+          <div class="stat-body">
+            <div class="stat-label">Obrigações do Mês</div>
+            <div class="stat-value">38</div>
+            <div class="stat-change neutral"><i class="fas fa-minus"></i> 12 pendentes</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon red"><i class="fas fa-file-invoice"></i></div>
+          <div class="stat-body">
+            <div class="stat-label">Guias Pendentes</div>
+            <div class="stat-value">7</div>
+            <div class="stat-change down"><i class="fas fa-arrow-up"></i> +3 vs mês ant.</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="fas fa-file-upload"></i></div>
+          <div class="stat-body">
+            <div class="stat-label">Documentos Recebidos</div>
+            <div class="stat-value">142</div>
+            <div class="stat-change up"><i class="fas fa-arrow-up"></i> +27 esta semana</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW -->
+      <div class="dashboard-grid">
+        <!-- Revenue Chart -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Receita Mensal de Honorários</div>
+              <div class="card-subtitle">Jan–Fev 2026 | Valores em R$</div>
+            </div>
+            <select class="filter-select" style="font-size:11px;padding:4px 8px">
+              <option>2026</option>
+              <option>2025</option>
+            </select>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="chartReceita"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Obrigações Donut -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Status das Obrigações</div>
+              <div class="card-subtitle">Fevereiro 2026</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="chartObrig"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Atividade Recente</div>
+            <button class="btn btn-outline btn-sm">Ver todas</button>
+          </div>
+          <div class="card-body" style="padding:0 20px">
+            <div class="activity-list">
+              <div class="activity-item">
+                <div class="activity-dot green"></div>
+                <div class="activity-text"><strong>DCTF Entregue</strong> — Metalúrgica Paulista Ltda (02/02/2026)</div>
+                <div class="activity-time">hoje, 09:14</div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot blue"></div>
+                <div class="activity-text"><strong>Doc. recebido:</strong> NF-e XML — Farmácias Saúde S/A</div>
+                <div class="activity-time">hoje, 08:32</div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot yellow"></div>
+                <div class="activity-text"><strong>Pendência:</strong> Guia INSS vence em 3 dias — Padaria Recanto Ltda</div>
+                <div class="activity-time">ontem</div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot red"></div>
+                <div class="activity-text"><strong>Atrasado:</strong> SPED Fiscal — Distribuidora Alfa ME</div>
+                <div class="activity-time">ontem</div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot green"></div>
+                <div class="activity-text"><strong>Pagamento recebido:</strong> Honorários jan/26 — Construtora MG</div>
+                <div class="activity-time">19/02</div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot blue"></div>
+                <div class="activity-text"><strong>Novo cliente:</strong> Tech Solutions SP Ltda cadastrado</div>
+                <div class="activity-time">18/02</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clientes Inadimplentes -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Inadimplência</div>
+            <span class="badge-pill status-late">3 em aberto</span>
+          </div>
+          <div class="card-body" style="padding:0">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Cliente</th>
+                    <th>Venc.</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="td-bold">Distribuidora Alfa ME</td>
+                    <td>10/02</td>
+                    <td>R$ 1.200</td>
+                    <td><span class="badge-pill status-late">12 dias</span></td>
+                  </tr>
+                  <tr>
+                    <td class="td-bold">Padaria Recanto Ltda</td>
+                    <td>15/02</td>
+                    <td>R$ 850</td>
+                    <td><span class="badge-pill status-late">7 dias</span></td>
+                  </tr>
+                  <tr>
+                    <td class="td-bold">Auto Peças Nobre ME</td>
+                    <td>20/02</td>
+                    <td>R$ 650</td>
+                    <td><span class="badge-pill status-pending">Amanhã</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /dashboard-grid -->
+
+      <!-- Progress Section -->
+      <div class="card" style="margin-top:0">
+        <div class="card-header">
+          <div class="card-title">Progresso por Obrigação — Fev/2026</div>
+        </div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-600);margin-bottom:6px;font-weight:600">
+                <span>DCTF</span><span>18/23</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill blue" style="width:78%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-600);margin-bottom:6px;font-weight:600">
+                <span>SPED Fiscal</span><span>11/23</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill yellow" style="width:48%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-600);margin-bottom:6px;font-weight:600">
+                <span>EFD Contribuições</span><span>20/23</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill green" style="width:87%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-600);margin-bottom:6px;font-weight:600">
+                <span>DIRF</span><span>5/23</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill red" style="width:22%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-600);margin-bottom:6px;font-weight:600">
+                <span>ECF</span><span>0/23</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill gray" style="width:0%;background:var(--gray-200)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-600);margin-bottom:6px;font-weight:600">
+                <span>RAIS</span><span>21/23</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill green" style="width:91%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /screen-dashboard -->
+
+    <!-- =========================================
+         SCREEN 2: CLIENTES
+    ========================================= -->
+    <div class="screen" id="screen-clientes">
+      <div class="card">
+        <div class="filters-bar">
+          <div class="search-input">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Buscar por nome, CNPJ ou responsável..." id="searchClientes" oninput="filterClientes()">
+          </div>
+          <select class="filter-select" id="filterRegime" onchange="filterClientes()">
+            <option value="">Todos os Regimes</option>
+            <option value="Simples Nacional">Simples Nacional</option>
+            <option value="Lucro Presumido">Lucro Presumido</option>
+            <option value="Lucro Real">Lucro Real</option>
+            <option value="MEI">MEI</option>
+          </select>
+          <select class="filter-select" id="filterStatus" onchange="filterClientes()">
+            <option value="">Todos os Status</option>
+            <option value="Ativo">Ativo</option>
+            <option value="Suspenso">Suspenso</option>
+            <option value="Inativo">Inativo</option>
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="openModal('modal-novo-cliente')">
+            <i class="fas fa-plus"></i> Novo Cliente
+          </button>
+        </div>
+
+        <div class="table-wrap">
+          <table id="tabelaClientes">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Razão Social</th>
+                <th>CNPJ</th>
+                <th>Regime</th>
+                <th>Responsável</th>
+                <th>Doc. Pendentes</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyClientes">
+              <!-- JS populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- /screen-clientes -->
+
+    <!-- =========================================
+         SCREEN 3: OBRIGAÇÕES FISCAIS
+    ========================================= -->
+    <div class="screen" id="screen-obrigacoes">
+      <div class="card">
+        <div class="cal-nav">
+          <button class="btn-icon" onclick="prevMonth()"><i class="fas fa-chevron-left"></i></button>
+          <div class="cal-month" id="calMonthLabel">Fevereiro 2026</div>
+          <button class="btn-icon" onclick="nextMonth()"><i class="fas fa-chevron-right"></i></button>
+          <select class="filter-select" id="filterObrigType" onchange="renderObrigacoes()">
+            <option value="">Todas</option>
+            <option value="DCTF">DCTF</option>
+            <option value="SPED">SPED</option>
+            <option value="ECD">ECD</option>
+            <option value="ECF">ECF</option>
+            <option value="DIRF">DIRF</option>
+            <option value="RAIS">RAIS</option>
+            <option value="GFIP">GFIP</option>
+          </select>
+          <select class="filter-select" id="filterObrigStatus" onchange="renderObrigacoes()">
+            <option value="">Todos os Status</option>
+            <option value="entregue">Entregue</option>
+            <option value="pendente">Pendente</option>
+            <option value="atrasado">Atrasado</option>
+          </select>
+        </div>
+        <div class="cal-legend">
+          <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--green)"></div>Entregue</div>
+          <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--yellow)"></div>Pendente</div>
+          <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--red)"></div>Atrasado</div>
+          <div style="margin-left:auto;font-size:12px;color:var(--gray-400)">
+            Total: <strong id="obrigTotal" style="color:var(--gray-700)">0</strong> obrigações
+          </div>
+        </div>
+        <div class="obrig-grid" id="obrigGrid">
+          <!-- JS populated -->
+        </div>
+      </div>
+    </div><!-- /screen-obrigacoes -->
+
+    <!-- =========================================
+         SCREEN 4: DOCUMENTOS
+    ========================================= -->
+    <div class="screen" id="screen-documentos">
+
+      <!-- Upload Zone -->
+      <div class="upload-zone" onclick="showToast('Área de upload — integrar com backend', 'blue')">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <div class="upload-title">Arraste arquivos aqui ou clique para enviar</div>
+        <div class="upload-sub">Suporta PDF, XML (NF-e), XLS, ZIP — até 50 MB por arquivo</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Gerenciador de Documentos</div>
+          <div style="display:flex;gap:8px">
+            <select class="filter-select" id="docClientFilter" onchange="renderDocs()">
+              <option value="">Todos os Clientes</option>
+              <option value="Metalúrgica Paulista">Metalúrgica Paulista</option>
+              <option value="Farmácias Saúde">Farmácias Saúde</option>
+              <option value="Construtora MG">Construtora MG</option>
+              <option value="Tech Solutions">Tech Solutions</option>
+            </select>
+            <select class="filter-select" id="docTypeFilter" onchange="renderDocs()">
+              <option value="">Todos os Tipos</option>
+              <option value="NF-e">Notas Fiscais</option>
+              <option value="Contra-cheque">Contracheques</option>
+              <option value="Guia">Guias</option>
+              <option value="Contrato">Contratos</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="tabs" id="docTabs">
+          <div class="tab-btn active" onclick="switchDocTab(0)">Notas Fiscais</div>
+          <div class="tab-btn" onclick="switchDocTab(1)">Contracheques</div>
+          <div class="tab-btn" onclick="switchDocTab(2)">Guias de Pagamento</div>
+          <div class="tab-btn" onclick="switchDocTab(3)">Contratos</div>
+        </div>
+
+        <div style="padding:20px">
+          <!-- Tab 0: Notas Fiscais -->
+          <div class="tab-pane active" id="docTab0">
+            <div class="doc-section">
+              <div class="doc-section-title">
+                <i class="fas fa-calendar-alt" style="color:var(--blue)"></i>
+                Fevereiro 2026
+              </div>
+              <div class="doc-grid" id="docGridNF">
+                <!-- JS populated -->
+              </div>
+            </div>
+            <div class="doc-section">
+              <div class="doc-section-title">
+                <i class="fas fa-calendar-alt" style="color:var(--gray-400)"></i>
+                Janeiro 2026
+              </div>
+              <div class="doc-grid" id="docGridNFJan">
+                <!-- JS populated -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 1: Contracheques -->
+          <div class="tab-pane" id="docTab1">
+            <div class="doc-grid" id="docGridCC"></div>
+          </div>
+
+          <!-- Tab 2: Guias -->
+          <div class="tab-pane" id="docTab2">
+            <div class="doc-grid" id="docGridGuias"></div>
+          </div>
+
+          <!-- Tab 3: Contratos -->
+          <div class="tab-pane" id="docTab3">
+            <div class="doc-grid" id="docGridContratos"></div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /screen-documentos -->
+
+    <!-- =========================================
+         SCREEN 5: FINANCEIRO
+    ========================================= -->
+    <div class="screen" id="screen-financeiro">
+
+      <!-- Summary -->
+      <div class="fin-summary-grid">
+        <div class="fin-summary-card">
+          <div class="fin-label">Receita Esperada</div>
+          <div class="fin-value blue">R$ 32.450</div>
+          <div class="fin-sub">Fevereiro 2026</div>
+        </div>
+        <div class="fin-summary-card">
+          <div class="fin-label">Recebido</div>
+          <div class="fin-value green">R$ 27.100</div>
+          <div class="fin-sub">83,5% da meta</div>
+        </div>
+        <div class="fin-summary-card">
+          <div class="fin-label">Inadimplência</div>
+          <div class="fin-value red">R$ 2.700</div>
+          <div class="fin-sub">3 clientes em aberto</div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Receita Recorrente Chart -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Receita Recorrente (MRR)</div>
+              <div class="card-subtitle">Últimos 12 meses</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="chartMRR"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status Boletos -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Boletos — Fev/2026</div>
+              <div class="card-subtitle">Gerados este mês</div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="showToast('Gerar boleto — integração bancária', 'blue')">
+              <i class="fas fa-barcode"></i> Gerar
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="chartBoletos"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabela Honorários -->
+      <div class="card" style="margin-top:0">
+        <div class="card-header">
+          <div class="card-title">Honorários por Cliente — Fev/2026</div>
+          <button class="btn btn-outline btn-sm"><i class="fas fa-download"></i> Exportar</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Regime</th>
+                <th>Honorário</th>
+                <th>Vencimento</th>
+                <th>Status</th>
+                <th>Boleto</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyHonorarios">
+              <!-- JS populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- /screen-financeiro -->
+
+    <!-- =========================================
+         SCREEN 6: PORTAL DO CLIENTE
+    ========================================= -->
+    <div class="screen" id="screen-portal">
+
+      <!-- Client Selector -->
+      <div style="margin-bottom:20px;display:flex;gap:12px;align-items:center">
+        <label style="font-size:13px;font-weight:600;color:var(--gray-600)">Visualizando como:</label>
+        <select class="filter-select" id="portalClientSelect" onchange="switchPortalClient()" style="font-size:13px;font-weight:600;color:var(--gray-800);min-width:260px">
+          <option value="0">Metalúrgica Paulista Ltda</option>
+          <option value="1">Farmácias Saúde S/A</option>
+          <option value="2">Construtora MG e Associados</option>
+          <option value="3">Tech Solutions SP Ltda</option>
+        </select>
+        <span style="font-size:11px;color:var(--gray-400);background:var(--blue-lt);padding:4px 10px;border-radius:20px;color:var(--blue);font-weight:600">
+          <i class="fas fa-eye"></i> Modo Visualização
+        </span>
+      </div>
+
+      <!-- Portal Header -->
+      <div class="portal-header" id="portalHeader">
+        <div class="portal-company" id="portalCompanyName">Metalúrgica Paulista Ltda</div>
+        <div class="portal-cnpj" id="portalCNPJ">CNPJ: 12.345.678/0001-90 · Lucro Presumido · Ativo</div>
+        <div class="portal-stats">
+          <div class="portal-stat">
+            <div class="p-val" id="portalDocPend">4</div>
+            <div class="p-lab">Docs Pendentes</div>
+          </div>
+          <div class="portal-stat">
+            <div class="p-val" id="portalGuias">3</div>
+            <div class="p-lab">Guias p/ Pagar</div>
+          </div>
+          <div class="portal-stat">
+            <div class="p-val" id="portalObrigOk">5</div>
+            <div class="p-lab">Obrig. OK</div>
+          </div>
+          <div class="portal-stat">
+            <div class="p-val" id="portalObrigPend">2</div>
+            <div class="p-lab">Obrig. Pendentes</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Portal Grid -->
+      <div class="portal-grid">
+
+        <!-- Meus Documentos -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-folder" style="color:var(--blue);margin-right:6px"></i>Meus Documentos</div>
+            <button class="btn btn-outline btn-sm" onclick="showToast('Download em lote', 'blue')">
+              <i class="fas fa-download"></i> Baixar Tudo
+            </button>
+          </div>
+          <div style="padding:0">
+            <div class="table-wrap">
+              <table id="portalDocsTable">
+                <thead>
+                  <tr>
+                    <th>Documento</th>
+                    <th>Tipo</th>
+                    <th>Data</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="tbodyPortalDocs">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guias para Pagar -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-barcode" style="color:var(--yellow);margin-right:6px"></i>Guias para Pagar</div>
+          </div>
+          <div class="card-body" style="padding:14px 20px;display:flex;flex-direction:column;gap:10px" id="portalGuiasList">
+            <!-- JS populated -->
+          </div>
+        </div>
+
+        <!-- Status Obrigações -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-tasks" style="color:var(--green);margin-right:6px"></i>Status das Obrigações</div>
+          </div>
+          <div style="padding:0">
+            <div class="table-wrap">
+              <table id="portalObrigTable">
+                <thead>
+                  <tr>
+                    <th>Obrigação</th>
+                    <th>Prazo</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="tbodyPortalObrig">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mensagens do Escritório -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-comments" style="color:var(--blue);margin-right:6px"></i>Avisos do Escritório</div>
+          </div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+            <div style="padding:12px;background:var(--blue-lt);border-radius:8px;border-left:3px solid var(--blue)">
+              <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:3px">📋 Lembrete Importante</div>
+              <div style="font-size:12px;color:var(--gray-600)">Favor enviar as notas fiscais de fevereiro/2026 até o dia <strong>25/02</strong> para não atrasar a apuração do imposto.</div>
+              <div style="font-size:10px;color:var(--gray-400);margin-top:6px">Escritório Santos & Associados · 18/02/2026</div>
+            </div>
+            <div style="padding:12px;background:#FFFBEB;border-radius:8px;border-left:3px solid var(--yellow)">
+              <div style="font-size:12px;font-weight:700;color:var(--yellow);margin-bottom:3px">⚠️ Vencimento Próximo</div>
+              <div style="font-size:12px;color:var(--gray-600)">O SIMPLES NACIONAL de jan/2026 vence em <strong>20/02/2026</strong>. Guia disponível para download.</div>
+              <div style="font-size:10px;color:var(--gray-400);margin-top:6px">Sistema Automático · 15/02/2026</div>
+            </div>
+            <div style="padding:12px;background:#ECFDF5;border-radius:8px;border-left:3px solid var(--green)">
+              <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:3px">✅ DCTF Entregue</div>
+              <div style="font-size:12px;color:var(--gray-600)">Sua DCTF referente a dez/2025 foi entregue com sucesso em 15/01/2026. Protocolo: 1234.56789.2025.</div>
+              <div style="font-size:10px;color:var(--gray-400);margin-top:6px">Sistema · 15/01/2026</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /portal-grid -->
+    </div><!-- /screen-portal -->
+
+  </div><!-- /content -->
+</div><!-- /main-wrap -->
+
+<!-- ===================== MODALS ===================== -->
+
+<!-- Modal: Novo Cliente -->
+<div class="modal-overlay" id="modal-novo-cliente">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Novo Cliente</div>
+      <button class="modal-close" onclick="closeModal('modal-novo-cliente')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Razão Social *</label>
+          <input type="text" class="form-input" placeholder="Ex: Empresa XYZ Ltda">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nome Fantasia</label>
+          <input type="text" class="form-input" placeholder="Ex: Empresa XYZ">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">CNPJ *</label>
+          <input type="text" class="form-input" placeholder="00.000.000/0000-00">
+        </div>
+        <div class="form-group">
+          <label class="form-label">IE (Inscrição Estadual)</label>
+          <input type="text" class="form-input" placeholder="000.000.000.000">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Regime Tributário *</label>
+          <select class="form-input">
+            <option>Simples Nacional</option>
+            <option>Lucro Presumido</option>
+            <option>Lucro Real</option>
+            <option>MEI</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Honorário Mensal *</label>
+          <input type="text" class="form-input" placeholder="R$ 0,00">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">E-mail do Responsável *</label>
+        <input type="email" class="form-input" placeholder="responsavel@empresa.com.br">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Telefone</label>
+          <input type="text" class="form-input" placeholder="(11) 00000-0000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data Início Contrato</label>
+          <input type="date" class="form-input">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-novo-cliente')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveNewClient()"><i class="fas fa-check"></i> Salvar Cliente</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===================== JAVASCRIPT ===================== -->
+<script>
+// =========================================
+// DATA — Realistic Brazilian fake data
+// =========================================
+const CLIENTES = [
+  { id:1, razao:"Metalúrgica Paulista Ltda",    fantasia:"MetalPaul",      cnpj:"12.345.678/0001-90", regime:"Lucro Presumido",   resp:"Ana Lima",      docPend:4, status:"Ativo",    honorario:2800 },
+  { id:2, razao:"Farmácias Saúde S/A",          fantasia:"FarmaçaSaúde",   cnpj:"23.456.789/0001-12", regime:"Lucro Real",        resp:"Carlos Melo",   docPend:1, status:"Ativo",    honorario:4500 },
+  { id:3, razao:"Construtora MG e Associados",  fantasia:"Construtora MG", cnpj:"34.567.890/0001-34", regime:"Lucro Presumido",   resp:"Fernanda Gomes",docPend:0, status:"Ativo",    honorario:3200 },
+  { id:4, razao:"Tech Solutions SP Ltda",       fantasia:"TechSP",         cnpj:"45.678.901/0001-56", regime:"Lucro Presumido",   resp:"Diego Alves",   docPend:7, status:"Ativo",    honorario:2100 },
+  { id:5, razao:"Distribuidora Alfa ME",        fantasia:"Alfa Dist",      cnpj:"56.789.012/0001-78", regime:"Simples Nacional",  resp:"Patricia Souza",docPend:2, status:"Suspenso", honorario:1200 },
+  { id:6, razao:"Padaria Recanto Ltda",         fantasia:"Recanto",        cnpj:"67.890.123/0001-90", regime:"Simples Nacional",  resp:"Marcos Ribeiro",docPend:3, status:"Ativo",    honorario:850  },
+  { id:7, razao:"Auto Peças Nobre ME",          fantasia:"Nobre Peças",    cnpj:"78.901.234/0001-11", regime:"MEI",               resp:"Silvia Nobre",  docPend:1, status:"Ativo",    honorario:650  },
+  { id:8, razao:"Serviços Gerais Omega Ltda",   fantasia:"Omega Serv",     cnpj:"89.012.345/0001-23", regime:"Simples Nacional",  resp:"Bruno Costa",   docPend:0, status:"Ativo",    honorario:1400 },
+  { id:9, razao:"Academia FitLife Ltda",        fantasia:"FitLife",        cnpj:"90.123.456/0001-45", regime:"Simples Nacional",  resp:"Juliana Freitas",docPend:5,status:"Ativo",    honorario:1100 },
+  { id:10,razao:"Escritório Advocacia Torres",  fantasia:"Torres Adv",     cnpj:"01.234.567/0001-67", regime:"Lucro Presumido",   resp:"Rafael Torres", docPend:2, status:"Ativo",    honorario:1800 },
+  { id:11,razao:"Clínica Bem Estar S/S",        fantasia:"Bem Estar",      cnpj:"12.234.578/0001-88", regime:"Lucro Presumido",   resp:"Dra. Camila",   docPend:0, status:"Ativo",    honorario:2200 },
+  { id:12,razao:"Supermercado Família Ltda",    fantasia:"Família Mercado", cnpj:"22.345.680/0001-09",regime:"Lucro Real",        resp:"João Família",  docPend:9, status:"Ativo",    honorario:5800 },
+  { id:13,razao:"Transportadora RápidLog ME",   fantasia:"RápidLog",       cnpj:"33.456.791/0001-20", regime:"Simples Nacional",  resp:"Wilson Santos", docPend:1, status:"Inativo",  honorario:980  },
+  { id:14,razao:"Pousada Beira Rio Ltda",       fantasia:"Beira Rio",      cnpj:"44.567.802/0001-41", regime:"Lucro Presumido",   resp:"Elaine Ramos",  docPend:2, status:"Ativo",    honorario:1600 },
+  { id:15,razao:"Gráfica Expressão Digital ME", fantasia:"ExprDigital",    cnpj:"55.678.913/0001-62", regime:"MEI",               resp:"Thiago Luz",    docPend:0, status:"Ativo",    honorario:550  },
+  { id:16,razao:"Petshop Patinha Feliz Ltda",   fantasia:"Patinha Feliz",  cnpj:"66.789.024/0001-83", regime:"Simples Nacional",  resp:"Aline Borges",  docPend:4, status:"Ativo",    honorario:920  },
+  { id:17,razao:"Imobiliária Vista Mar S/A",    fantasia:"Vista Mar",      cnpj:"77.890.135/0001-04", regime:"Lucro Real",        resp:"Eduardo Mendes",docPend:0, status:"Ativo",    honorario:3800 },
+  { id:18,razao:"Escola Infantil Sonhos ME",    fantasia:"Sonhos",         cnpj:"88.901.246/0001-25", regime:"Simples Nacional",  resp:"Patrícia Lima",  docPend:3,status:"Ativo",    honorario:1050 },
+  { id:19,razao:"Restaurante Sabor & Arte Ltda",fantasia:"Sabor & Arte",   cnpj:"99.012.357/0001-46", regime:"Simples Nacional",  resp:"Chef Marcos",   docPend:2, status:"Ativo",    honorario:1300 },
+  { id:20,razao:"Farmacêutica Nacional S/A",    fantasia:"FarmaNac",       cnpj:"10.123.468/0001-67", regime:"Lucro Real",        resp:"Dra. Helena",   docPend:0, status:"Ativo",    honorario:6200 },
+  { id:21,razao:"Oficina TechCar Ltda",         fantasia:"TechCar",        cnpj:"21.234.579/0001-88", regime:"Simples Nacional",  resp:"Rogério Pinto", docPend:1, status:"Ativo",    honorario:780  },
+  { id:22,razao:"Floricultura Jardim Vivo ME",  fantasia:"Jardim Vivo",    cnpj:"32.345.680/0001-09", regime:"MEI",               resp:"Lúcia Verde",   docPend:0, status:"Ativo",    honorario:480  },
+  { id:23,razao:"Software House Inovare Ltda",  fantasia:"Inovare Dev",    cnpj:"43.456.791/0001-20", regime:"Lucro Presumido",   resp:"Arthur Dev",    docPend:2, status:"Ativo",    honorario:2600 },
+];
+
+const OBRIGACOES_DATA = [
+  // entregue
+  { tipo:"DCTF",  cliente:"Metalúrgica Paulista Ltda",   prazo:"15/02/2026", status:"entregue", entregue:"02/02/2026", prog:100 },
+  { tipo:"DCTF",  cliente:"Farmácias Saúde S/A",         prazo:"15/02/2026", status:"entregue", entregue:"10/02/2026", prog:100 },
+  { tipo:"DCTF",  cliente:"Construtora MG e Associados", prazo:"15/02/2026", status:"entregue", entregue:"12/02/2026", prog:100 },
+  { tipo:"DCTF",  cliente:"Tech Solutions SP Ltda",      prazo:"15/02/2026", status:"pendente", entregue:"",           prog:60  },
+  { tipo:"DCTF",  cliente:"Imobiliária Vista Mar S/A",   prazo:"15/02/2026", status:"atrasado", entregue:"",           prog:0   },
+  { tipo:"SPED",  cliente:"Farmácias Saúde S/A",         prazo:"25/02/2026", status:"pendente", entregue:"",           prog:40  },
+  { tipo:"SPED",  cliente:"Metalúrgica Paulista Ltda",   prazo:"25/02/2026", status:"pendente", entregue:"",           prog:30  },
+  { tipo:"SPED",  cliente:"Distribuidora Alfa ME",       prazo:"20/02/2026", status:"atrasado", entregue:"",           prog:0   },
+  { tipo:"SPED",  cliente:"Supermercado Família Ltda",   prazo:"25/02/2026", status:"pendente", entregue:"",           prog:70  },
+  { tipo:"GFIP",  cliente:"Metalúrgica Paulista Ltda",   prazo:"07/02/2026", status:"entregue", entregue:"05/02/2026", prog:100 },
+  { tipo:"GFIP",  cliente:"Construtora MG e Associados", prazo:"07/02/2026", status:"entregue", entregue:"06/02/2026", prog:100 },
+  { tipo:"GFIP",  cliente:"Padaria Recanto Ltda",        prazo:"07/02/2026", status:"entregue", entregue:"07/02/2026", prog:100 },
+  { tipo:"DIRF",  cliente:"Farmácias Saúde S/A",         prazo:"28/02/2026", status:"pendente", entregue:"",           prog:20  },
+  { tipo:"DIRF",  cliente:"Imobiliária Vista Mar S/A",   prazo:"28/02/2026", status:"pendente", entregue:"",           prog:50  },
+  { tipo:"DIRF",  cliente:"Farmacêutica Nacional S/A",   prazo:"28/02/2026", status:"pendente", entregue:"",           prog:80  },
+  { tipo:"ECD",   cliente:"Farmacêutica Nacional S/A",   prazo:"31/05/2026", status:"pendente", entregue:"",           prog:10  },
+  { tipo:"ECD",   cliente:"Supermercado Família Ltda",   prazo:"31/05/2026", status:"pendente", entregue:"",           prog:5   },
+  { tipo:"ECF",   cliente:"Farmácias Saúde S/A",         prazo:"31/07/2026", status:"pendente", entregue:"",           prog:0   },
+  { tipo:"RAIS",  cliente:"Metalúrgica Paulista Ltda",   prazo:"17/02/2026", status:"entregue", entregue:"10/02/2026", prog:100 },
+  { tipo:"RAIS",  cliente:"Construtora MG e Associados", prazo:"17/02/2026", status:"entregue", entregue:"14/02/2026", prog:100 },
+  { tipo:"RAIS",  cliente:"Farmacêutica Nacional S/A",   prazo:"17/02/2026", status:"entregue", entregue:"15/02/2026", prog:100 },
+  { tipo:"DCTF",  cliente:"Padaria Recanto Ltda",        prazo:"15/02/2026", status:"atrasado", entregue:"",           prog:0   },
+  { tipo:"GFIP",  cliente:"Distribuidora Alfa ME",       prazo:"07/02/2026", status:"atrasado", entregue:"",           prog:0   },
+];
+
+const DOCS_NF_FEV = [
+  { nome:"NF-e 001234 - Metalúrgica Paulista",    tipo:"xml",  data:"05/02/2026", size:"12 KB", client:"Metalúrgica Paulista" },
+  { nome:"NF-e 002345 - Farmácias Saúde",         tipo:"xml",  data:"08/02/2026", size:"9 KB",  client:"Farmácias Saúde" },
+  { nome:"NF-e 003456 - Construtora MG",          tipo:"pdf",  data:"10/02/2026", size:"145 KB",client:"Construtora MG" },
+  { nome:"NF-e 004567 - Tech Solutions",          tipo:"xml",  data:"12/02/2026", size:"8 KB",  client:"Tech Solutions" },
+  { nome:"NF-e 005678 - Academia FitLife",        tipo:"xml",  data:"14/02/2026", size:"11 KB", client:"Farmácias Saúde" },
+  { nome:"NF-e 006789 - Supermercado Família",    tipo:"pdf",  data:"15/02/2026", size:"230 KB",client:"Construtora MG" },
+  { nome:"NF-e Lote Fev/2026 - Vista Mar",        tipo:"zip",  data:"17/02/2026", size:"1.2 MB",client:"Metalúrgica Paulista" },
+  { nome:"NF-e 008901 - Farmacêutica Nacional",   tipo:"xml",  data:"18/02/2026", size:"14 KB", client:"Tech Solutions" },
+];
+
+const DOCS_NF_JAN = [
+  { nome:"NF-e Lote Jan/2026 - Metalúrgica",      tipo:"zip",  data:"31/01/2026", size:"3.4 MB",client:"Metalúrgica Paulista" },
+  { nome:"NF-e 009012 - Farmácias Saúde",         tipo:"xml",  data:"28/01/2026", size:"10 KB", client:"Farmácias Saúde" },
+  { nome:"NF-e 010123 - Construtora MG",          tipo:"pdf",  data:"25/01/2026", size:"180 KB",client:"Construtora MG" },
+  { nome:"Relatório NF Jan/2026",                 tipo:"xls",  data:"31/01/2026", size:"55 KB", client:"Tech Solutions" },
+];
+
+const DOCS_CC = [
+  { nome:"Contra-cheque Jan/26 - João Silva",     tipo:"pdf",  data:"31/01/2026", size:"88 KB", client:"Metalúrgica Paulista" },
+  { nome:"Contra-cheque Jan/26 - Maria Santos",   tipo:"pdf",  data:"31/01/2026", size:"88 KB", client:"Metalúrgica Paulista" },
+  { nome:"Holerite Fev/26 - Equipe TI",           tipo:"pdf",  data:"15/02/2026", size:"210 KB",client:"Tech Solutions" },
+  { nome:"Folha Pgto Fev/26 - Farmácias",         tipo:"xls",  data:"20/02/2026", size:"45 KB", client:"Farmácias Saúde" },
+  { nome:"Contra-cheque Fev/26 - Carlos Melo",    tipo:"pdf",  data:"28/02/2026", size:"91 KB", client:"Construtora MG" },
+];
+
+const DOCS_GUIAS = [
+  { nome:"DAS Simples Jan/26 - Padaria Recanto",  tipo:"pdf",  data:"18/02/2026", size:"65 KB", client:"Farmácias Saúde" },
+  { nome:"DARF IRPJ 4T25 - Farmácias Saúde",      tipo:"pdf",  data:"12/02/2026", size:"72 KB", client:"Farmácias Saúde" },
+  { nome:"GPS INSS Fev/26 - Metalúrgica",         tipo:"pdf",  data:"20/02/2026", size:"58 KB", client:"Metalúrgica Paulista" },
+  { nome:"FGTS Fev/26 - Construtora MG",          tipo:"pdf",  data:"20/02/2026", size:"61 KB", client:"Construtora MG" },
+  { nome:"ISS Mensal Fev/26 - Tech Solutions",    tipo:"pdf",  data:"22/02/2026", size:"49 KB", client:"Tech Solutions" },
+  { nome:"DAS MEI Jan/26 - Auto Peças Nobre",     tipo:"pdf",  data:"17/02/2026", size:"32 KB", client:"Metalúrgica Paulista" },
+];
+
+const DOCS_CONTRATOS = [
+  { nome:"Contrato Prestação Serviços - FarmaS",  tipo:"pdf",  data:"01/01/2026", size:"320 KB",client:"Farmácias Saúde" },
+  { nome:"Contrato Aditivo - Construtora MG",     tipo:"pdf",  data:"15/01/2026", size:"185 KB",client:"Construtora MG" },
+  { nome:"Procuração CNPJ - Tech Solutions",      tipo:"pdf",  data:"03/02/2026", size:"95 KB", client:"Tech Solutions" },
+  { nome:"Contrato Social - Metalúrgica Paulista",tipo:"pdf",  data:"10/01/2026", size:"440 KB",client:"Metalúrgica Paulista" },
+];
+
+const PORTAL_CLIENTS = [
+  {
+    name:"Metalúrgica Paulista Ltda",
+    cnpj:"12.345.678/0001-90",
+    regime:"Lucro Presumido",
+    docPend:4, guias:3, obrigOk:5, obrigPend:2,
+    docs:[
+      { name:"NF-e Lote Fev/2026",    type:"ZIP",  date:"17/02/2026" },
+      { name:"Contra-cheque Jan/26",  type:"PDF",  date:"31/01/2026" },
+      { name:"GPS INSS Fev/26",       type:"PDF",  date:"20/02/2026" },
+      { name:"Balancete Jan/2026",    type:"PDF",  date:"05/02/2026" },
+      { name:"DRE 2025",              type:"XLS",  date:"10/01/2026" },
+    ],
+    guiasList:[
+      { desc:"GPS INSS Fev/2026",     valor:"R$ 4.230,00", venc:"20/02/2026", status:"pendente" },
+      { desc:"FGTS Fev/2026",         valor:"R$ 2.180,00", venc:"20/02/2026", status:"pendente" },
+      { desc:"DARF CSLL 4T25",        valor:"R$ 1.560,00", venc:"28/02/2026", status:"pendente" },
+    ],
+    obrig:[
+      { name:"DCTF Jan/2026",         prazo:"15/02/2026", status:"entregue" },
+      { name:"GFIP Fev/2026",         prazo:"07/02/2026", status:"entregue" },
+      { name:"RAIS 2025",             prazo:"17/02/2026", status:"entregue" },
+      { name:"SPED Fiscal Jan/2026",  prazo:"25/02/2026", status:"pendente" },
+      { name:"ECD 2025",              prazo:"31/05/2026", status:"pendente" },
+      { name:"ECF 2025",              prazo:"31/07/2026", status:"pendente" },
+      { name:"DIRF 2025",             prazo:"28/02/2026", status:"pendente" },
+    ]
+  },
+  {
+    name:"Farmácias Saúde S/A",
+    cnpj:"23.456.789/0001-12",
+    regime:"Lucro Real",
+    docPend:1, guias:2, obrigOk:3, obrigPend:3,
+    docs:[
+      { name:"NF-e 002345 Jan/2026",  type:"XML",  date:"08/01/2026" },
+      { name:"LALUR 2025",            type:"PDF",  date:"15/01/2026" },
+      { name:"Balanço Patrimonial",   type:"XLS",  date:"20/01/2026" },
+    ],
+    guiasList:[
+      { desc:"IRPJ Lucro Real 4T25",  valor:"R$ 12.400,00", venc:"28/02/2026", status:"pendente" },
+      { desc:"CSLL 4T25",             valor:"R$ 4.460,00",  venc:"28/02/2026", status:"pendente" },
+    ],
+    obrig:[
+      { name:"DCTF Dez/2025",        prazo:"15/01/2026", status:"entregue" },
+      { name:"GFIP Jan/2026",        prazo:"07/02/2026", status:"entregue" },
+      { name:"RAIS 2025",            prazo:"17/02/2026", status:"entregue" },
+      { name:"SPED Fiscal Jan/2026", prazo:"25/02/2026", status:"pendente" },
+      { name:"DIRF 2025",            prazo:"28/02/2026", status:"pendente" },
+      { name:"ECD 2025",             prazo:"31/05/2026", status:"pendente" },
+    ]
+  },
+  {
+    name:"Construtora MG e Associados",
+    cnpj:"34.567.890/0001-34",
+    regime:"Lucro Presumido",
+    docPend:0, guias:2, obrigOk:4, obrigPend:1,
+    docs:[
+      { name:"NF-e Serviços Fev/26",  type:"XML",  date:"10/02/2026" },
+      { name:"Planilha Custos MG",    type:"XLS",  date:"12/02/2026" },
+      { name:"FGTS Fev/2026",         type:"PDF",  date:"20/02/2026" },
+      { name:"Contrato Obra 2026-01", type:"PDF",  date:"03/02/2026" },
+    ],
+    guiasList:[
+      { desc:"FGTS Fev/2026",         valor:"R$ 3.100,00", venc:"20/02/2026", status:"pendente" },
+      { desc:"ISS Mensal Fev/26",     valor:"R$ 980,00",   venc:"25/02/2026", status:"pendente" },
+    ],
+    obrig:[
+      { name:"DCTF Jan/2026",        prazo:"15/02/2026", status:"entregue" },
+      { name:"GFIP Fev/2026",        prazo:"07/02/2026", status:"entregue" },
+      { name:"RAIS 2025",            prazo:"17/02/2026", status:"entregue" },
+      { name:"DIRF 2025",            prazo:"28/02/2026", status:"entregue" },
+      { name:"SPED Fiscal Jan/2026", prazo:"25/02/2026", status:"pendente" },
+    ]
+  },
+  {
+    name:"Tech Solutions SP Ltda",
+    cnpj:"45.678.901/0001-56",
+    regime:"Lucro Presumido",
+    docPend:7, guias:1, obrigOk:2, obrigPend:3,
+    docs:[
+      { name:"NF-e Serv 004567",      type:"XML",  date:"12/02/2026" },
+      { name:"Holerite Fev/26 TI",    type:"PDF",  date:"15/02/2026" },
+    ],
+    guiasList:[
+      { desc:"ISS Mensal Fev/2026",   valor:"R$ 1.240,00", venc:"22/02/2026", status:"pendente" },
+    ],
+    obrig:[
+      { name:"GFIP Jan/2026",        prazo:"07/01/2026", status:"entregue" },
+      { name:"RAIS 2025",            prazo:"17/02/2026", status:"entregue" },
+      { name:"DCTF Jan/2026",        prazo:"15/02/2026", status:"pendente" },
+      { name:"SPED Fiscal Jan/2026", prazo:"25/02/2026", status:"pendente" },
+      { name:"DIRF 2025",            prazo:"28/02/2026", status:"pendente" },
+    ]
+  },
+];
+
+const HONORARIOS = [
+  { client:"Metalúrgica Paulista Ltda",    regime:"Lucro Presumido",  valor:2800, venc:"10/02/2026", status:"pago",     boleto:"BOL-2026-001" },
+  { client:"Farmácias Saúde S/A",          regime:"Lucro Real",       valor:4500, venc:"10/02/2026", status:"pago",     boleto:"BOL-2026-002" },
+  { client:"Construtora MG e Associados",  regime:"Lucro Presumido",  valor:3200, venc:"10/02/2026", status:"pago",     boleto:"BOL-2026-003" },
+  { client:"Tech Solutions SP Ltda",       regime:"Lucro Presumido",  valor:2100, venc:"10/02/2026", status:"pago",     boleto:"BOL-2026-004" },
+  { client:"Distribuidora Alfa ME",        regime:"Simples Nacional", valor:1200, venc:"10/02/2026", status:"atrasado", boleto:"BOL-2026-005" },
+  { client:"Padaria Recanto Ltda",         regime:"Simples Nacional", valor:850,  venc:"15/02/2026", status:"atrasado", boleto:"BOL-2026-006" },
+  { client:"Auto Peças Nobre ME",          regime:"MEI",              valor:650,  venc:"20/02/2026", status:"pendente", boleto:"BOL-2026-007" },
+  { client:"Serviços Gerais Omega Ltda",   regime:"Simples Nacional", valor:1400, venc:"10/02/2026", status:"pago",     boleto:"BOL-2026-008" },
+  { client:"Academia FitLife Ltda",        regime:"Simples Nacional", valor:1100, venc:"10/02/2026", status:"pago",     boleto:"BOL-2026-009" },
+  { client:"Escritório Advocacia Torres",  regime:"Lucro Presumido",  valor:1800, venc:"10/02/2026", status:"pago",     boleto:"BOL-2026-010" },
+  { client:"Clínica Bem Estar S/S",        regime:"Lucro Presumido",  valor:2200, venc:"10/02/2026", status:"pago",     boleto:"BOL-2026-011" },
+  { client:"Supermercado Família Ltda",    regime:"Lucro Real",       valor:5800, venc:"10/02/2026", status:"pago",     boleto:"BOL-2026-012" },
+  { client:"Pousada Beira Rio Ltda",       regime:"Lucro Presumido",  valor:1600, venc:"10/02/2026", status:"pago",     boleto:"BOL-2026-013" },
+  { client:"Farmacêutica Nacional S/A",    regime:"Lucro Real",       valor:6200, venc:"10/02/2026", status:"pago",     boleto:"BOL-2026-014" },
+  { client:"Software House Inovare Ltda",  regime:"Lucro Presumido",  valor:2600, venc:"10/02/2026", status:"pago",     boleto:"BOL-2026-015" },
+];
+
+// =========================================
+// NAVIGATION
+// =========================================
+const SCREENS = ['dashboard','clientes','obrigacoes','documentos','financeiro','portal'];
+const TITLES = {
+  dashboard:   ['Dashboard',            'Visão geral — Fevereiro 2026'],
+  clientes:    ['Clientes',             '23 clientes cadastrados'],
+  obrigacoes:  ['Obrigações Fiscais',   'Calendário de entregas — Fev/2026'],
+  documentos:  ['Documentos',           'Gestão de arquivos e uploads'],
+  financeiro:  ['Financeiro',           'Honorários e inadimplência — Fev/2026'],
+  portal:      ['Portal do Cliente',    'Visualização do cliente'],
+};
+let currentScreen = 'dashboard';
+let chartsInit = {};
+
+function navigate(screen) {
+  SCREENS.forEach(s => {
+    document.getElementById('screen-'+s).classList.remove('active');
+    document.getElementById('nav-'+s)?.classList.remove('active');
+  });
+  document.getElementById('screen-'+screen).classList.add('active');
+  document.getElementById('nav-'+screen)?.classList.add('active');
+  document.getElementById('topbarTitle').textContent = TITLES[screen][0];
+  document.getElementById('topbarSubtitle').textContent = TITLES[screen][1];
+  currentScreen = screen;
+  closeSidebar();
+  initScreen(screen);
+}
+
+function initScreen(screen) {
+  if(screen === 'dashboard' && !chartsInit.dash) { initDashboardCharts(); chartsInit.dash = true; }
+  if(screen === 'clientes')   renderClientes();
+  if(screen === 'obrigacoes') renderObrigacoes();
+  if(screen === 'documentos') renderDocs();
+  if(screen === 'financeiro' && !chartsInit.fin) { renderHonorarios(); initFinCharts(); chartsInit.fin = true; }
+  if(screen === 'portal') renderPortal(0);
+}
+
+// =========================================
+// SIDEBAR MOBILE
+// =========================================
+function openSidebar()  { document.getElementById('sidebar').classList.add('open'); document.getElementById('backdrop').classList.add('open'); }
+function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('backdrop').classList.remove('open'); }
+
+// =========================================
+// CLIENTES
+// =========================================
+function renderClientes(data) {
+  data = data || CLIENTES;
+  const tbody = document.getElementById('tbodyClientes');
+  tbody.innerHTML = '';
+  data.forEach((c, i) => {
+    const statusClass = c.status === 'Ativo' ? 'status-ok' : c.status === 'Suspenso' ? 'status-pending' : 'status-gray';
+    tbody.innerHTML += `
+      <tr>
+        <td class="td-small">${String(i+1).padStart(2,'0')}</td>
+        <td>
+          <div class="td-bold">${c.razao}</div>
+          <div class="td-small">${c.fantasia}</div>
+        </td>
+        <td class="td-mono">${c.cnpj}</td>
+        <td><span class="badge-pill status-blue">${c.regime}</span></td>
+        <td>${c.resp}</td>
+        <td style="text-align:center">
+          ${c.docPend > 0 
+            ? `<span style="background:#FEF2F2;color:#DC2626;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700">${c.docPend} pend.</span>`
+            : `<span style="background:#ECFDF5;color:#059669;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700">OK</span>`
+          }
+        </td>
+        <td><span class="badge-pill ${statusClass}">${c.status}</span></td>
+        <td>
+          <div class="td-actions">
+            <button class="btn-icon" title="Visualizar" onclick="navigate('portal');document.getElementById('portalClientSelect').value=${i<4?i:0};renderPortal(${i<4?i:0})"><i class="fas fa-eye"></i></button>
+            <button class="btn-icon" title="Editar" onclick="showToast('Editando: ${c.fantasia}','blue')"><i class="fas fa-edit"></i></button>
+            <button class="btn-icon" title="Documentos" onclick="navigate('documentos')"><i class="fas fa-folder"></i></button>
+          </div>
+        </td>
+      </tr>`;
+  });
+}
+
+function filterClientes() {
+  const q      = document.getElementById('searchClientes').value.toLowerCase();
+  const regime = document.getElementById('filterRegime').value;
+  const status = document.getElementById('filterStatus').value;
+  renderClientes(CLIENTES.filter(c =>
+    (!q      || c.razao.toLowerCase().includes(q) || c.cnpj.includes(q) || c.resp.toLowerCase().includes(q)) &&
+    (!regime || c.regime === regime) &&
+    (!status || c.status === status)
+  ));
+}
+
+// =========================================
+// OBRIGAÇÕES
+// =========================================
+let calCurrentDate = new Date(2026, 1, 1); // Feb 2026
+
+function renderObrigacoes() {
+  const typeFilter   = document.getElementById('filterObrigType').value;
+  const statusFilter = document.getElementById('filterObrigStatus').value;
+  let data = OBRIGACOES_DATA.filter(o =>
+    (!typeFilter   || o.tipo === typeFilter) &&
+    (!statusFilter || o.status === statusFilter)
+  );
+  document.getElementById('obrigTotal').textContent = data.length;
+  const grid = document.getElementById('obrigGrid');
+  grid.innerHTML = '';
+  data.forEach(o => {
+    const statusLabel = o.status === 'entregue' ? 'Entregue' : o.status === 'pendente' ? 'Pendente' : 'Atrasado';
+    const statusClass = o.status === 'entregue' ? 'status-ok' : o.status === 'pendente' ? 'status-pending' : 'status-late';
+    const borderClass = o.status === 'entregue' ? 'ok' : o.status === 'pendente' ? 'pending' : 'late';
+    grid.innerHTML += `
+      <div class="obrig-card ${borderClass}">
+        <div class="obrig-header">
+          <span class="obrig-name">${o.tipo}</span>
+          <span class="badge-pill ${statusClass}">${statusLabel}</span>
+        </div>
+        <div class="obrig-client"><i class="fas fa-building" style="color:var(--gray-300);margin-right:4px"></i>${o.cliente}</div>
+        <div class="obrig-deadline">
+          <i class="fas fa-calendar" style="color:var(--gray-300);margin-right:4px"></i>
+          Prazo: <strong>${o.prazo}</strong>
+          ${o.entregue ? `&nbsp;· Entregue em: <strong>${o.entregue}</strong>` : ''}
+        </div>
+        ${o.prog > 0 && o.status !== 'entregue' ? `
+        <div>
+          <div class="obrig-progress-label"><span>Progresso</span><span>${o.prog}%</span></div>
+          <div class="progress-bar">
+            <div class="progress-fill ${o.prog > 70 ? 'green' : o.prog > 30 ? 'yellow' : 'red'}" style="width:${o.prog}%"></div>
+          </div>
+        </div>` : ''}
+        ${o.status === 'entregue' ? `
+        <div style="font-size:11px;color:var(--green);font-weight:600">
+          <i class="fas fa-check-circle"></i> Enviado ao Fisco com sucesso
+        </div>` : ''}
+        <div style="display:flex;gap:6px;margin-top:4px">
+          ${o.status !== 'entregue' 
+            ? `<button class="btn btn-primary btn-sm" style="flex:1;justify-content:center" onclick="showToast('Marcando como entregue: ${o.tipo} — ${o.cliente.split(' ')[0]}','success')"><i class="fas fa-paper-plane"></i> Enviar</button>`
+            : `<button class="btn btn-outline btn-sm" style="flex:1;justify-content:center"><i class="fas fa-download"></i> Recibo</button>`
+          }
+          <button class="btn btn-outline btn-sm" onclick="showToast('Histórico de ${o.tipo}','blue')"><i class="fas fa-history"></i></button>
+        </div>
+      </div>`;
+  });
+  if(!data.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><i class="fas fa-check-circle" style="color:var(--green)"></i><p>Nenhuma obrigação encontrada</p><small>Tente outros filtros</small></div>`;
+  }
+}
+
+function prevMonth() {
+  showToast('Navegando para mês anterior', 'blue');
+  document.getElementById('calMonthLabel').textContent = 'Janeiro 2026';
+}
+function nextMonth() {
+  showToast('Navegando para próximo mês', 'blue');
+  document.getElementById('calMonthLabel').textContent = 'Março 2026';
+}
+
+// =========================================
+// DOCUMENTOS
+// =========================================
+const ICON_MAP = { pdf:'pdf fas fa-file-pdf', xml:'xml fas fa-code', xls:'xls fas fa-file-excel', zip:'zip fas fa-file-zipper', txt:'txt fas fa-file-alt' };
+
+function createDocCard(doc) {
+  const [cls, icon] = (ICON_MAP[doc.tipo] || 'txt fas fa-file').split(' ').reduce((a,_,i,arr)=>i===0?[arr[0],arr.slice(1).join(' ')]:a, ['','']);
+  const iconParts = ICON_MAP[doc.tipo] || 'txt fas fa-file';
+  const parts = iconParts.split(' ');
+  const docCls = parts[0];
+  const docIcon = parts.slice(1).join(' ');
+  return `
+    <div class="doc-card" onclick="showToast('Abrindo: ${doc.nome.replace(/'/g,"\\'")}','blue')">
+      <div class="doc-icon ${docCls}"><i class="${docIcon}"></i></div>
+      <div class="doc-name">${doc.nome}</div>
+      <div class="doc-meta">${doc.client}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+        <div class="doc-size">${doc.data} · ${doc.size}</div>
+        <button class="btn-icon" style="width:26px;height:26px;font-size:11px" onclick="event.stopPropagation();showToast('Download iniciado','success')"><i class="fas fa-download"></i></button>
+      </div>
+    </div>`;
+}
+
+function renderDocs() {
+  document.getElementById('docGridNF').innerHTML         = DOCS_NF_FEV.map(createDocCard).join('');
+  document.getElementById('docGridNFJan').innerHTML      = DOCS_NF_JAN.map(createDocCard).join('');
+  document.getElementById('docGridCC').innerHTML         = DOCS_CC.map(createDocCard).join('');
+  document.getElementById('docGridGuias').innerHTML      = DOCS_GUIAS.map(createDocCard).join('');
+  document.getElementById('docGridContratos').innerHTML  = DOCS_CONTRATOS.map(createDocCard).join('');
+}
+
+let activeDocTab = 0;
+function switchDocTab(idx) {
+  const tabs  = document.querySelectorAll('#docTabs .tab-btn');
+  const panes = document.querySelectorAll('.tab-pane');
+  tabs.forEach((t,i)  => t.classList.toggle('active', i===idx));
+  panes.forEach((p,i) => p.classList.toggle('active', i===idx));
+  activeDocTab = idx;
+}
+
+// =========================================
+// FINANCEIRO
+// =========================================
+function renderHonorarios() {
+  const tbody = document.getElementById('tbodyHonorarios');
+  tbody.innerHTML = '';
+  HONORARIOS.forEach(h => {
+    const sc = h.status === 'pago' ? 'status-ok' : h.status === 'pendente' ? 'status-pending' : 'status-late';
+    const sl = h.status === 'pago' ? 'Pago' : h.status === 'pendente' ? 'Pendente' : 'Atrasado';
+    tbody.innerHTML += `
+      <tr>
+        <td class="td-bold">${h.client}</td>
+        <td><span class="badge-pill status-blue" style="font-size:10px">${h.regime}</span></td>
+        <td style="font-weight:700;color:var(--gray-900)">R$ ${h.valor.toLocaleString('pt-BR')}</td>
+        <td>${h.venc}</td>
+        <td><span class="badge-pill ${sc}">${sl}</span></td>
+        <td class="td-mono td-small">${h.boleto}</td>
+        <td>
+          <div class="td-actions">
+            <button class="btn-icon" title="Baixar Boleto" onclick="showToast('Boleto ${h.boleto} — download','success')"><i class="fas fa-barcode"></i></button>
+            ${h.status !== 'pago' ? `<button class="btn btn-primary btn-sm" onclick="showToast('Cobrança enviada para ${h.client.split(' ')[0]}','success')"><i class="fas fa-paper-plane"></i></button>` : ''}
+          </div>
+        </td>
+      </tr>`;
+  });
+}
+
+// =========================================
+// PORTAL DO CLIENTE
+// =========================================
+function renderPortal(idx) {
+  const c = PORTAL_CLIENTS[idx];
+  if(!c) return;
+  document.getElementById('portalCompanyName').textContent = c.name;
+  document.getElementById('portalCNPJ').textContent        = `CNPJ: ${c.cnpj} · ${c.regime} · Ativo`;
+  document.getElementById('portalDocPend').textContent     = c.docPend;
+  document.getElementById('portalGuias').textContent       = c.guias;
+  document.getElementById('portalObrigOk').textContent     = c.obrigOk;
+  document.getElementById('portalObrigPend').textContent   = c.obrigPend;
+
+  // Docs
+  const tdocs = document.getElementById('tbodyPortalDocs');
+  tdocs.innerHTML = '';
+  c.docs.forEach(d => {
+    tdocs.innerHTML += `
+      <tr>
+        <td class="td-bold">${d.name}</td>
+        <td><span class="badge-pill status-blue" style="font-size:10px">${d.type}</span></td>
+        <td class="td-small">${d.date}</td>
+        <td><button class="btn-icon" onclick="showToast('Download: ${d.name.replace(/'/g,"\\'")}','success')"><i class="fas fa-download"></i></button></td>
+      </tr>`;
+  });
+
+  // Guias
+  const guias = document.getElementById('portalGuiasList');
+  guias.innerHTML = '';
+  c.guiasList.forEach(g => {
+    const sc = g.status === 'pago' ? 'status-ok' : 'status-pending';
+    const sl = g.status === 'pago' ? 'Pago' : 'Pendente';
+    guias.innerHTML += `
+      <div style="display:flex;align-items:center;padding:10px 12px;background:var(--gray-50);border-radius:8px;border:1px solid var(--gray-100);gap:12px">
+        <div style="width:36px;height:36px;background:#FFFBEB;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--yellow);flex-shrink:0">
+          <i class="fas fa-barcode"></i>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:600;color:var(--gray-800)">${g.desc}</div>
+          <div style="font-size:11px;color:var(--gray-400)">Vencimento: ${g.venc}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:13px;font-weight:800;color:var(--gray-900)">${g.valor}</div>
+          <span class="badge-pill ${sc}" style="font-size:10px">${sl}</span>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="showToast('Download da guia','success')"><i class="fas fa-download"></i></button>
+      </div>`;
+  });
+
+  // Obrig
+  const tobrig = document.getElementById('tbodyPortalObrig');
+  tobrig.innerHTML = '';
+  c.obrig.forEach(o => {
+    const sc = o.status === 'entregue' ? 'status-ok' : 'status-pending';
+    const sl = o.status === 'entregue' ? 'Entregue' : 'Pendente';
+    tobrig.innerHTML += `
+      <tr>
+        <td class="td-bold">${o.name}</td>
+        <td class="td-small">${o.prazo}</td>
+        <td><span class="badge-pill ${sc}">${sl}</span></td>
+      </tr>`;
+  });
+}
+
+function switchPortalClient() {
+  const idx = parseInt(document.getElementById('portalClientSelect').value);
+  renderPortal(idx);
+}
+
+// =========================================
+// CHARTS
+// =========================================
+const MONTHS = ['Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez','Jan','Fev'];
+const MRR_DATA = [24800,25200,25800,26100,26800,27200,28100,28900,29400,30100,31200,32450];
+
+function initDashboardCharts() {
+  // Revenue Chart
+  const ctx1 = document.getElementById('chartReceita').getContext('2d');
+  new Chart(ctx1, {
+    type:'bar',
+    data:{
+      labels: MONTHS,
+      datasets:[{
+        label:'Honorários (R$)',
+        data: MRR_DATA,
+        backgroundColor: 'rgba(37,99,235,0.15)',
+        borderColor: '#2563EB',
+        borderWidth: 2,
+        borderRadius: 6,
+        borderSkipped: false,
+      },{
+        label:'Recebido (R$)',
+        data: MRR_DATA.map((v,i) => i < 11 ? v : 27100),
+        backgroundColor: 'rgba(16,185,129,0.15)',
+        borderColor: '#10B981',
+        borderWidth: 2,
+        borderRadius: 6,
+        borderSkipped: false,
+        type: 'line',
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#10B981',
+        pointRadius: 4,
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ position:'top', labels:{ font:{size:11,family:'Inter'}, usePointStyle:true, padding:16 }}},
+      scales:{
+        y:{ beginAtZero:false, min:22000, ticks:{ callback:v=>'R$'+Math.round(v/1000)+'k', font:{size:10}}, grid:{color:'rgba(0,0,0,.04)'}},
+        x:{ ticks:{ font:{size:10}}, grid:{ display:false }}
+      }
+    }
+  });
+
+  // Donut Chart
+  const ctx2 = document.getElementById('chartObrig').getContext('2d');
+  new Chart(ctx2, {
+    type:'doughnut',
+    data:{
+      labels:['Entregue','Pendente','Atrasado'],
+      datasets:[{
+        data:[9,10,4],
+        backgroundColor:['#10B981','#F59E0B','#EF4444'],
+        borderWidth:3,
+        borderColor:'#fff',
+        hoverOffset:8,
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      cutout:'68%',
+      plugins:{
+        legend:{ position:'bottom', labels:{ font:{size:11,family:'Inter'}, usePointStyle:true, padding:16 }},
+        tooltip:{ callbacks:{ label: ctx => ` ${ctx.label}: ${ctx.parsed} obrigações` }}
+      }
+    }
+  });
+}
+
+function initFinCharts() {
+  // MRR Line Chart
+  const ctx3 = document.getElementById('chartMRR').getContext('2d');
+  new Chart(ctx3, {
+    type:'line',
+    data:{
+      labels: MONTHS,
+      datasets:[{
+        label:'MRR (R$)',
+        data: MRR_DATA,
+        borderColor: '#2563EB',
+        backgroundColor: 'rgba(37,99,235,0.08)',
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#2563EB',
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        borderWidth: 2.5,
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false }},
+      scales:{
+        y:{ beginAtZero:false, min:23000, ticks:{ callback:v=>'R$'+Math.round(v/1000)+'k', font:{size:10}}, grid:{color:'rgba(0,0,0,.04)'}},
+        x:{ ticks:{ font:{size:10}}, grid:{ display:false }}
+      }
+    }
+  });
+
+  // Boletos Pie Chart
+  const ctx4 = document.getElementById('chartBoletos').getContext('2d');
+  new Chart(ctx4, {
+    type:'doughnut',
+    data:{
+      labels:['Pagos','Pendentes','Atrasados','Cancelados'],
+      datasets:[{
+        data:[12,4,3,1],
+        backgroundColor:['#10B981','#3B82F6','#EF4444','#94A3B8'],
+        borderWidth:3,
+        borderColor:'#fff',
+        hoverOffset:8,
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      cutout:'65%',
+      plugins:{
+        legend:{ position:'bottom', labels:{ font:{size:11,family:'Inter'}, usePointStyle:true, padding:14 }},
+      }
+    }
+  });
+}
+
+// =========================================
+// MODALS
+// =========================================
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if(e.target === m) m.classList.remove('open'); });
+});
+
+function saveNewClient() {
+  closeModal('modal-novo-cliente');
+  showToast('Cliente salvo com sucesso!', 'success');
+}
+
+// =========================================
+// TOAST
+// =========================================
+function showToast(msg, type='default') {
+  const container = document.getElementById('toastContainer');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  const icons = { success:'fa-check-circle', error:'fa-times-circle', warning:'fa-exclamation-triangle', blue:'fa-info-circle', default:'fa-bell' };
+  const icon  = icons[type] || icons.default;
+  el.innerHTML = `<i class="fas ${icon}"></i> ${msg}`;
+  container.appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; setTimeout(() => el.remove(), 300); }, 3000);
+}
+
+// =========================================
+// INIT
+// =========================================
+window.addEventListener('DOMContentLoaded', () => {
+  initDashboardCharts();
+  chartsInit.dash = true;
+});
+</script>
+</body>
+</html>

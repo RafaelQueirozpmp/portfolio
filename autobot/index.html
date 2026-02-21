@@ -1,0 +1,2474 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoBot Pro — Chatbot & Automação WhatsApp com IA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    /* ===== CSS RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #25D366;
+      --green-dark: #1ebe5a;
+      --green-light: #e8fdf2;
+      --green-mid: #d1fae5;
+      --sidebar: #1E293B;
+      --sidebar-hover: #2d3f57;
+      --sidebar-active: #25D366;
+      --bg: #F5F6FA;
+      --card: #ffffff;
+      --border: #e8eaed;
+      --text: #1a1f2e;
+      --text-muted: #6b7280;
+      --text-light: #9ca3af;
+      --blue: #3b82f6;
+      --orange: #f59e0b;
+      --red: #ef4444;
+      --purple: #8b5cf6;
+      --pink: #ec4899;
+      --cyan: #06b6d4;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
+      --shadow: 0 4px 16px rgba(0,0,0,.1);
+      --shadow-lg: 0 10px 40px rgba(0,0,0,.15);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --radius-lg: 16px;
+    }
+    html { font-size: 14px; scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      width: 240px;
+      background: var(--sidebar);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0;
+      height: 100vh;
+      z-index: 200;
+      transition: transform .3s ease;
+      overflow-y: auto;
+    }
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 22px 20px 18px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .sidebar-logo .logo-icon {
+      width: 36px; height: 36px;
+      background: var(--green);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px; color: #fff;
+      flex-shrink: 0;
+    }
+    .sidebar-logo .logo-text { color: #fff; font-weight: 700; font-size: 15px; line-height: 1.2; }
+    .sidebar-logo .logo-text small { display: block; font-size: 11px; color: rgba(255,255,255,.5); font-weight: 400; }
+    .sidebar-nav { flex: 1; padding: 12px 0; }
+    .sidebar-section { padding: 8px 16px 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,.3); font-weight: 600; margin-top: 4px; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 20px;
+      color: rgba(255,255,255,.65);
+      cursor: pointer;
+      border-radius: 0;
+      transition: all .2s;
+      font-size: 13.5px;
+      font-weight: 500;
+      position: relative;
+      user-select: none;
+    }
+    .nav-item:hover { background: var(--sidebar-hover); color: #fff; }
+    .nav-item.active {
+      color: #fff;
+      background: linear-gradient(90deg, rgba(37,211,102,.2) 0%, transparent 100%);
+    }
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 50%; transform: translateY(-50%);
+      width: 3px; height: 60%;
+      background: var(--green);
+      border-radius: 0 4px 4px 0;
+    }
+    .nav-item i { width: 18px; text-align: center; font-size: 15px; }
+    .nav-badge {
+      margin-left: auto;
+      background: var(--red);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 99px;
+      min-width: 18px;
+      text-align: center;
+    }
+    .nav-badge.green { background: var(--green); }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,.08); }
+    .sidebar-user { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .sidebar-user .avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; flex-shrink: 0; }
+    .sidebar-user .user-info { flex: 1; overflow: hidden; }
+    .sidebar-user .user-name { color: #fff; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar-user .user-role { color: rgba(255,255,255,.4); font-size: 11px; }
+    .sidebar-user .dots { color: rgba(255,255,255,.4); font-size: 14px; }
+
+    /* ===== MAIN CONTENT ===== */
+    .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: sticky;
+      top: 0; z-index: 100;
+    }
+    .topbar .hamburger { display: none; background: none; border: none; cursor: pointer; color: var(--text); font-size: 18px; }
+    .topbar-title { font-size: 17px; font-weight: 700; color: var(--text); flex: 1; }
+    .topbar-actions { display: flex; align-items: center; gap: 10px; }
+    .btn-icon { width: 36px; height: 36px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 14px; transition: all .2s; position: relative; }
+    .btn-icon:hover { background: var(--bg); color: var(--text); }
+    .btn-icon .notif-dot { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; background: var(--red); border-radius: 50%; border: 2px solid var(--card); }
+    .topbar-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #25D366, #128c7e); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; cursor: pointer; }
+    .content { flex: 1; padding: 28px; overflow-y: auto; }
+
+    /* ===== SCREEN SYSTEM ===== */
+    .screen { display: none; animation: fadeIn .25s ease; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ===== PAGE HEADER ===== */
+    .page-header { margin-bottom: 24px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .page-header-left .page-title { font-size: 22px; font-weight: 800; color: var(--text); }
+    .page-header-left .page-subtitle { color: var(--text-muted); font-size: 13.5px; margin-top: 2px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      border: none;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+    .btn-primary { background: var(--green); color: #fff; }
+    .btn-primary:hover { background: var(--green-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,211,102,.35); }
+    .btn-secondary { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--border); }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+    /* ===== CARDS ===== */
+    .card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow-sm); overflow: hidden; }
+    .card-header { padding: 16px 20px 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+    .card-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .card-body { padding: 20px; }
+
+    /* ===== GRID ===== */
+    .grid { display: grid; gap: 20px; }
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+
+    /* ===== KPI CARDS ===== */
+    .kpi-card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; box-shadow: var(--shadow-sm); transition: transform .2s, box-shadow .2s; }
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .kpi-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+    .kpi-icon { width: 44px; height: 44px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .kpi-icon.green { background: var(--green-light); color: var(--green); }
+    .kpi-icon.blue { background: #eff6ff; color: var(--blue); }
+    .kpi-icon.orange { background: #fffbeb; color: var(--orange); }
+    .kpi-icon.purple { background: #f5f3ff; color: var(--purple); }
+    .kpi-icon.red { background: #fff1f2; color: var(--red); }
+    .kpi-icon.cyan { background: #ecfeff; color: var(--cyan); }
+    .kpi-trend { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 99px; }
+    .kpi-trend.up { background: var(--green-light); color: var(--green-dark); }
+    .kpi-trend.down { background: #fff1f2; color: var(--red); }
+    .kpi-value { font-size: 28px; font-weight: 800; color: var(--text); line-height: 1; margin-bottom: 4px; }
+    .kpi-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+    .kpi-sub { font-size: 11.5px; color: var(--text-light); margin-top: 3px; }
+
+    /* ===== STATUS BADGE ===== */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+    .badge-green { background: var(--green-light); color: var(--green-dark); }
+    .badge-blue { background: #eff6ff; color: var(--blue); }
+    .badge-orange { background: #fffbeb; color: #d97706; }
+    .badge-red { background: #fff1f2; color: var(--red); }
+    .badge-purple { background: #f5f3ff; color: var(--purple); }
+    .badge-gray { background: #f3f4f6; color: #6b7280; }
+    .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; display: inline-block; }
+
+    /* ===== TOGGLE ===== */
+    .toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #d1d5db;
+      border-radius: 99px;
+      transition: .3s;
+    }
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 18px; height: 18px;
+      left: 3px; bottom: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: .3s;
+      box-shadow: 0 1px 4px rgba(0,0,0,.2);
+    }
+    .toggle input:checked + .toggle-slider { background: var(--green); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+    /* ===== AVATAR ===== */
+    .avatar-sm { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; flex-shrink: 0; }
+    .avatar-md { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0; }
+    .avatar-lg { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; flex-shrink: 0; }
+
+    /* ===== SEARCH INPUT ===== */
+    .search-box { position: relative; }
+    .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 13px; }
+    .search-box input { width: 100%; padding: 9px 12px 9px 36px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); font-size: 13.5px; font-family: 'Inter', sans-serif; color: var(--text); outline: none; transition: border-color .2s; }
+    .search-box input:focus { border-color: var(--green); background: var(--card); }
+    .search-box input::placeholder { color: var(--text-light); }
+
+    /* ===== PROGRESS BAR ===== */
+    .progress-bar { background: var(--border); border-radius: 99px; height: 6px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 99px; transition: width .5s ease; }
+    .progress-green { background: var(--green); }
+    .progress-blue { background: var(--blue); }
+    .progress-orange { background: var(--orange); }
+    .progress-purple { background: var(--purple); }
+
+    /* ========================
+       SCREEN 1: DASHBOARD
+       ======================== */
+    .chart-container { position: relative; }
+    .activity-list { list-style: none; }
+    .activity-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-icon { width: 34px; height: 34px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .activity-content { flex: 1; }
+    .activity-title { font-size: 13px; font-weight: 600; color: var(--text); }
+    .activity-desc { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+    .activity-time { font-size: 11px; color: var(--text-light); white-space: nowrap; flex-shrink: 0; }
+    .quick-stats { display: flex; gap: 12px; flex-wrap: wrap; }
+    .quick-stat { flex: 1; min-width: 120px; background: var(--bg); border-radius: var(--radius-sm); padding: 12px 16px; border: 1px solid var(--border); }
+    .quick-stat .qs-val { font-size: 20px; font-weight: 800; color: var(--text); }
+    .quick-stat .qs-lbl { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+    .top-agents-list { list-style: none; }
+    .top-agent-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .top-agent-item:last-child { border-bottom: none; }
+    .top-agent-info { flex: 1; }
+    .top-agent-name { font-size: 13px; font-weight: 600; }
+    .top-agent-stats { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+    .top-agent-score { font-size: 15px; font-weight: 800; color: var(--green); }
+
+    /* ========================
+       SCREEN 2: CONVERSATIONS
+       ======================== */
+    .conversations-layout { display: grid; grid-template-columns: 320px 1fr; gap: 0; height: calc(100vh - 140px); min-height: 500px; }
+    .conv-list-panel { background: var(--card); border-radius: var(--radius) 0 0 var(--radius); border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; }
+    .conv-list-header { padding: 16px; border-bottom: 1px solid var(--border); }
+    .conv-list-header h3 { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+    .conv-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+    .filter-chip { padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid var(--border); background: transparent; color: var(--text-muted); transition: all .2s; white-space: nowrap; font-family: 'Inter', sans-serif; }
+    .filter-chip.active { border-color: var(--green); background: var(--green-light); color: var(--green-dark); }
+    .conv-list-body { flex: 1; overflow-y: auto; }
+    .conv-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; cursor: pointer; border-bottom: 1px solid var(--border); transition: background .15s; }
+    .conv-item:hover { background: var(--bg); }
+    .conv-item.active { background: var(--green-light); border-left: 3px solid var(--green); }
+    .conv-avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; flex-shrink: 0; }
+    .conv-body { flex: 1; overflow: hidden; }
+    .conv-row1 { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .conv-name { font-size: 13.5px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .conv-time { font-size: 11px; color: var(--text-light); flex-shrink: 0; }
+    .conv-preview { font-size: 12.5px; color: var(--text-muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .conv-row3 { display: flex; align-items: center; justify-content: space-between; margin-top: 5px; }
+    .conv-unread { background: var(--green); color: #fff; font-size: 10px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+    /* Chat Panel */
+    .conv-chat-panel { background: var(--card); border-radius: 0 var(--radius) var(--radius) 0; border: 1px solid var(--border); border-left: none; display: flex; flex-direction: column; overflow: hidden; }
+    .chat-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+    .chat-header-info { flex: 1; }
+    .chat-header-name { font-size: 15px; font-weight: 700; }
+    .chat-header-sub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+    .chat-header-actions { display: flex; gap: 8px; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; background: #f0f7f4; }
+    .msg { display: flex; flex-direction: column; max-width: 75%; }
+    .msg.incoming { align-self: flex-start; align-items: flex-start; }
+    .msg.outgoing { align-self: flex-end; align-items: flex-end; }
+    .msg-bubble { padding: 10px 14px; border-radius: 12px; font-size: 13.5px; line-height: 1.5; position: relative; }
+    .msg.incoming .msg-bubble { background: #fff; border-bottom-left-radius: 3px; color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+    .msg.outgoing .msg-bubble { background: #dcf8c6; border-bottom-right-radius: 3px; color: #1a1f2e; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+    .msg.ai .msg-bubble { background: #f0f4ff; border-bottom-left-radius: 3px; border: 1px solid #dbeafe; }
+    .msg-time { font-size: 10.5px; color: var(--text-light); margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+    .msg-meta { font-size: 11px; color: var(--text-light); margin-bottom: 4px; }
+    .msg-ai-label { font-size: 11px; background: #eff6ff; color: var(--blue); padding: 2px 8px; border-radius: 99px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 4px; }
+    .chat-composer { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; align-items: flex-end; gap: 10px; }
+    .chat-input { flex: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: 24px; font-size: 13.5px; font-family: 'Inter', sans-serif; outline: none; resize: none; max-height: 100px; transition: border-color .2s; }
+    .chat-input:focus { border-color: var(--green); }
+    .chat-send-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--green); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 16px; transition: all .2s; flex-shrink: 0; }
+    .chat-send-btn:hover { background: var(--green-dark); transform: scale(1.05); }
+
+    /* ========================
+       SCREEN 3: FLOWS
+       ======================== */
+    .flows-layout { display: grid; grid-template-columns: 280px 1fr; gap: 20px; }
+    .flows-sidebar { display: flex; flex-direction: column; gap: 16px; }
+    .flow-list-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: var(--radius-sm); cursor: pointer; border: 1.5px solid var(--border); background: var(--card); transition: all .2s; }
+    .flow-list-item:hover { border-color: var(--green); background: var(--green-light); }
+    .flow-list-item.active { border-color: var(--green); background: var(--green-light); }
+    .flow-icon { width: 36px; height: 36px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .flow-info { flex: 1; overflow: hidden; }
+    .flow-name { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .flow-meta { font-size: 11.5px; color: var(--text-muted); margin-top: 1px; }
+    .flows-canvas { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); min-height: 540px; overflow: hidden; position: relative; }
+    .flows-canvas-header { padding: 12px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .flows-canvas-body { position: relative; overflow: auto; height: 480px; background-image: radial-gradient(circle, #d1d5db 1px, transparent 1px); background-size: 24px 24px; background-color: #fafbfc; }
+
+    /* Flow Nodes */
+    .flow-node {
+      position: absolute;
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      width: 180px;
+      box-shadow: var(--shadow-sm);
+      cursor: grab;
+      user-select: none;
+      transition: box-shadow .2s;
+    }
+    .flow-node:hover { box-shadow: var(--shadow); }
+    .flow-node.dragging { box-shadow: var(--shadow-lg); cursor: grabbing; z-index: 100; }
+    .flow-node.trigger { border-color: var(--green); }
+    .flow-node.condition { border-color: var(--orange); }
+    .flow-node.action { border-color: var(--blue); }
+    .flow-node.end-node { border-color: var(--red); }
+    .node-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .node-type-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+    .node-type-icon.trigger { background: var(--green-light); color: var(--green-dark); }
+    .node-type-icon.condition { background: #fffbeb; color: #d97706; }
+    .node-type-icon.action { background: #eff6ff; color: var(--blue); }
+    .node-type-icon.end-node { background: #fff1f2; color: var(--red); }
+    .node-title { font-size: 12px; font-weight: 700; color: var(--text); }
+    .node-desc { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+    .node-port { width: 12px; height: 12px; border-radius: 50%; background: var(--border); border: 2px solid var(--card); position: absolute; cursor: pointer; transition: background .2s; }
+    .node-port:hover { background: var(--green); }
+    .node-port.port-bottom { bottom: -7px; left: 50%; transform: translateX(-50%); }
+    .node-port.port-top { top: -7px; left: 50%; transform: translateX(-50%); }
+    .node-port.port-right { right: -7px; top: 50%; transform: translateY(-50%); }
+    .node-port.port-left { left: -7px; top: 50%; transform: translateY(-50%); }
+    .flow-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+
+    /* ========================
+       SCREEN 4: KNOWLEDGE BASE
+       ======================== */
+    .kb-layout { display: grid; grid-template-columns: 220px 1fr; gap: 20px; }
+    .kb-categories { display: flex; flex-direction: column; gap: 4px; }
+    .kb-cat-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--radius-sm); cursor: pointer; transition: all .2s; color: var(--text-muted); font-size: 13px; font-weight: 500; }
+    .kb-cat-item:hover { background: var(--border); color: var(--text); }
+    .kb-cat-item.active { background: var(--green-light); color: var(--green-dark); font-weight: 700; }
+    .kb-cat-item i { width: 16px; text-align: center; }
+    .kb-cat-count { margin-left: auto; background: var(--border); color: var(--text-muted); font-size: 11px; padding: 1px 7px; border-radius: 99px; }
+    .kb-content { display: flex; flex-direction: column; gap: 16px; }
+    .kb-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .kb-toolbar .search-box { flex: 1; min-width: 200px; }
+    .faq-item { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+    .faq-header { padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; gap: 12px; }
+    .faq-header:hover { background: var(--bg); }
+    .faq-question { font-size: 13.5px; font-weight: 600; flex: 1; }
+    .faq-toggle { color: var(--text-muted); font-size: 12px; transition: transform .2s; }
+    .faq-item.open .faq-toggle { transform: rotate(180deg); }
+    .faq-body { padding: 0 18px 14px; font-size: 13px; color: var(--text-muted); line-height: 1.6; display: none; border-top: 1px solid var(--border); padding-top: 14px; }
+    .faq-item.open .faq-body { display: block; }
+    .doc-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; display: flex; align-items: flex-start; gap: 14px; transition: all .2s; cursor: pointer; }
+    .doc-card:hover { border-color: var(--green); box-shadow: var(--shadow-sm); }
+    .doc-icon { width: 42px; height: 42px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .doc-info { flex: 1; }
+    .doc-name { font-size: 13.5px; font-weight: 700; margin-bottom: 3px; }
+    .doc-meta { font-size: 12px; color: var(--text-muted); }
+    .training-item { display: flex; align-items: flex-start; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+    .training-item:last-child { border-bottom: none; }
+    .training-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+
+    /* ========================
+       SCREEN 5: INTEGRATIONS
+       ======================== */
+    .integrations-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .integration-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; transition: all .2s; }
+    .integration-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+    .integration-card.connected { border-color: var(--green); border-width: 1.5px; }
+    .int-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+    .int-logo { width: 48px; height: 48px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .int-info { flex: 1; margin-left: 14px; }
+    .int-name { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+    .int-category { font-size: 11.5px; color: var(--text-muted); font-weight: 500; }
+    .int-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px; }
+    .int-features { list-style: none; margin-bottom: 16px; }
+    .int-features li { font-size: 12.5px; color: var(--text-muted); padding: 2px 0; display: flex; align-items: center; gap: 6px; }
+    .int-features li::before { content: '✓'; color: var(--green); font-weight: 700; font-size: 11px; }
+    .int-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid var(--border); }
+    .int-status { font-size: 12px; font-weight: 600; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+    .int-status.active { color: var(--green-dark); }
+    .int-status-dot { width: 7px; height: 7px; border-radius: 50%; background: #d1d5db; }
+    .int-status.active .int-status-dot { background: var(--green); }
+
+    /* ========================
+       SCREEN 6: REPORTS
+       ======================== */
+    .report-tabs { display: flex; gap: 4px; background: var(--bg); padding: 4px; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-bottom: 24px; width: fit-content; }
+    .report-tab { padding: 7px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--text-muted); transition: all .2s; border: none; background: transparent; font-family: 'Inter', sans-serif; }
+    .report-tab.active { background: var(--card); color: var(--text); box-shadow: var(--shadow-sm); }
+    .csat-score { font-size: 56px; font-weight: 800; color: var(--green); line-height: 1; }
+    .csat-label { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+    .csat-stars { color: var(--orange); font-size: 20px; margin-top: 8px; }
+    .metric-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .metric-row:last-child { border-bottom: none; }
+    .metric-rank { font-size: 13px; font-weight: 800; color: var(--text-light); width: 24px; }
+    .metric-bar-wrap { flex: 1; }
+    .metric-label { font-size: 12.5px; font-weight: 600; margin-bottom: 4px; }
+    .metric-val { font-size: 12.5px; font-weight: 700; color: var(--text-muted); white-space: nowrap; }
+
+    /* ========================
+       CHAT WIDGET
+       ======================== */
+    .chat-widget {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 9999;
+      font-family: 'Inter', sans-serif;
+    }
+    .chat-widget-btn {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: var(--green);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 24px;
+      box-shadow: 0 4px 20px rgba(37,211,102,.5);
+      transition: all .3s;
+      position: relative;
+    }
+    .chat-widget-btn:hover { transform: scale(1.08); background: var(--green-dark); }
+    .chat-widget-btn .widget-notif { position: absolute; top: 4px; right: 4px; width: 14px; height: 14px; background: var(--red); border-radius: 50%; border: 2px solid #fff; font-size: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; }
+    .chat-widget-popup {
+      position: absolute;
+      bottom: 72px;
+      right: 0;
+      width: 340px;
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      transform-origin: bottom right;
+      transform: scale(0);
+      opacity: 0;
+      transition: all .25s cubic-bezier(.34,1.56,.64,1);
+      pointer-events: none;
+    }
+    .chat-widget-popup.open { transform: scale(1); opacity: 1; pointer-events: all; }
+    .widget-header { background: linear-gradient(135deg, #25D366 0%, #128c7e 100%); padding: 18px 18px 14px; }
+    .widget-header h4 { color: #fff; font-size: 16px; font-weight: 700; }
+    .widget-header p { color: rgba(255,255,255,.8); font-size: 12.5px; margin-top: 2px; }
+    .widget-header-status { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+    .widget-online-dot { width: 8px; height: 8px; border-radius: 50%; background: #a7f3d0; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+    .widget-header-status span { font-size: 12px; color: rgba(255,255,255,.85); }
+    .widget-body { padding: 14px; max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #ecf6f0; }
+    .widget-msg { max-width: 85%; }
+    .widget-msg.bot { align-self: flex-start; }
+    .widget-msg.user { align-self: flex-end; }
+    .widget-bubble { padding: 9px 13px; border-radius: 12px; font-size: 13px; line-height: 1.5; }
+    .widget-msg.bot .widget-bubble { background: #fff; border-bottom-left-radius: 3px; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+    .widget-msg.user .widget-bubble { background: #dcf8c6; border-bottom-right-radius: 3px; }
+    .widget-footer { padding: 12px 14px; border-top: 1px solid var(--border); display: flex; gap: 8px; }
+    .widget-input { flex: 1; padding: 9px 12px; border: 1px solid var(--border); border-radius: 22px; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; }
+    .widget-input:focus { border-color: var(--green); }
+    .widget-send { width: 36px; height: 36px; border-radius: 50%; background: var(--green); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; flex-shrink: 0; transition: all .2s; }
+    .widget-send:hover { background: var(--green-dark); }
+    .widget-quick-replies { padding: 0 14px 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+    .quick-reply-btn { padding: 5px 12px; border: 1.5px solid var(--green); border-radius: 99px; background: transparent; color: var(--green-dark); font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: all .2s; white-space: nowrap; }
+    .quick-reply-btn:hover { background: var(--green); color: #fff; }
+    .widget-typing { display: flex; align-items: center; gap: 4px; padding: 8px 12px; background: #fff; border-radius: 12px; width: fit-content; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+    .typing-dot { width: 7px; height: 7px; border-radius: 50%; background: #94a3b8; animation: typingAnim 1.2s infinite; }
+    .typing-dot:nth-child(2) { animation-delay: .2s; }
+    .typing-dot:nth-child(3) { animation-delay: .4s; }
+    @keyframes typingAnim { 0%, 80%, 100% { transform: translateY(0); opacity: .5; } 40% { transform: translateY(-5px); opacity: 1; } }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; text-align: center; }
+    .empty-state-icon { width: 64px; height: 64px; border-radius: 50%; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 16px; }
+    .empty-state h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .empty-state p { font-size: 13.5px; color: var(--text-muted); max-width: 280px; }
+
+    /* ===== DIVIDER ===== */
+    .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+    /* ===== TABLE ===== */
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th { background: var(--bg); padding: 11px 14px; text-align: left; font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid var(--border); }
+    .data-table td { padding: 13px 14px; border-bottom: 1px solid var(--border); font-size: 13.5px; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: var(--bg); }
+
+    /* ===== TOOLTIP ===== */
+    [data-tooltip] { position: relative; }
+    [data-tooltip]::after { content: attr(data-tooltip); position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%); background: #1e293b; color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 11.5px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 999; }
+    [data-tooltip]:hover::after { opacity: 1; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1200px) {
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .integrations-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 1024px) {
+      .flows-layout { grid-template-columns: 1fr; }
+      .kb-layout { grid-template-columns: 1fr; }
+      .conversations-layout { grid-template-columns: 1fr; height: auto; }
+      .conv-chat-panel { display: none; border-radius: var(--radius); border-left: 1px solid var(--border); }
+      .conv-list-panel { border-radius: var(--radius); }
+    }
+    @media (max-width: 900px) {
+      .grid-3 { grid-template-columns: repeat(2, 1fr); }
+      .integrations-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.mobile-open { transform: translateX(0); }
+      .main { margin-left: 0; }
+      .topbar .hamburger { display: flex; }
+      .content { padding: 16px; }
+      .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+      .chat-widget { bottom: 16px; right: 16px; }
+      .chat-widget-popup { width: 300px; }
+    }
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 199; }
+    .sidebar-overlay.show { display: block; }
+
+    /* ===== MISC UTILITIES ===== */
+    .text-green { color: var(--green-dark); }
+    .text-muted { color: var(--text-muted); }
+    .fw-700 { font-weight: 700; }
+    .mt-4 { margin-top: 4px; }
+    .mt-8 { margin-top: 8px; }
+    .mt-16 { margin-top: 16px; }
+    .mb-8 { margin-bottom: 8px; }
+    .mb-16 { margin-bottom: 16px; }
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .gap-8 { gap: 8px; }
+    .gap-12 { gap: 12px; }
+    .gap-16 { gap: 16px; }
+    .flex-1 { flex: 1; }
+    .justify-between { justify-content: space-between; }
+    .w-full { width: 100%; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+<!-- ======= SIDEBAR OVERLAY ======= -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+<!-- ======= SIDEBAR ======= -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon"><i class="fab fa-whatsapp"></i></div>
+    <div class="logo-text">AutoBot Pro <small>Plataforma de IA</small></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="sidebar-section">Principal</div>
+    <div class="nav-item active" onclick="navigate('dashboard', this)">
+      <i class="fas fa-chart-line"></i> Dashboard
+    </div>
+    <div class="nav-item" onclick="navigate('conversations', this)">
+      <i class="fas fa-comments"></i> Conversas
+      <span class="nav-badge">7</span>
+    </div>
+    <div class="nav-item" onclick="navigate('flows', this)">
+      <i class="fas fa-project-diagram"></i> Fluxos
+    </div>
+    <div class="sidebar-section">Configurações</div>
+    <div class="nav-item" onclick="navigate('knowledge', this)">
+      <i class="fas fa-brain"></i> Base de Conhecimento
+    </div>
+    <div class="nav-item" onclick="navigate('integrations', this)">
+      <i class="fas fa-plug"></i> Integrações
+      <span class="nav-badge green">4</span>
+    </div>
+    <div class="nav-item" onclick="navigate('reports', this)">
+      <i class="fas fa-chart-bar"></i> Relatórios
+    </div>
+    <div class="sidebar-section">Sistema</div>
+    <div class="nav-item">
+      <i class="fas fa-bell"></i> Notificações
+    </div>
+    <div class="nav-item">
+      <i class="fas fa-cog"></i> Configurações
+    </div>
+    <div class="nav-item">
+      <i class="fas fa-question-circle"></i> Suporte
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="avatar" style="background:linear-gradient(135deg,#25D366,#128c7e)">R</div>
+      <div class="user-info">
+        <div class="user-name">Rafael Mendes</div>
+        <div class="user-role">Administrador</div>
+      </div>
+      <i class="fas fa-ellipsis-v dots"></i>
+    </div>
+  </div>
+</aside>
+
+<!-- ======= MAIN ======= -->
+<div class="main">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <button class="hamburger btn-icon" onclick="toggleMobileSidebar()"><i class="fas fa-bars"></i></button>
+    <span class="topbar-title" id="topbarTitle">Dashboard</span>
+    <div class="topbar-actions">
+      <button class="btn-icon" data-tooltip="Buscar"><i class="fas fa-search"></i></button>
+      <button class="btn-icon" data-tooltip="Notificações">
+        <i class="fas fa-bell"></i>
+        <span class="notif-dot"></span>
+      </button>
+      <button class="btn-icon" data-tooltip="Ajuda"><i class="fas fa-question-circle"></i></button>
+      <div class="topbar-avatar" data-tooltip="Rafael Mendes">R</div>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <!-- ============================================================
+         SCREEN 1: DASHBOARD
+         ============================================================ -->
+    <section class="screen active" id="screen-dashboard">
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1 class="page-title">Dashboard</h1>
+          <p class="page-subtitle">Bem-vindo, Rafael. Aqui está seu resumo de hoje, <strong>21 de fevereiro</strong>.</p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="btn btn-secondary"><i class="fas fa-calendar-alt"></i> Últimos 7 dias</button>
+          <button class="btn btn-primary"><i class="fas fa-download"></i> Exportar</button>
+        </div>
+      </div>
+
+      <!-- KPI Row -->
+      <div class="grid grid-4" style="margin-bottom:20px">
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-icon green"><i class="fas fa-comments"></i></div>
+            <div class="kpi-trend up"><i class="fas fa-arrow-up"></i> 18%</div>
+          </div>
+          <div class="kpi-value">1.284</div>
+          <div class="kpi-label">Mensagens Hoje</div>
+          <div class="kpi-sub">+192 em relação a ontem</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-icon blue"><i class="fas fa-user-clock"></i></div>
+            <div class="kpi-trend up"><i class="fas fa-arrow-up"></i> 5%</div>
+          </div>
+          <div class="kpi-value">347</div>
+          <div class="kpi-label">Conversas Ativas</div>
+          <div class="kpi-sub">48 aguardando humano</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-icon green"><i class="fas fa-robot"></i></div>
+            <div class="kpi-trend up"><i class="fas fa-arrow-up"></i> 3%</div>
+          </div>
+          <div class="kpi-value">87,4%</div>
+          <div class="kpi-label">Taxa de Resolução IA</div>
+          <div class="kpi-sub">Objetivo: 90% — quase lá!</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-icon orange"><i class="fas fa-stopwatch"></i></div>
+            <div class="kpi-trend down"><i class="fas fa-arrow-down"></i> 8%</div>
+          </div>
+          <div class="kpi-value">1m 42s</div>
+          <div class="kpi-label">Tempo Médio de Resposta</div>
+          <div class="kpi-sub">-14s vs semana passada</div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="grid grid-2" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="fas fa-chart-area" style="color:var(--green);margin-right:8px"></i>Mensagens por Hora</span>
+            <div style="display:flex;gap:8px">
+              <span class="badge badge-green">IA</span>
+              <span class="badge badge-blue">Humano</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="height:220px">
+              <canvas id="chartMessages"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="fas fa-pie-chart" style="color:var(--purple);margin-right:8px"></i>Resolução por Tipo</span>
+            <button class="btn btn-secondary btn-sm">Ver detalhes</button>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="height:220px">
+              <canvas id="chartResolution"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Row -->
+      <div class="grid grid-2">
+        <!-- Activity Feed -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Atividade Recente</span>
+            <button class="btn btn-secondary btn-sm">Ver tudo</button>
+          </div>
+          <div class="card-body" style="padding-top:0">
+            <ul class="activity-list">
+              <li class="activity-item">
+                <div class="activity-icon" style="background:var(--green-light);color:var(--green)"><i class="fab fa-whatsapp"></i></div>
+                <div class="activity-content">
+                  <div class="activity-title">Nova conversa iniciada</div>
+                  <div class="activity-desc">Ana Paula perguntou sobre status de pedido</div>
+                </div>
+                <div class="activity-time">2 min</div>
+              </li>
+              <li class="activity-item">
+                <div class="activity-icon" style="background:#eff6ff;color:var(--blue)"><i class="fas fa-robot"></i></div>
+                <div class="activity-content">
+                  <div class="activity-title">IA resolveu automaticamente</div>
+                  <div class="activity-desc">FAQ sobre prazo de entrega — 98% confiança</div>
+                </div>
+                <div class="activity-time">5 min</div>
+              </li>
+              <li class="activity-item">
+                <div class="activity-icon" style="background:#fffbeb;color:var(--orange)"><i class="fas fa-hand-paper"></i></div>
+                <div class="activity-content">
+                  <div class="activity-title">Transferência para humano</div>
+                  <div class="activity-desc">Reclamação complexa — Carlos Souza</div>
+                </div>
+                <div class="activity-time">12 min</div>
+              </li>
+              <li class="activity-item">
+                <div class="activity-icon" style="background:#f5f3ff;color:var(--purple)"><i class="fas fa-project-diagram"></i></div>
+                <div class="activity-content">
+                  <div class="activity-title">Fluxo "Boas-vindas" disparado</div>
+                  <div class="activity-desc">14 novos usuários onboarded</div>
+                </div>
+                <div class="activity-time">28 min</div>
+              </li>
+              <li class="activity-item">
+                <div class="activity-icon" style="background:var(--green-light);color:var(--green)"><i class="fas fa-star"></i></div>
+                <div class="activity-content">
+                  <div class="activity-title">Avaliação CSAT recebida</div>
+                  <div class="activity-desc">Beatriz Lima avaliou: ⭐⭐⭐⭐⭐</div>
+                </div>
+                <div class="activity-time">34 min</div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Top Metrics -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Agentes em Destaque</span>
+            <button class="btn btn-secondary btn-sm">Gerenciar equipe</button>
+          </div>
+          <div class="card-body" style="padding-top:8px">
+            <ul class="top-agents-list">
+              <li class="top-agent-item">
+                <div class="avatar-md" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff">JM</div>
+                <div class="top-agent-info">
+                  <div class="top-agent-name">João Martins</div>
+                  <div class="top-agent-stats">47 conversas · CSAT 4.9</div>
+                </div>
+                <div class="top-agent-score">🏆 97%</div>
+              </li>
+              <li class="top-agent-item">
+                <div class="avatar-md" style="background:linear-gradient(135deg,#f093fb,#f5576c);color:#fff">CA</div>
+                <div class="top-agent-info">
+                  <div class="top-agent-name">Carla Andrade</div>
+                  <div class="top-agent-stats">39 conversas · CSAT 4.8</div>
+                </div>
+                <div class="top-agent-score">🥈 94%</div>
+              </li>
+              <li class="top-agent-item">
+                <div class="avatar-md" style="background:linear-gradient(135deg,#4facfe,#00f2fe);color:#fff">PE</div>
+                <div class="top-agent-info">
+                  <div class="top-agent-name">Pedro Esteves</div>
+                  <div class="top-agent-stats">31 conversas · CSAT 4.7</div>
+                </div>
+                <div class="top-agent-score">🥉 91%</div>
+              </li>
+              <li class="top-agent-item">
+                <div class="avatar-md" style="background:linear-gradient(135deg,#fa709a,#fee140);color:#fff">LS</div>
+                <div class="top-agent-info">
+                  <div class="top-agent-name">Larissa Santos</div>
+                  <div class="top-agent-stats">26 conversas · CSAT 4.6</div>
+                </div>
+                <div class="top-agent-score">89%</div>
+              </li>
+            </ul>
+            <hr class="divider" />
+            <div class="quick-stats">
+              <div class="quick-stat">
+                <div class="qs-val" style="color:var(--green)">23</div>
+                <div class="qs-lbl">Agentes Online</div>
+              </div>
+              <div class="quick-stat">
+                <div class="qs-val" style="color:var(--orange)">48</div>
+                <div class="qs-lbl">Na Fila</div>
+              </div>
+              <div class="quick-stat">
+                <div class="qs-val" style="color:var(--blue)">4.8</div>
+                <div class="qs-lbl">CSAT Médio</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SCREEN 2: CONVERSATIONS
+         ============================================================ -->
+    <section class="screen" id="screen-conversations">
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1 class="page-title">Conversas</h1>
+          <p class="page-subtitle">347 conversas ativas · 48 aguardando atendimento humano</p>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-secondary"><i class="fas fa-filter"></i> Filtros</button>
+          <button class="btn btn-primary"><i class="fas fa-plus"></i> Nova Conversa</button>
+        </div>
+      </div>
+
+      <div class="conversations-layout">
+        <!-- Conversation List -->
+        <div class="conv-list-panel">
+          <div class="conv-list-header">
+            <h3>Todas as Conversas</h3>
+            <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Buscar conversa..." /></div>
+            <div class="conv-filters">
+              <button class="filter-chip active">Todas</button>
+              <button class="filter-chip">IA</button>
+              <button class="filter-chip">Humano</button>
+              <button class="filter-chip">Pendente</button>
+              <button class="filter-chip">Encerradas</button>
+            </div>
+          </div>
+          <div class="conv-list-body">
+            <div class="conv-item active" onclick="selectConv(this, 'ana')">
+              <div class="conv-avatar" style="background:#fce7f3;color:#ec4899">AN</div>
+              <div class="conv-body">
+                <div class="conv-row1"><span class="conv-name">Ana Paula Silva</span><span class="conv-time">agora</span></div>
+                <div class="conv-preview"><i class="fas fa-robot" style="color:var(--blue);font-size:10px"></i> Olá! Como posso rastrear meu pedido?</div>
+                <div class="conv-row3"><span class="badge badge-blue">IA</span><span class="conv-unread">3</span></div>
+              </div>
+            </div>
+            <div class="conv-item" onclick="selectConv(this, 'carlos')">
+              <div class="conv-avatar" style="background:#e0f2fe;color:#0284c7">CS</div>
+              <div class="conv-body">
+                <div class="conv-row1"><span class="conv-name">Carlos Souza</span><span class="conv-time">3 min</span></div>
+                <div class="conv-preview">Quero fazer uma reclamação sobre o produto</div>
+                <div class="conv-row3"><span class="badge badge-orange">Humano</span></div>
+              </div>
+            </div>
+            <div class="conv-item" onclick="selectConv(this, 'beatriz')">
+              <div class="conv-avatar" style="background:#dcfce7;color:#16a34a">BL</div>
+              <div class="conv-body">
+                <div class="conv-row1"><span class="conv-name">Beatriz Lima</span><span class="conv-time">8 min</span></div>
+                <div class="conv-preview">✓ Obrigada! Problema resolvido 😊</div>
+                <div class="conv-row3"><span class="badge badge-green">Resolvida</span></div>
+              </div>
+            </div>
+            <div class="conv-item" onclick="selectConv(this, 'marcos')">
+              <div class="conv-avatar" style="background:#f3e8ff;color:#7c3aed">MO</div>
+              <div class="conv-body">
+                <div class="conv-row1"><span class="conv-name">Marcos Oliveira</span><span class="conv-time">15 min</span></div>
+                <div class="conv-preview">Preciso trocar o endereço de entrega</div>
+                <div class="conv-row3"><span class="badge badge-red">Pendente</span><span class="conv-unread">1</span></div>
+              </div>
+            </div>
+            <div class="conv-item" onclick="selectConv(this, 'julia')">
+              <div class="conv-avatar" style="background:#fef3c7;color:#d97706">JR</div>
+              <div class="conv-body">
+                <div class="conv-row1"><span class="conv-name">Júlia Rodrigues</span><span class="conv-time">22 min</span></div>
+                <div class="conv-preview"><i class="fas fa-robot" style="color:var(--blue);font-size:10px"></i> Qual o prazo para reembolso?</div>
+                <div class="conv-row3"><span class="badge badge-blue">IA</span></div>
+              </div>
+            </div>
+            <div class="conv-item" onclick="selectConv(this, 'pedro')">
+              <div class="conv-avatar" style="background:#e0f2fe;color:#0369a1">PF</div>
+              <div class="conv-body">
+                <div class="conv-row1"><span class="conv-name">Pedro Ferreira</span><span class="conv-time">35 min</span></div>
+                <div class="conv-preview">Meu pedido chegou com defeito</div>
+                <div class="conv-row3"><span class="badge badge-orange">Humano</span><span class="conv-unread">5</span></div>
+              </div>
+            </div>
+            <div class="conv-item" onclick="selectConv(this, 'larissa')">
+              <div class="conv-avatar" style="background:#fce7f3;color:#db2777">LM</div>
+              <div class="conv-body">
+                <div class="conv-row1"><span class="conv-name">Larissa Mello</span><span class="conv-time">1h</span></div>
+                <div class="conv-preview"><i class="fas fa-robot" style="color:var(--blue);font-size:10px"></i> Como cancelo meu plano?</div>
+                <div class="conv-row3"><span class="badge badge-blue">IA</span></div>
+              </div>
+            </div>
+            <div class="conv-item" onclick="selectConv(this, 'roberto')">
+              <div class="conv-avatar" style="background:#f0fdf4;color:#15803d">RC</div>
+              <div class="conv-body">
+                <div class="conv-row1"><span class="conv-name">Roberto Costa</span><span class="conv-time">2h</span></div>
+                <div class="conv-preview">Boa tarde! Gostaria de saber sobre...</div>
+                <div class="conv-row3"><span class="badge badge-gray">Encerrada</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Panel -->
+        <div class="conv-chat-panel">
+          <div class="chat-header">
+            <div class="conv-avatar" style="background:#fce7f3;color:#ec4899;width:40px;height:40px;flex-shrink:0">AN</div>
+            <div class="chat-header-info">
+              <div class="chat-header-name">Ana Paula Silva</div>
+              <div class="chat-header-sub"><span class="badge badge-blue">IA Ativa</span> · +55 11 99887-6655 · Última mensagem agora</div>
+            </div>
+            <div class="chat-header-actions">
+              <button class="btn btn-secondary btn-sm"><i class="fas fa-user-check"></i> Assumir</button>
+              <button class="btn btn-secondary btn-sm"><i class="fas fa-tag"></i> Tag</button>
+              <button class="btn-icon"><i class="fas fa-ellipsis-v"></i></button>
+            </div>
+          </div>
+          <div class="chat-messages">
+            <!-- Messages -->
+            <div style="text-align:center;margin:8px 0">
+              <span style="background:#e8eaed;color:#6b7280;font-size:11px;padding:3px 12px;border-radius:99px">Hoje, 08:45</span>
+            </div>
+            <div class="msg incoming">
+              <div class="msg-meta">Ana Paula Silva</div>
+              <div class="msg-bubble">Olá! Bom dia! 😊 Preciso rastrear meu pedido #87634. Vocês podem me ajudar?</div>
+              <div class="msg-time">08:45 <i class="fas fa-check" style="color:#94a3b8;font-size:10px"></i></div>
+            </div>
+            <div class="msg ai incoming">
+              <div class="msg-ai-label"><i class="fas fa-robot"></i> AutoBot IA</div>
+              <div class="msg-bubble">Olá, Ana Paula! 👋 Bom dia!<br/><br/>Claro, posso te ajudar com o rastreamento do pedido #87634. Para localizar seu pedido, preciso verificar alguns dados:<br/><br/>📦 Confirma seu CPF ou e-mail cadastrado?</div>
+              <div class="msg-time">08:45 <i class="fas fa-check-double" style="color:var(--green);font-size:10px"></i></div>
+            </div>
+            <div class="msg incoming">
+              <div class="msg-bubble">Sim! CPF: 123.456.789-00</div>
+              <div class="msg-time">08:46</div>
+            </div>
+            <div class="msg ai incoming">
+              <div class="msg-ai-label"><i class="fas fa-robot"></i> AutoBot IA</div>
+              <div class="msg-bubble">Encontrei seu pedido! ✅<br/><br/><strong>#87634 — Tênis Nike Air Max</strong><br/>📍 Status: <strong>Em trânsito</strong><br/>🚚 Previsão: <strong>Amanhã, 22/02</strong><br/>📬 Entregar em: Rua das Flores, 123<br/><br/>Quer acompanhar em tempo real? Te mando o link de rastreio!</div>
+              <div class="msg-time">08:46 <i class="fas fa-check-double" style="color:var(--green);font-size:10px"></i></div>
+            </div>
+            <div class="msg incoming">
+              <div class="msg-bubble">Nossa, que rápido! Sim, manda o link 😍</div>
+              <div class="msg-time">08:47</div>
+            </div>
+            <div class="msg outgoing">
+              <div class="msg-bubble">🔗 https://rastreio.correios.com.br/AA123456789BR<br/><br/>Qualquer dúvida, é só chamar! 😊</div>
+              <div class="msg-time">08:47 <i class="fas fa-check-double" style="color:var(--green);font-size:10px"></i></div>
+            </div>
+            <div class="msg incoming">
+              <div class="msg-bubble">Perfeito! Obrigada demais! ❤️</div>
+              <div class="msg-time">agora</div>
+            </div>
+          </div>
+          <div class="chat-composer">
+            <button class="btn-icon"><i class="fas fa-paperclip"></i></button>
+            <button class="btn-icon"><i class="fas fa-smile"></i></button>
+            <textarea class="chat-input" rows="1" placeholder="Digite uma mensagem..."></textarea>
+            <button class="btn btn-secondary btn-sm"><i class="fas fa-robot"></i> Sugerir IA</button>
+            <button class="chat-send-btn"><i class="fas fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SCREEN 3: FLOWS
+         ============================================================ -->
+    <section class="screen" id="screen-flows">
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1 class="page-title">Fluxos de Automação</h1>
+          <p class="page-subtitle">Crie e gerencie fluxos de chatbot visuais com triggers, condições e ações.</p>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-secondary"><i class="fas fa-upload"></i> Importar</button>
+          <button class="btn btn-primary" onclick="addNewFlow()"><i class="fas fa-plus"></i> Novo Fluxo</button>
+        </div>
+      </div>
+
+      <div class="flows-layout">
+        <!-- Flows Sidebar -->
+        <div class="flows-sidebar">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Meus Fluxos</span><span class="badge badge-green">6 ativos</span></div>
+            <div class="card-body" style="padding:10px;display:flex;flex-direction:column;gap:8px">
+              <div class="flow-list-item active" onclick="selectFlow(this,'welcome')">
+                <div class="flow-icon" style="background:var(--green-light);color:var(--green)"><i class="fab fa-whatsapp"></i></div>
+                <div class="flow-info"><div class="flow-name">Boas-vindas</div><div class="flow-meta"><span class="badge badge-green" style="font-size:10px">Ativo</span> · 2.1k disparos</div></div>
+              </div>
+              <div class="flow-list-item" onclick="selectFlow(this,'order')">
+                <div class="flow-icon" style="background:#eff6ff;color:var(--blue)"><i class="fas fa-box"></i></div>
+                <div class="flow-info"><div class="flow-name">Rastreio de Pedido</div><div class="flow-meta"><span class="badge badge-green" style="font-size:10px">Ativo</span> · 847 disparos</div></div>
+              </div>
+              <div class="flow-list-item" onclick="selectFlow(this,'support')">
+                <div class="flow-icon" style="background:#fffbeb;color:var(--orange)"><i class="fas fa-headset"></i></div>
+                <div class="flow-info"><div class="flow-name">Suporte Técnico</div><div class="flow-meta"><span class="badge badge-green" style="font-size:10px">Ativo</span> · 412 disparos</div></div>
+              </div>
+              <div class="flow-list-item" onclick="selectFlow(this,'sales')">
+                <div class="flow-icon" style="background:#f5f3ff;color:var(--purple)"><i class="fas fa-shopping-cart"></i></div>
+                <div class="flow-info"><div class="flow-name">Funil de Vendas</div><div class="flow-meta"><span class="badge badge-green" style="font-size:10px">Ativo</span> · 203 disparos</div></div>
+              </div>
+              <div class="flow-list-item" onclick="selectFlow(this,'csat')">
+                <div class="flow-icon" style="background:#ecfeff;color:var(--cyan)"><i class="fas fa-star"></i></div>
+                <div class="flow-info"><div class="flow-name">Pesquisa CSAT</div><div class="flow-meta"><span class="badge badge-green" style="font-size:10px">Ativo</span> · 98 disparos</div></div>
+              </div>
+              <div class="flow-list-item" onclick="selectFlow(this,'abandon')">
+                <div class="flow-icon" style="background:#fff1f2;color:var(--red)"><i class="fas fa-cart-arrow-down"></i></div>
+                <div class="flow-info"><div class="flow-name">Carrinho Abandonado</div><div class="flow-meta"><span class="badge badge-gray" style="font-size:10px">Inativo</span></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Node Palette -->
+          <div class="card">
+            <div class="card-header"><span class="card-title">Componentes</span></div>
+            <div class="card-body" style="padding:10px;display:flex;flex-direction:column;gap:6px">
+              <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Triggers</div>
+              <div class="flow-list-item" style="cursor:grab;padding:8px 10px">
+                <div class="flow-icon" style="background:var(--green-light);color:var(--green);width:28px;height:28px;font-size:12px"><i class="fab fa-whatsapp"></i></div>
+                <div class="flow-info"><div class="flow-name" style="font-size:12px">Mensagem recebida</div></div>
+              </div>
+              <div class="flow-list-item" style="cursor:grab;padding:8px 10px">
+                <div class="flow-icon" style="background:var(--green-light);color:var(--green);width:28px;height:28px;font-size:12px"><i class="fas fa-clock"></i></div>
+                <div class="flow-info"><div class="flow-name" style="font-size:12px">Agendado</div></div>
+              </div>
+              <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin:6px 0 4px">Condições</div>
+              <div class="flow-list-item" style="cursor:grab;padding:8px 10px">
+                <div class="flow-icon" style="background:#fffbeb;color:var(--orange);width:28px;height:28px;font-size:12px"><i class="fas fa-code-branch"></i></div>
+                <div class="flow-info"><div class="flow-name" style="font-size:12px">Contém palavra-chave</div></div>
+              </div>
+              <div class="flow-list-item" style="cursor:grab;padding:8px 10px">
+                <div class="flow-icon" style="background:#fffbeb;color:var(--orange);width:28px;height:28px;font-size:12px"><i class="fas fa-filter"></i></div>
+                <div class="flow-info"><div class="flow-name" style="font-size:12px">Segmento de cliente</div></div>
+              </div>
+              <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin:6px 0 4px">Ações</div>
+              <div class="flow-list-item" style="cursor:grab;padding:8px 10px">
+                <div class="flow-icon" style="background:#eff6ff;color:var(--blue);width:28px;height:28px;font-size:12px"><i class="fas fa-reply"></i></div>
+                <div class="flow-info"><div class="flow-name" style="font-size:12px">Enviar mensagem</div></div>
+              </div>
+              <div class="flow-list-item" style="cursor:grab;padding:8px 10px">
+                <div class="flow-icon" style="background:#eff6ff;color:var(--blue);width:28px;height:28px;font-size:12px"><i class="fas fa-user-tie"></i></div>
+                <div class="flow-info"><div class="flow-name" style="font-size:12px">Transferir humano</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flow Canvas -->
+        <div class="flows-canvas">
+          <div class="flows-canvas-header">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span class="card-title">✏️ Editando: <span id="flowCanvasTitle">Boas-vindas</span></span>
+              <span class="badge badge-green">Ativo</span>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-secondary btn-sm"><i class="fas fa-undo"></i></button>
+              <button class="btn btn-secondary btn-sm"><i class="fas fa-redo"></i></button>
+              <button class="btn btn-secondary btn-sm"><i class="fas fa-expand"></i></button>
+              <button class="btn btn-secondary btn-sm"><i class="fas fa-play"></i> Testar</button>
+              <button class="btn btn-primary btn-sm"><i class="fas fa-save"></i> Salvar</button>
+            </div>
+          </div>
+          <div class="flows-canvas-body" id="flowsCanvas">
+            <!-- SVG Connections -->
+            <svg class="flow-svg" id="flowSvg">
+              <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                  <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8" />
+                </marker>
+              </defs>
+              <!-- Connections drawn by JS -->
+            </svg>
+
+            <!-- TRIGGER NODE -->
+            <div class="flow-node trigger" id="node-trigger" style="left:60px;top:40px" data-node="trigger">
+              <div class="node-header">
+                <div class="node-type-icon trigger"><i class="fab fa-whatsapp"></i></div>
+                <div class="node-title">Trigger: WhatsApp</div>
+              </div>
+              <div class="node-desc">Qualquer nova mensagem recebida no canal</div>
+              <div class="node-port port-bottom"></div>
+            </div>
+
+            <!-- CONDITION NODE -->
+            <div class="flow-node condition" id="node-cond1" style="left:60px;top:175px" data-node="cond1">
+              <div class="node-header">
+                <div class="node-type-icon condition"><i class="fas fa-code-branch"></i></div>
+                <div class="node-title">Condição: Novo cliente?</div>
+              </div>
+              <div class="node-desc">Verifica se é a primeira interação do contato</div>
+              <div class="node-port port-top"></div>
+              <div class="node-port port-bottom"></div>
+            </div>
+
+            <!-- ACTION NODE: Saudação -->
+            <div class="flow-node action" id="node-action1" style="left:60px;top:320px" data-node="action1">
+              <div class="node-header">
+                <div class="node-type-icon action"><i class="fas fa-paper-plane"></i></div>
+                <div class="node-title">Enviar Saudação</div>
+              </div>
+              <div class="node-desc">"Olá! Bem-vindo à nossa empresa 👋 Como posso ajudar?"</div>
+              <div class="node-port port-top"></div>
+              <div class="node-port port-bottom"></div>
+            </div>
+
+            <!-- CONDITION: Intenção -->
+            <div class="flow-node condition" id="node-cond2" style="left:280px;top:175px" data-node="cond2">
+              <div class="node-header">
+                <div class="node-type-icon condition"><i class="fas fa-brain"></i></div>
+                <div class="node-title">IA: Detectar intenção</div>
+              </div>
+              <div class="node-desc">Classifica: Pedido / Suporte / Vendas / Outros</div>
+              <div class="node-port port-top"></div>
+              <div class="node-port port-bottom"></div>
+            </div>
+
+            <!-- ACTION NODE: Encaminhar -->
+            <div class="flow-node action" id="node-action2" style="left:280px;top:320px" data-node="action2">
+              <div class="node-header">
+                <div class="node-type-icon action"><i class="fas fa-sitemap"></i></div>
+                <div class="node-title">Encaminhar Fluxo</div>
+              </div>
+              <div class="node-desc">Redireciona para fluxo específico da intenção detectada</div>
+              <div class="node-port port-top"></div>
+              <div class="node-port port-bottom"></div>
+            </div>
+
+            <!-- END NODE -->
+            <div class="flow-node end-node" id="node-end" style="left:170px;top:460px" data-node="end">
+              <div class="node-header">
+                <div class="node-type-icon end-node"><i class="fas fa-flag-checkered"></i></div>
+                <div class="node-title">Fim do Fluxo</div>
+              </div>
+              <div class="node-desc">Conversa finalizada ou passada para agente</div>
+              <div class="node-port port-top"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SCREEN 4: KNOWLEDGE BASE
+         ============================================================ -->
+    <section class="screen" id="screen-knowledge">
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1 class="page-title">Base de Conhecimento</h1>
+          <p class="page-subtitle">Gerencie FAQs, documentos e treine a IA com seu conteúdo.</p>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-secondary"><i class="fas fa-upload"></i> Importar Doc</button>
+          <button class="btn btn-primary"><i class="fas fa-plus"></i> Novo Conteúdo</button>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="report-tabs" style="margin-bottom:20px">
+        <button class="report-tab active" onclick="switchKbTab(this,'faq')">FAQs</button>
+        <button class="report-tab" onclick="switchKbTab(this,'docs')">Documentos</button>
+        <button class="report-tab" onclick="switchKbTab(this,'training')">Treinamento IA</button>
+      </div>
+
+      <div class="kb-layout">
+        <!-- Category Sidebar -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">Categorias</span></div>
+          <div class="card-body" style="padding:8px">
+            <div class="kb-categories">
+              <div class="kb-cat-item active" onclick="setKbCat(this)"><i class="fas fa-th-large"></i> Todas <span class="kb-cat-count">47</span></div>
+              <div class="kb-cat-item" onclick="setKbCat(this)"><i class="fas fa-box"></i> Pedidos <span class="kb-cat-count">14</span></div>
+              <div class="kb-cat-item" onclick="setKbCat(this)"><i class="fas fa-truck"></i> Entregas <span class="kb-cat-count">9</span></div>
+              <div class="kb-cat-item" onclick="setKbCat(this)"><i class="fas fa-undo"></i> Devoluções <span class="kb-cat-count">7</span></div>
+              <div class="kb-cat-item" onclick="setKbCat(this)"><i class="fas fa-credit-card"></i> Pagamentos <span class="kb-cat-count">11</span></div>
+              <div class="kb-cat-item" onclick="setKbCat(this)"><i class="fas fa-wrench"></i> Suporte Técnico <span class="kb-cat-count">6</span></div>
+            </div>
+            <hr class="divider" />
+            <div style="padding:6px 6px 0">
+              <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:8px">Status da IA</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Precisão</span><span class="fw-700" style="color:var(--green)">94,2%</span></div>
+                  <div class="progress-bar"><div class="progress-fill progress-green" style="width:94%"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Cobertura</span><span class="fw-700" style="color:var(--blue)">78%</span></div>
+                  <div class="progress-bar"><div class="progress-fill progress-blue" style="width:78%"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Confiança média</span><span class="fw-700" style="color:var(--purple)">87%</span></div>
+                  <div class="progress-bar"><div class="progress-fill progress-purple" style="width:87%"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="kb-content">
+          <!-- FAQ Tab -->
+          <div id="kb-faq">
+            <div class="kb-toolbar">
+              <div class="search-box flex-1"><i class="fas fa-search"></i><input type="text" placeholder="Buscar pergunta..." /></div>
+              <button class="btn btn-secondary btn-sm"><i class="fas fa-sort"></i> Ordenar</button>
+              <button class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Nova FAQ</button>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px">
+              <div class="faq-item open">
+                <div class="faq-header" onclick="toggleFaq(this)">
+                  <span class="badge badge-blue" style="flex-shrink:0">Pedidos</span>
+                  <span class="faq-question">Como faço para rastrear meu pedido?</span>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <span style="font-size:11px;color:var(--text-muted)">Usada 348x</span>
+                    <span class="badge badge-green" style="font-size:10px">98% confiança</span>
+                    <i class="fas fa-chevron-down faq-toggle"></i>
+                  </div>
+                </div>
+                <div class="faq-body">
+                  Para rastrear seu pedido, você pode: 1) Acessar o link enviado por e-mail/WhatsApp após a confirmação do pedido; 2) Acessar nossa área do cliente em nosso site com seu CPF; 3) Nos enviar o número do pedido aqui mesmo pelo chat. O rastreamento é atualizado em tempo real pelos Correios ou pela transportadora parceira.
+                </div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-header" onclick="toggleFaq(this)">
+                  <span class="badge badge-orange" style="flex-shrink:0">Entregas</span>
+                  <span class="faq-question">Qual o prazo de entrega para minha cidade?</span>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <span style="font-size:11px;color:var(--text-muted)">Usada 291x</span>
+                    <span class="badge badge-green" style="font-size:10px">95% confiança</span>
+                    <i class="fas fa-chevron-down faq-toggle"></i>
+                  </div>
+                </div>
+                <div class="faq-body">O prazo de entrega varia de acordo com a região: São Paulo capital: 1-2 dias úteis. Interior de SP: 2-4 dias úteis. Sul e Sudeste: 3-5 dias úteis. Outras regiões: 5-8 dias úteis. Frete expresso disponível com entrega em 24h.</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-header" onclick="toggleFaq(this)">
+                  <span class="badge badge-purple" style="flex-shrink:0">Pagamentos</span>
+                  <span class="faq-question">Quais formas de pagamento vocês aceitam?</span>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <span style="font-size:11px;color:var(--text-muted)">Usada 214x</span>
+                    <span class="badge badge-green" style="font-size:10px">99% confiança</span>
+                    <i class="fas fa-chevron-down faq-toggle"></i>
+                  </div>
+                </div>
+                <div class="faq-body">Aceitamos: Cartão de crédito (Visa, Master, Elo, Amex) em até 12x; Cartão de débito; PIX (aprovação imediata com 5% de desconto!); Boleto bancário (prazo de 2 dias úteis); Mercado Pago.</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-header" onclick="toggleFaq(this)">
+                  <span class="badge badge-red" style="flex-shrink:0">Devoluções</span>
+                  <span class="faq-question">Como solicitar a troca ou devolução de um produto?</span>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <span style="font-size:11px;color:var(--text-muted)">Usada 187x</span>
+                    <span class="badge badge-orange" style="font-size:10px">89% confiança</span>
+                    <i class="fas fa-chevron-down faq-toggle"></i>
+                  </div>
+                </div>
+                <div class="faq-body">Você tem até 30 dias após o recebimento para solicitar troca ou devolução. O produto deve estar em perfeitas condições, na embalagem original. Para iniciar, responda este chat com "TROCA" ou acesse a área do cliente. O frete de devolução é por nossa conta!</div>
+              </div>
+              <div class="faq-item">
+                <div class="faq-header" onclick="toggleFaq(this)">
+                  <span class="badge badge-blue" style="flex-shrink:0">Pedidos</span>
+                  <span class="faq-question">Posso alterar ou cancelar meu pedido?</span>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <span style="font-size:11px;color:var(--text-muted)">Usada 156x</span>
+                    <span class="badge badge-green" style="font-size:10px">93% confiança</span>
+                    <i class="fas fa-chevron-down faq-toggle"></i>
+                  </div>
+                </div>
+                <div class="faq-body">Sim! Pedidos podem ser alterados ou cancelados em até 2 horas após a confirmação, enquanto ainda estão com status "Aguardando separação". Após este prazo, o pedido já pode estar em processo de envio. Neste caso, o cancelamento só é possível após recebimento via política de devolução.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Docs Tab (hidden by default) -->
+          <div id="kb-docs" style="display:none">
+            <div class="kb-toolbar">
+              <div class="search-box flex-1"><i class="fas fa-search"></i><input type="text" placeholder="Buscar documento..." /></div>
+              <button class="btn btn-primary btn-sm"><i class="fas fa-upload"></i> Upload</button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px">
+              <div class="doc-card">
+                <div class="doc-icon" style="background:#fff1f2;color:var(--red)"><i class="fas fa-file-pdf"></i></div>
+                <div class="doc-info">
+                  <div class="doc-name">Política de Trocas e Devoluções</div>
+                  <div class="doc-meta">PDF · 2.4 MB · Atualizado 15/01/2026</div>
+                  <div style="margin-top:6px"><span class="badge badge-green" style="font-size:10px">Treinado</span></div>
+                </div>
+              </div>
+              <div class="doc-card">
+                <div class="doc-icon" style="background:#eff6ff;color:var(--blue)"><i class="fas fa-file-word"></i></div>
+                <div class="doc-info">
+                  <div class="doc-name">Manual do Produto - Linha Pro</div>
+                  <div class="doc-meta">DOCX · 8.1 MB · Atualizado 02/02/2026</div>
+                  <div style="margin-top:6px"><span class="badge badge-green" style="font-size:10px">Treinado</span></div>
+                </div>
+              </div>
+              <div class="doc-card">
+                <div class="doc-icon" style="background:#f0fdf4;color:#16a34a"><i class="fas fa-file-excel"></i></div>
+                <div class="doc-info">
+                  <div class="doc-name">Tabela de Preços 2026</div>
+                  <div class="doc-meta">XLSX · 512 KB · Atualizado 01/01/2026</div>
+                  <div style="margin-top:6px"><span class="badge badge-orange" style="font-size:10px">Processando...</span></div>
+                </div>
+              </div>
+              <div class="doc-card">
+                <div class="doc-icon" style="background:#fef3c7;color:#d97706"><i class="fas fa-globe"></i></div>
+                <div class="doc-info">
+                  <div class="doc-name">FAQ do Site (URL Sync)</div>
+                  <div class="doc-meta">Website · Auto-atualiza · 47 páginas</div>
+                  <div style="margin-top:6px"><span class="badge badge-green" style="font-size:10px">Sincronizado</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Training Tab (hidden by default) -->
+          <div id="kb-training" style="display:none">
+            <div class="card">
+              <div class="card-header"><span class="card-title"><i class="fas fa-brain" style="color:var(--purple);margin-right:8px"></i>Log de Treinamento da IA</span><button class="btn btn-primary btn-sm"><i class="fas fa-sync"></i> Retreinar</button></div>
+              <div class="card-body">
+                <ul style="list-style:none;display:flex;flex-direction:column">
+                  <li class="training-item">
+                    <div class="training-dot" style="background:var(--green)"></div>
+                    <div style="flex:1"><div style="font-size:13px;font-weight:600">Treinamento concluído — v3.2.1</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px">47 FAQs · 4 documentos · 98,4% acurácia · Duração: 4min 23s</div></div>
+                    <div style="font-size:11px;color:var(--text-light)">Hoje, 06:00</div>
+                  </li>
+                  <li class="training-item">
+                    <div class="training-dot" style="background:var(--orange)"></div>
+                    <div style="flex:1"><div style="font-size:13px;font-weight:600">Novo documento adicionado</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px">Manual do Produto - Linha Pro (DOCX 8.1MB) — aguardando re-treino</div></div>
+                    <div style="font-size:11px;color:var(--text-light)">Ontem, 14:32</div>
+                  </li>
+                  <li class="training-item">
+                    <div class="training-dot" style="background:var(--green)"></div>
+                    <div style="flex:1"><div style="font-size:13px;font-weight:600">12 novas FAQs confirmadas por agentes</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px">Perguntas sobre entrega express e rastreio incorporadas ao modelo</div></div>
+                    <div style="font-size:11px;color:var(--text-light)">19/02, 09:15</div>
+                  </li>
+                  <li class="training-item">
+                    <div class="training-dot" style="background:var(--red)"></div>
+                    <div style="flex:1"><div style="font-size:13px;font-weight:600">3 respostas incorretas identificadas</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px">Sobre cancelamento de pedido — corrigidas e adicionadas ao treinamento</div></div>
+                    <div style="font-size:11px;color:var(--text-light)">18/02, 16:48</div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SCREEN 5: INTEGRATIONS
+         ============================================================ -->
+    <section class="screen" id="screen-integrations">
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1 class="page-title">Integrações</h1>
+          <p class="page-subtitle">Conecte AutoBot Pro com suas ferramentas e plataformas favoritas.</p>
+        </div>
+        <button class="btn btn-primary"><i class="fas fa-store"></i> Marketplace</button>
+      </div>
+
+      <!-- Status Bar -->
+      <div class="card" style="margin-bottom:24px;padding:16px 20px">
+        <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:8px">
+            <i class="fas fa-circle" style="color:var(--green);font-size:10px"></i>
+            <span style="font-size:13.5px;font-weight:600">4 integrações ativas</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <i class="fas fa-circle" style="color:#d1d5db;font-size:10px"></i>
+            <span style="font-size:13.5px;font-weight:600;color:var(--text-muted)">2 inativas</span>
+          </div>
+          <div style="flex:1"></div>
+          <span style="font-size:13px;color:var(--text-muted)">Última sincronização: há 2 minutos</span>
+          <button class="btn btn-secondary btn-sm"><i class="fas fa-sync"></i> Sincronizar tudo</button>
+        </div>
+      </div>
+
+      <div class="integrations-grid">
+        <!-- WhatsApp Business API -->
+        <div class="integration-card connected">
+          <div class="int-header">
+            <div class="int-logo" style="background:#e7fdf0"><i class="fab fa-whatsapp" style="color:#25D366"></i></div>
+            <div class="int-info">
+              <div class="int-name">WhatsApp Business API</div>
+              <div class="int-category">Mensageria</div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked onchange="toggleIntegration(this,'whatsapp')"><div class="toggle-slider"></div></label>
+          </div>
+          <div class="int-desc">Conecte-se diretamente à API oficial do WhatsApp Business para enviar e receber mensagens em escala.</div>
+          <ul class="int-features">
+            <li>Mensagens ilimitadas</li>
+            <li>Templates aprovados pela Meta</li>
+            <li>Múltiplos números</li>
+            <li>Chatbot 24/7</li>
+          </ul>
+          <div class="int-footer">
+            <div class="int-status active"><span class="int-status-dot"></span>Conectado · +55 11 9988-7766</div>
+            <button class="btn btn-secondary btn-sm">Configurar</button>
+          </div>
+        </div>
+
+        <!-- Instagram -->
+        <div class="integration-card connected">
+          <div class="int-header">
+            <div class="int-logo" style="background:linear-gradient(135deg,#f9ce34,#ee2a7b,#6228d7);color:#fff"><i class="fab fa-instagram"></i></div>
+            <div class="int-info">
+              <div class="int-name">Instagram DM</div>
+              <div class="int-category">Redes Sociais</div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked onchange="toggleIntegration(this,'instagram')"><div class="toggle-slider"></div></label>
+          </div>
+          <div class="int-desc">Automatize respostas nos DMs do Instagram e gerencie comentários com inteligência artificial.</div>
+          <ul class="int-features">
+            <li>Auto-resposta DMs</li>
+            <li>Moderação de comentários</li>
+            <li>Stories interativos</li>
+          </ul>
+          <div class="int-footer">
+            <div class="int-status active"><span class="int-status-dot"></span>Conectado · @empresa</div>
+            <button class="btn btn-secondary btn-sm">Configurar</button>
+          </div>
+        </div>
+
+        <!-- Telegram -->
+        <div class="integration-card connected">
+          <div class="int-header">
+            <div class="int-logo" style="background:#e8f4fd"><i class="fab fa-telegram" style="color:#2CA5E0"></i></div>
+            <div class="int-info">
+              <div class="int-name">Telegram Bot</div>
+              <div class="int-category">Mensageria</div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked onchange="toggleIntegration(this,'telegram')"><div class="toggle-slider"></div></label>
+          </div>
+          <div class="int-desc">Crie e gerencie um bot Telegram com automação completa de atendimento e notificações.</div>
+          <ul class="int-features">
+            <li>Bot com comandos personalizados</li>
+            <li>Grupos e canais</li>
+            <li>Notificações push</li>
+          </ul>
+          <div class="int-footer">
+            <div class="int-status active"><span class="int-status-dot"></span>Conectado · @autobot_pro</div>
+            <button class="btn btn-secondary btn-sm">Configurar</button>
+          </div>
+        </div>
+
+        <!-- Google Sheets -->
+        <div class="integration-card connected">
+          <div class="int-header">
+            <div class="int-logo" style="background:#e6f4ea"><i class="fas fa-table" style="color:#0F9D58"></i></div>
+            <div class="int-info">
+              <div class="int-name">Google Sheets</div>
+              <div class="int-category">Produtividade</div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked onchange="toggleIntegration(this,'gsheets')"><div class="toggle-slider"></div></label>
+          </div>
+          <div class="int-desc">Sincronize dados de conversas, leads e relatórios automaticamente com planilhas Google.</div>
+          <ul class="int-features">
+            <li>Exportação automática de leads</li>
+            <li>Relatórios em tempo real</li>
+            <li>Leitura de dados da planilha</li>
+          </ul>
+          <div class="int-footer">
+            <div class="int-status active"><span class="int-status-dot"></span>Sincronizando · 3 planilhas</div>
+            <button class="btn btn-secondary btn-sm">Configurar</button>
+          </div>
+        </div>
+
+        <!-- CRM -->
+        <div class="integration-card">
+          <div class="int-header">
+            <div class="int-logo" style="background:#fef3c7"><i class="fas fa-user-tie" style="color:#d97706"></i></div>
+            <div class="int-info">
+              <div class="int-name">CRM / Salesforce</div>
+              <div class="int-category">CRM</div>
+            </div>
+            <label class="toggle"><input type="checkbox" onchange="toggleIntegration(this,'crm')"><div class="toggle-slider"></div></label>
+          </div>
+          <div class="int-desc">Integre com seu CRM para criar e atualizar oportunidades, contatos e negócios automaticamente.</div>
+          <ul class="int-features">
+            <li>Criação automática de leads</li>
+            <li>Sync de histórico de conversas</li>
+            <li>Pipelines automatizados</li>
+          </ul>
+          <div class="int-footer">
+            <div class="int-status"><span class="int-status-dot"></span>Desconectado</div>
+            <button class="btn btn-primary btn-sm">Conectar</button>
+          </div>
+        </div>
+
+        <!-- Mercado Pago -->
+        <div class="integration-card">
+          <div class="int-header">
+            <div class="int-logo" style="background:#e8f4f8"><i class="fas fa-dollar-sign" style="color:#009ee3"></i></div>
+            <div class="int-info">
+              <div class="int-name">Mercado Pago</div>
+              <div class="int-category">Pagamentos</div>
+            </div>
+            <label class="toggle"><input type="checkbox" onchange="toggleIntegration(this,'mp')"><div class="toggle-slider"></div></label>
+          </div>
+          <div class="int-desc">Aceite pagamentos direto pelo chat! Gere links de pagamento PIX, cartão e boleto automaticamente.</div>
+          <ul class="int-features">
+            <li>Cobranças via chat</li>
+            <li>Links de pagamento automáticos</li>
+            <li>Notificações de pagamento</li>
+          </ul>
+          <div class="int-footer">
+            <div class="int-status"><span class="int-status-dot"></span>Desconectado</div>
+            <button class="btn btn-primary btn-sm">Conectar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SCREEN 6: REPORTS
+         ============================================================ -->
+    <section class="screen" id="screen-reports">
+      <div class="page-header">
+        <div class="page-header-left">
+          <h1 class="page-title">Relatórios</h1>
+          <p class="page-subtitle">Análise completa de performance: 15 a 21 de fevereiro de 2026</p>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-secondary"><i class="fas fa-calendar-alt"></i> Período</button>
+          <button class="btn btn-primary"><i class="fas fa-file-pdf"></i> Gerar PDF</button>
+        </div>
+      </div>
+
+      <div class="report-tabs">
+        <button class="report-tab active" onclick="switchReportTab(this,'overview')">Visão Geral</button>
+        <button class="report-tab" onclick="switchReportTab(this,'csat')">CSAT</button>
+        <button class="report-tab" onclick="switchReportTab(this,'team')">Equipe</button>
+        <button class="report-tab" onclick="switchReportTab(this,'ai')">Performance IA</button>
+      </div>
+
+      <!-- Overview Tab -->
+      <div id="report-overview">
+        <div class="grid grid-4" style="margin-bottom:20px">
+          <div class="kpi-card">
+            <div class="kpi-top"><div class="kpi-icon green"><i class="fas fa-comments"></i></div><div class="kpi-trend up"><i class="fas fa-arrow-up"></i>12%</div></div>
+            <div class="kpi-value">8.241</div>
+            <div class="kpi-label">Total Conversas</div>
+            <div class="kpi-sub">vs 7.354 semana anterior</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><div class="kpi-icon blue"><i class="fas fa-check-circle"></i></div><div class="kpi-trend up"><i class="fas fa-arrow-up"></i>4%</div></div>
+            <div class="kpi-value">87,4%</div>
+            <div class="kpi-label">Taxa de Resolução</div>
+            <div class="kpi-sub">7.202 resolvidas</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><div class="kpi-icon orange"><i class="fas fa-star"></i></div><div class="kpi-trend up"><i class="fas fa-arrow-up"></i>0.2</div></div>
+            <div class="kpi-value">4.8</div>
+            <div class="kpi-label">CSAT Médio</div>
+            <div class="kpi-sub">de 1.842 avaliações</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><div class="kpi-icon purple"><i class="fas fa-robot"></i></div><div class="kpi-trend up"><i class="fas fa-arrow-up"></i>3%</div></div>
+            <div class="kpi-value">87,4%</div>
+            <div class="kpi-label">Resolvidas pela IA</div>
+            <div class="kpi-sub">sem intervenção humana</div>
+          </div>
+        </div>
+
+        <div class="grid grid-2" style="margin-bottom:20px">
+          <div class="card">
+            <div class="card-header"><span class="card-title"><i class="fas fa-chart-bar" style="color:var(--blue);margin-right:8px"></i>Conversas por Dia</span></div>
+            <div class="card-body"><canvas id="chartWeekly" style="height:200px"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title"><i class="fas fa-chart-line" style="color:var(--green);margin-right:8px"></i>Tempo de Resposta (min)</span></div>
+            <div class="card-body"><canvas id="chartResponseTime" style="height:200px"></canvas></div>
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Resoluções por Tipo</span></div>
+            <div class="card-body">
+              <div class="metric-row">
+                <span class="metric-rank">01</span>
+                <div class="metric-bar-wrap">
+                  <div class="metric-label">Rastreio de Pedido</div>
+                  <div class="progress-bar"><div class="progress-fill progress-green" style="width:78%"></div></div>
+                </div>
+                <span class="metric-val">78% · 2.847</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-rank">02</span>
+                <div class="metric-bar-wrap">
+                  <div class="metric-label">Prazo de Entrega</div>
+                  <div class="progress-bar"><div class="progress-fill progress-blue" style="width:62%"></div></div>
+                </div>
+                <span class="metric-val">62% · 1.914</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-rank">03</span>
+                <div class="metric-bar-wrap">
+                  <div class="metric-label">Formas de Pagamento</div>
+                  <div class="progress-bar"><div class="progress-fill progress-purple" style="width:54%"></div></div>
+                </div>
+                <span class="metric-val">54% · 1.672</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-rank">04</span>
+                <div class="metric-bar-wrap">
+                  <div class="metric-label">Troca e Devolução</div>
+                  <div class="progress-bar"><div class="progress-fill progress-orange" style="width:41%"></div></div>
+                </div>
+                <span class="metric-val">41% · 1.208</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-rank">05</span>
+                <div class="metric-bar-wrap">
+                  <div class="metric-label">Suporte Técnico</div>
+                  <div class="progress-bar"><div class="progress-fill" style="width:28%;background:var(--red)"></div></div>
+                </div>
+                <span class="metric-val">28% · 600</span>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Canal de Origem</span></div>
+            <div class="card-body">
+              <canvas id="chartChannels" style="height:220px"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CSAT Tab -->
+      <div id="report-csat" style="display:none">
+        <div class="grid grid-3">
+          <div class="card" style="text-align:center;padding:30px 20px">
+            <div class="csat-score">4.8</div>
+            <div class="csat-label">Satisfação Média</div>
+            <div class="csat-stars">⭐⭐⭐⭐⭐</div>
+            <div style="font-size:13px;color:var(--text-muted);margin-top:12px">de <strong>1.842</strong> avaliações esta semana</div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Distribuição de Notas</span></div>
+            <div class="card-body">
+              <canvas id="chartCsat" style="height:160px"></canvas>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Evolução CSAT</span></div>
+            <div class="card-body">
+              <canvas id="chartCsatTrend" style="height:160px"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:20px">
+          <div class="card-header"><span class="card-title">Comentários Recentes</span></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <div class="avatar-sm" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;flex-shrink:0">AN</div>
+                <div style="flex:1">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                    <strong style="font-size:13px">Ana Paula Silva</strong>
+                    <span style="color:var(--orange)">⭐⭐⭐⭐⭐</span>
+                    <span style="font-size:11px;color:var(--text-light)">21/02</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--text-muted);line-height:1.5">"Atendimento incrível! O bot resolveu minha dúvida em menos de 1 minuto. Super recomendo! 😍"</p>
+                </div>
+              </div>
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <div class="avatar-sm" style="background:linear-gradient(135deg,#f093fb,#f5576c);color:#fff;flex-shrink:0">CS</div>
+                <div style="flex:1">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                    <strong style="font-size:13px">Carlos Souza</strong>
+                    <span style="color:var(--orange)">⭐⭐⭐⭐</span>
+                    <span style="font-size:11px;color:var(--text-light)">20/02</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--text-muted);line-height:1.5">"Boa experiência, só demorou um pouco para transferir para humano. Mas no final resolveram tudo."</p>
+                </div>
+              </div>
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <div class="avatar-sm" style="background:linear-gradient(135deg,#4facfe,#00f2fe);color:#fff;flex-shrink:0">BL</div>
+                <div style="flex:1">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                    <strong style="font-size:13px">Beatriz Lima</strong>
+                    <span style="color:var(--orange)">⭐⭐⭐⭐⭐</span>
+                    <span style="font-size:11px;color:var(--text-light)">20/02</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--text-muted);line-height:1.5">"Melhor atendimento virtual que já tive! O bot entende tudo que eu escrevo e responde na hora. Nota 10!"</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Team Tab -->
+      <div id="report-team" style="display:none">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Performance da Equipe — Semana 15-21/02</span>
+            <button class="btn btn-secondary btn-sm"><i class="fas fa-download"></i> Exportar</button>
+          </div>
+          <div class="card-body" style="padding:0">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Agente</th>
+                  <th>Conversas</th>
+                  <th>Resolvidas</th>
+                  <th>Taxa</th>
+                  <th>TMA</th>
+                  <th>CSAT</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar-sm" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff">JM</div><span style="font-weight:600">João Martins</span></div></td>
+                  <td>47</td><td>45</td>
+                  <td><span class="badge badge-green">95.7%</span></td>
+                  <td>2m 14s</td>
+                  <td><strong style="color:var(--orange)">4.9 ⭐</strong></td>
+                  <td><span class="badge badge-green">Online</span></td>
+                </tr>
+                <tr>
+                  <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar-sm" style="background:linear-gradient(135deg,#f093fb,#f5576c);color:#fff">CA</div><span style="font-weight:600">Carla Andrade</span></div></td>
+                  <td>39</td><td>37</td>
+                  <td><span class="badge badge-green">94.8%</span></td>
+                  <td>2m 38s</td>
+                  <td><strong style="color:var(--orange)">4.8 ⭐</strong></td>
+                  <td><span class="badge badge-green">Online</span></td>
+                </tr>
+                <tr>
+                  <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar-sm" style="background:linear-gradient(135deg,#4facfe,#00f2fe);color:#fff">PE</div><span style="font-weight:600">Pedro Esteves</span></div></td>
+                  <td>31</td><td>29</td>
+                  <td><span class="badge badge-green">93.5%</span></td>
+                  <td>3m 05s</td>
+                  <td><strong style="color:var(--orange)">4.7 ⭐</strong></td>
+                  <td><span class="badge badge-orange">Pausa</span></td>
+                </tr>
+                <tr>
+                  <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar-sm" style="background:linear-gradient(135deg,#fa709a,#fee140);color:#fff">LS</div><span style="font-weight:600">Larissa Santos</span></div></td>
+                  <td>26</td><td>24</td>
+                  <td><span class="badge badge-blue">92.3%</span></td>
+                  <td>3m 42s</td>
+                  <td><strong style="color:var(--orange)">4.6 ⭐</strong></td>
+                  <td><span class="badge badge-green">Online</span></td>
+                </tr>
+                <tr>
+                  <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar-sm" style="background:linear-gradient(135deg,#a8edea,#fed6e3);color:#555">MR</div><span style="font-weight:600">Marcos Reis</span></div></td>
+                  <td>18</td><td>15</td>
+                  <td><span class="badge badge-orange">83.3%</span></td>
+                  <td>5m 12s</td>
+                  <td><strong style="color:var(--orange)">4.3 ⭐</strong></td>
+                  <td><span class="badge badge-gray">Offline</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Performance Tab -->
+      <div id="report-ai" style="display:none">
+        <div class="grid grid-4" style="margin-bottom:20px">
+          <div class="kpi-card">
+            <div class="kpi-top"><div class="kpi-icon blue"><i class="fas fa-robot"></i></div><div class="kpi-trend up"><i class="fas fa-arrow-up"></i>3%</div></div>
+            <div class="kpi-value">87.4%</div>
+            <div class="kpi-label">Taxa de Resolução IA</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><div class="kpi-icon green"><i class="fas fa-bolt"></i></div><div class="kpi-trend up"><i class="fas fa-arrow-up"></i>5%</div></div>
+            <div class="kpi-value">0.8s</div>
+            <div class="kpi-label">Tempo médio resposta IA</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><div class="kpi-icon purple"><i class="fas fa-brain"></i></div><div class="kpi-trend up"><i class="fas fa-arrow-up"></i>2%</div></div>
+            <div class="kpi-value">94.2%</div>
+            <div class="kpi-label">Precisão do Modelo</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-top"><div class="kpi-icon orange"><i class="fas fa-hand-paper"></i></div><div class="kpi-trend down"><i class="fas fa-arrow-down"></i>4%</div></div>
+            <div class="kpi-value">12.6%</div>
+            <div class="kpi-label">Taxa de Transferência</div>
+          </div>
+        </div>
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Intenções Mais Detectadas</span></div>
+            <div class="card-body">
+              <div class="metric-row">
+                <span class="metric-rank">01</span>
+                <div class="metric-bar-wrap">
+                  <div class="metric-label">Rastrear Pedido</div>
+                  <div class="progress-bar" style="margin-top:4px"><div class="progress-fill progress-green" style="width:82%"></div></div>
+                </div>
+                <span class="metric-val">82% · 3.12k</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-rank">02</span>
+                <div class="metric-bar-wrap">
+                  <div class="metric-label">Prazo Entrega</div>
+                  <div class="progress-bar" style="margin-top:4px"><div class="progress-fill progress-blue" style="width:61%"></div></div>
+                </div>
+                <span class="metric-val">61% · 1.87k</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-rank">03</span>
+                <div class="metric-bar-wrap">
+                  <div class="metric-label">Cancelar Pedido</div>
+                  <div class="progress-bar" style="margin-top:4px"><div class="progress-fill progress-orange" style="width:44%"></div></div>
+                </div>
+                <span class="metric-val">44% · 1.21k</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-rank">04</span>
+                <div class="metric-bar-wrap">
+                  <div class="metric-label">Formas de Pagamento</div>
+                  <div class="progress-bar" style="margin-top:4px"><div class="progress-fill progress-purple" style="width:38%"></div></div>
+                </div>
+                <span class="metric-val">38% · 987</span>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Confiança por Intenção</span></div>
+            <div class="card-body"><canvas id="chartAiConfidence" style="height:200px"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div><!-- /.main -->
+
+<!-- ============================================================
+     CHAT WIDGET
+     ============================================================ -->
+<div class="chat-widget" id="chatWidget">
+  <div class="chat-widget-popup" id="widgetPopup">
+    <div class="widget-header">
+      <h4>AutoBot Pro 🤖</h4>
+      <p>Sua assistente virtual inteligente</p>
+      <div class="widget-header-status">
+        <div class="widget-online-dot"></div>
+        <span>Online agora · responde em segundos</span>
+      </div>
+    </div>
+    <div class="widget-body" id="widgetBody">
+      <div class="widget-msg bot">
+        <div class="widget-bubble">Olá! 👋 Sou o AutoBot. Como posso ajudar você hoje?</div>
+      </div>
+      <div class="widget-msg bot">
+        <div class="widget-bubble">Escolha uma opção ou digite sua pergunta livremente:</div>
+      </div>
+    </div>
+    <div class="widget-quick-replies" id="widgetQuickReplies">
+      <button class="quick-reply-btn" onclick="sendWidgetReply('📦 Rastrear pedido')">📦 Rastrear pedido</button>
+      <button class="quick-reply-btn" onclick="sendWidgetReply('💳 Formas de pagamento')">💳 Pagamentos</button>
+      <button class="quick-reply-btn" onclick="sendWidgetReply('🔄 Trocar produto')">🔄 Trocas</button>
+      <button class="quick-reply-btn" onclick="sendWidgetReply('🎧 Falar com atendente')">🎧 Atendente</button>
+    </div>
+    <div class="widget-footer">
+      <input class="widget-input" id="widgetInput" type="text" placeholder="Digite sua mensagem..." onkeydown="if(event.key==='Enter')sendWidgetMsg()" />
+      <button class="widget-send" onclick="sendWidgetMsg()"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+  <button class="chat-widget-btn" id="widgetBtn" onclick="toggleWidget()">
+    <i class="fab fa-whatsapp" id="widgetIcon"></i>
+    <span class="widget-notif">1</span>
+  </button>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+// ===== NAVIGATION =====
+const screenTitles = {
+  dashboard: 'Dashboard',
+  conversations: 'Conversas',
+  flows: 'Fluxos de Automação',
+  knowledge: 'Base de Conhecimento',
+  integrations: 'Integrações',
+  reports: 'Relatórios'
+};
+
+function navigate(screenId, el) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const screen = document.getElementById('screen-' + screenId);
+  if (screen) screen.classList.add('active');
+  if (el) el.classList.add('active');
+  document.getElementById('topbarTitle').textContent = screenTitles[screenId] || screenId;
+  closeMobileSidebar();
+  // Initialize charts when needed
+  if (screenId === 'dashboard') initDashboardCharts();
+  if (screenId === 'reports') initReportCharts();
+}
+
+// ===== MOBILE SIDEBAR =====
+function toggleMobileSidebar() {
+  document.getElementById('sidebar').classList.toggle('mobile-open');
+  document.getElementById('sidebarOverlay').classList.toggle('show');
+}
+function closeMobileSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+}
+
+// ===== FILTER CHIPS =====
+document.querySelectorAll('.conv-filters .filter-chip').forEach(chip => {
+  chip.addEventListener('click', function() {
+    this.closest('.conv-filters').querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+// ===== CONVERSATION SELECTION =====
+function selectConv(el, id) {
+  document.querySelectorAll('.conv-item').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ===== FAQ TOGGLE =====
+function toggleFaq(headerEl) {
+  const item = headerEl.closest('.faq-item');
+  item.classList.toggle('open');
+}
+
+// ===== KB TABS =====
+function switchKbTab(btn, tab) {
+  document.querySelectorAll('.report-tabs .report-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ['kb-faq','kb-docs','kb-training'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  const target = document.getElementById('kb-' + tab);
+  if (target) target.style.display = 'block';
+}
+
+function setKbCat(el) {
+  document.querySelectorAll('.kb-cat-item').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ===== REPORT TABS =====
+function switchReportTab(btn, tab) {
+  document.querySelectorAll('.report-tabs .report-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ['report-overview','report-csat','report-team','report-ai'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  const target = document.getElementById('report-' + tab);
+  if (target) target.style.display = 'block';
+  // Init CSAT charts when tab shown
+  if (tab === 'csat') setTimeout(initCsatCharts, 50);
+  if (tab === 'ai') setTimeout(initAiCharts, 50);
+}
+
+// ===== FLOW SELECTION =====
+function selectFlow(el, id) {
+  document.querySelectorAll('.flow-list-item').forEach(f => f.classList.remove('active'));
+  el.classList.add('active');
+  const names = {welcome:'Boas-vindas',order:'Rastreio de Pedido',support:'Suporte Técnico',sales:'Funil de Vendas',csat:'Pesquisa CSAT',abandon:'Carrinho Abandonado'};
+  document.getElementById('flowCanvasTitle').textContent = names[id] || id;
+}
+
+function addNewFlow() {
+  alert('✨ Funcionalidade disponível no plano Pro!\n\nNo produto final, você pode criar fluxos ilimitados arrastando componentes para o canvas.');
+}
+
+// ===== INTEGRATION TOGGLE =====
+function toggleIntegration(checkbox, service) {
+  const card = checkbox.closest('.integration-card');
+  const statusEl = card.querySelector('.int-status');
+  const statusDot = card.querySelector('.int-status-dot');
+  if (checkbox.checked) {
+    card.classList.add('connected');
+    statusEl.classList.add('active');
+  } else {
+    card.classList.remove('connected');
+    statusEl.classList.remove('active');
+  }
+}
+
+// ===== DRAGGABLE NODES (Flow Canvas) =====
+let dragging = null, offsetX = 0, offsetY = 0;
+document.querySelectorAll('.flow-node').forEach(node => {
+  node.addEventListener('mousedown', e => {
+    if (e.target.classList.contains('node-port')) return;
+    dragging = node;
+    const rect = node.getBoundingClientRect();
+    const canvasRect = document.getElementById('flowsCanvas').getBoundingClientRect();
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
+    node.classList.add('dragging');
+    e.preventDefault();
+  });
+});
+document.addEventListener('mousemove', e => {
+  if (!dragging) return;
+  const canvas = document.getElementById('flowsCanvas');
+  const rect = canvas.getBoundingClientRect();
+  let x = e.clientX - rect.left - offsetX + canvas.scrollLeft;
+  let y = e.clientY - rect.top - offsetY + canvas.scrollTop;
+  x = Math.max(0, x); y = Math.max(0, y);
+  dragging.style.left = x + 'px';
+  dragging.style.top = y + 'px';
+  drawFlowConnections();
+});
+document.addEventListener('mouseup', () => {
+  if (dragging) { dragging.classList.remove('dragging'); dragging = null; }
+});
+
+// ===== DRAW SVG CONNECTIONS =====
+function getNodeCenter(nodeId) {
+  const node = document.getElementById(nodeId);
+  const canvas = document.getElementById('flowsCanvas');
+  if (!node) return {x:0,y:0};
+  const left = parseInt(node.style.left) || 0;
+  const top = parseInt(node.style.top) || 0;
+  return { x: left + node.offsetWidth / 2, y: top + node.offsetHeight / 2 };
+}
+function getNodeBottom(nodeId) {
+  const node = document.getElementById(nodeId);
+  if (!node) return {x:0,y:0};
+  return { x: parseInt(node.style.left) + node.offsetWidth/2, y: parseInt(node.style.top) + node.offsetHeight };
+}
+function getNodeTop(nodeId) {
+  const node = document.getElementById(nodeId);
+  if (!node) return {x:0,y:0};
+  return { x: parseInt(node.style.left) + node.offsetWidth/2, y: parseInt(node.style.top) };
+}
+function drawFlowConnections() {
+  const svg = document.getElementById('flowSvg');
+  if (!svg) return;
+  const connections = [
+    ['node-trigger','node-cond1'],
+    ['node-cond1','node-action1'],
+    ['node-cond1','node-cond2'],
+    ['node-cond2','node-action2'],
+    ['node-action1','node-end'],
+    ['node-action2','node-end'],
+  ];
+  let paths = '';
+  connections.forEach(([from, to]) => {
+    const p1 = getNodeBottom(from);
+    const p2 = getNodeTop(to);
+    const midY = (p1.y + p2.y) / 2;
+    paths += `<path d="M${p1.x},${p1.y} C${p1.x},${midY} ${p2.x},${midY} ${p2.x},${p2.y}" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arrowhead)" stroke-dasharray="5,3"/>`;
+  });
+  svg.innerHTML = `<defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/></marker></defs>` + paths;
+}
+
+// Init connections
+setTimeout(drawFlowConnections, 300);
+
+// ===== CHAT WIDGET =====
+let widgetOpen = false;
+const botResponses = {
+  '📦 Rastrear pedido': 'Claro! Para rastrear seu pedido, por favor informe o número do pedido ou seu CPF. 📦',
+  '💳 Formas de pagamento': 'Aceitamos: Cartão de crédito/débito, PIX (5% OFF!), Boleto e Mercado Pago. 💳',
+  '🔄 Trocar produto': 'Você tem até 30 dias para solicitar troca. O produto deve estar na embalagem original. Posso te ajudar a iniciar o processo! 🔄',
+  '🎧 Falar com atendente': 'Te conectando a um agente humano... Aguarde um momento! 👨‍💼 Tempo médio de espera: 2 min.',
+};
+
+function toggleWidget() {
+  widgetOpen = !widgetOpen;
+  const popup = document.getElementById('widgetPopup');
+  const icon = document.getElementById('widgetIcon');
+  const notif = document.querySelector('.widget-notif');
+  popup.classList.toggle('open', widgetOpen);
+  icon.className = widgetOpen ? 'fas fa-times' : 'fab fa-whatsapp';
+  if (notif) notif.style.display = widgetOpen ? 'none' : 'flex';
+}
+
+function sendWidgetMsg() {
+  const input = document.getElementById('widgetInput');
+  const text = input.value.trim();
+  if (!text) return;
+  addWidgetMsg(text, 'user');
+  input.value = '';
+  document.getElementById('widgetQuickReplies').style.display = 'none';
+  setTimeout(() => addWidgetTyping(), 600);
+  const response = botResponses[text] || getBotResponse(text);
+  setTimeout(() => {
+    removeWidgetTyping();
+    addWidgetMsg(response, 'bot');
+  }, 1800);
+}
+
+function sendWidgetReply(text) {
+  addWidgetMsg(text, 'user');
+  document.getElementById('widgetQuickReplies').style.display = 'none';
+  setTimeout(() => addWidgetTyping(), 600);
+  const response = botResponses[text] || getBotResponse(text);
+  setTimeout(() => {
+    removeWidgetTyping();
+    addWidgetMsg(response, 'bot');
+  }, 1800);
+}
+
+function getBotResponse(text) {
+  const t = text.toLowerCase();
+  if (t.includes('pedido') || t.includes('rastr')) return 'Para rastrear, informe o número do seu pedido. Você pode encontrá-lo no e-mail de confirmação! 📦';
+  if (t.includes('prazo') || t.includes('entrega')) return 'O prazo de entrega é de 2-8 dias úteis dependendo da região. SP capital: 1-2 dias! 🚚';
+  if (t.includes('pix') || t.includes('pagament')) return 'Aceitamos PIX (com 5% de desconto!), cartão, boleto e Mercado Pago. 💳';
+  if (t.includes('troca') || t.includes('devolu')) return 'Você tem 30 dias para troca/devolução. O frete de retorno é por nossa conta! 🔄';
+  if (t.includes('oi') || t.includes('olá') || t.includes('ola')) return 'Olá! 😊 Como posso te ajudar hoje?';
+  return 'Entendi! Vou verificar isso para você. Para um atendimento mais rápido, posso te transferir para um de nossos especialistas. Deseja isso? 🎧';
+}
+
+function addWidgetMsg(text, sender) {
+  const body = document.getElementById('widgetBody');
+  const div = document.createElement('div');
+  div.className = `widget-msg ${sender}`;
+  div.innerHTML = `<div class="widget-bubble">${text}</div>`;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+
+function addWidgetTyping() {
+  const body = document.getElementById('widgetBody');
+  const div = document.createElement('div');
+  div.className = 'widget-msg bot';
+  div.id = 'widget-typing';
+  div.innerHTML = '<div class="widget-typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+
+function removeWidgetTyping() {
+  const t = document.getElementById('widget-typing');
+  if (t) t.remove();
+}
+
+// ===== CHARTS =====
+let dashChartsInit = false;
+let reportChartsInit = false;
+
+function initDashboardCharts() {
+  if (dashChartsInit) return;
+  dashChartsInit = true;
+
+  // Messages by Hour
+  const ctxMsg = document.getElementById('chartMessages');
+  if (ctxMsg) {
+    new Chart(ctxMsg, {
+      type: 'line',
+      data: {
+        labels: ['00h','02h','04h','06h','08h','10h','12h','14h','16h','18h','20h','22h'],
+        datasets: [
+          {
+            label: 'IA',
+            data: [12,8,5,15,48,95,142,168,155,130,88,52],
+            borderColor: '#25D366',
+            backgroundColor: 'rgba(37,211,102,0.12)',
+            fill: true, tension: 0.4, pointRadius: 3,
+          },
+          {
+            label: 'Humano',
+            data: [3,2,1,4,18,35,52,61,58,47,28,14],
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59,130,246,0.08)',
+            fill: true, tension: 0.4, pointRadius: 3,
+          }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } },
+          x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+        }
+      }
+    });
+  }
+
+  // Resolution Donut
+  const ctxRes = document.getElementById('chartResolution');
+  if (ctxRes) {
+    new Chart(ctxRes, {
+      type: 'doughnut',
+      data: {
+        labels: ['Resolvida pela IA','Transferida p/ Humano','Pendente','Abandonada'],
+        datasets: [{
+          data: [874, 126, 48, 22],
+          backgroundColor: ['#25D366','#3b82f6','#f59e0b','#ef4444'],
+          borderWidth: 0, hoverOffset: 6
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        cutout: '68%',
+        plugins: {
+          legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 12, boxWidth: 10 } }
+        }
+      }
+    });
+  }
+}
+
+function initReportCharts() {
+  if (reportChartsInit) return;
+  reportChartsInit = true;
+
+  // Weekly Conversations
+  const ctxWeekly = document.getElementById('chartWeekly');
+  if (ctxWeekly) {
+    new Chart(ctxWeekly, {
+      type: 'bar',
+      data: {
+        labels: ['Seg 15','Ter 16','Qua 17','Qui 18','Sex 19','Sáb 20','Dom 21'],
+        datasets: [
+          {
+            label: 'IA',
+            data: [980, 1120, 1045, 1280, 1350, 890, 640],
+            backgroundColor: 'rgba(37,211,102,0.8)',
+            borderRadius: 4,
+          },
+          {
+            label: 'Humano',
+            data: [200, 240, 210, 280, 310, 140, 80],
+            backgroundColor: 'rgba(59,130,246,0.7)',
+            borderRadius: 4,
+          }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 10 } } },
+        scales: {
+          y: { beginAtZero: true, stacked: false, grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } },
+          x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+        }
+      }
+    });
+  }
+
+  // Response Time
+  const ctxRT = document.getElementById('chartResponseTime');
+  if (ctxRT) {
+    new Chart(ctxRT, {
+      type: 'line',
+      data: {
+        labels: ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],
+        datasets: [
+          {
+            label: 'IA (s)',
+            data: [0.9, 0.8, 1.1, 0.7, 0.8, 0.6, 0.9],
+            borderColor: '#25D366', backgroundColor: 'rgba(37,211,102,0.1)',
+            fill: true, tension: 0.4, yAxisID: 'yBot',
+          },
+          {
+            label: 'Humano (min)',
+            data: [3.1, 2.8, 3.5, 2.4, 2.9, 4.2, 3.8],
+            borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.08)',
+            fill: false, tension: 0.4, yAxisID: 'yHuman',
+          }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, boxWidth: 10 } } },
+        scales: {
+          yBot: { type: 'linear', position: 'left', grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
+          yHuman: { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, ticks: { font: { size: 10 } } },
+          x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+        }
+      }
+    });
+  }
+
+  // Channel Breakdown
+  const ctxCh = document.getElementById('chartChannels');
+  if (ctxCh) {
+    new Chart(ctxCh, {
+      type: 'doughnut',
+      data: {
+        labels: ['WhatsApp','Instagram DM','Telegram','Web Chat'],
+        datasets: [{
+          data: [72, 15, 8, 5],
+          backgroundColor: ['#25D366','#c13584','#2CA5E0','#6366f1'],
+          borderWidth: 0, hoverOffset: 6
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, cutout: '62%',
+        plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 10, boxWidth: 10 } } }
+      }
+    });
+  }
+}
+
+function initCsatCharts() {
+  const ctxCsat = document.getElementById('chartCsat');
+  if (ctxCsat && !ctxCsat._chartInit) {
+    ctxCsat._chartInit = true;
+    new Chart(ctxCsat, {
+      type: 'bar',
+      data: {
+        labels: ['⭐ 1','⭐⭐ 2','⭐⭐⭐ 3','⭐⭐⭐⭐ 4','⭐⭐⭐⭐⭐ 5'],
+        datasets: [{
+          label: 'Avaliações',
+          data: [24, 38, 112, 364, 1304],
+          backgroundColor: ['#ef4444','#f59e0b','#f59e0b','#3b82f6','#25D366'],
+          borderRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { font: { size: 10 } } }, x: { ticks: { font: { size: 10 } } } }
+      }
+    });
+  }
+  const ctxTrend = document.getElementById('chartCsatTrend');
+  if (ctxTrend && !ctxTrend._chartInit) {
+    ctxTrend._chartInit = true;
+    new Chart(ctxTrend, {
+      type: 'line',
+      data: {
+        labels: ['Nov','Dez','Jan','Fev'],
+        datasets: [{
+          label: 'CSAT',
+          data: [4.3, 4.5, 4.6, 4.8],
+          borderColor: '#25D366', backgroundColor: 'rgba(37,211,102,0.12)',
+          fill: true, tension: 0.4, pointRadius: 5, pointBackgroundColor: '#25D366',
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { min: 4, max: 5, ticks: { font: { size: 10 } } }, x: { ticks: { font: { size: 10 } } } }
+      }
+    });
+  }
+}
+
+function initAiCharts() {
+  const ctxAI = document.getElementById('chartAiConfidence');
+  if (ctxAI && !ctxAI._chartInit) {
+    ctxAI._chartInit = true;
+    new Chart(ctxAI, {
+      type: 'radar',
+      data: {
+        labels: ['Rastreio','Entrega','Pagamento','Troca','Cancelamento','Suporte'],
+        datasets: [{
+          label: 'Confiança (%)',
+          data: [98, 95, 99, 89, 88, 81],
+          borderColor: '#25D366',
+          backgroundColor: 'rgba(37,211,102,0.15)',
+          pointBackgroundColor: '#25D366',
+          pointRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { r: { beginAtZero: false, min: 70, max: 100, ticks: { font: { size: 10 } } } }
+      }
+    });
+  }
+}
+
+// ===== INIT =====
+window.addEventListener('DOMContentLoaded', () => {
+  initDashboardCharts();
+  drawFlowConnections();
+
+  // Simulate live updates on KPIs
+  setInterval(() => {
+    const kpiVals = document.querySelectorAll('.kpi-value');
+    if (kpiVals[0]) {
+      const cur = parseInt(kpiVals[0].textContent.replace(/\D/g,''));
+      const newVal = cur + Math.floor(Math.random() * 3);
+      kpiVals[0].textContent = newVal.toLocaleString('pt-BR');
+    }
+  }, 5000);
+
+  // Simulate typing indicator in widget after 3s
+  setTimeout(() => {
+    document.querySelector('.widget-notif') && (document.querySelector('.widget-notif').textContent = '1');
+  }, 3000);
+});
+</script>
+</body>
+</html>
