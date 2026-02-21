@@ -1,0 +1,3972 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkyMed ERP â€” Sistema de GestÃ£o MÃ©dica</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal-50: #f0fdfa;
+      --teal-100: #ccfbf1;
+      --teal-200: #99f6e4;
+      --teal-300: #5eead4;
+      --teal-400: #2dd4bf;
+      --teal-500: #14b8a6;
+      --teal-600: #0d9488;
+      --teal-700: #0f766e;
+      --teal-800: #115e59;
+      --teal-900: #134e4a;
+      --sidebar-bg: #0f172a;
+      --sidebar-hover: #1e293b;
+      --sidebar-active: #0d9488;
+      --sidebar-text: #94a3b8;
+      --sidebar-text-active: #ffffff;
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --border: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      --purple: #8b5cf6;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -1px rgba(0,0,0,0.04);
+      --shadow-md: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
+      --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+      --radius: 0.75rem;
+      --radius-sm: 0.375rem;
+      --radius-lg: 1rem;
+      --sidebar-w: 260px;
+      --topbar-h: 64px;
+    }
+    html { font-size: 15px; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-main);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ===== LAYOUT ===== */
+    .app-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--sidebar-bg);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+      transition: transform 0.3s ease;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      text-decoration: none;
+      min-height: var(--topbar-h);
+    }
+    .sidebar-logo .logo-icon {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--teal-500), var(--teal-700));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(13, 148, 136, 0.4);
+    }
+    .sidebar-logo .logo-text {
+      display: flex; flex-direction: column;
+    }
+    .sidebar-logo .logo-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    .sidebar-logo .logo-sub {
+      font-size: 0.65rem;
+      color: var(--teal-400);
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .sidebar-section-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--sidebar-text);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 1.25rem 1.5rem 0.4rem;
+      opacity: 0.5;
+    }
+
+    .sidebar-nav {
+      padding: 0.5rem 0;
+      flex: 1;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.7rem 1.5rem;
+      color: var(--sidebar-text);
+      cursor: pointer;
+      transition: all 0.18s ease;
+      border-left: 3px solid transparent;
+      font-size: 0.875rem;
+      font-weight: 500;
+      user-select: none;
+      position: relative;
+    }
+    .nav-item:hover {
+      background: var(--sidebar-hover);
+      color: #fff;
+    }
+    .nav-item.active {
+      background: rgba(13, 148, 136, 0.15);
+      color: var(--teal-400);
+      border-left-color: var(--teal-500);
+    }
+    .nav-item .nav-icon {
+      width: 18px;
+      text-align: center;
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+    .nav-item .nav-badge {
+      margin-left: auto;
+      background: var(--danger);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.1rem 0.45rem;
+      border-radius: 99px;
+      line-height: 1.4;
+    }
+    .nav-item .nav-badge.teal {
+      background: var(--teal-600);
+    }
+
+    .sidebar-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .sidebar-user .user-avatar {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--teal-500), var(--teal-700));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .sidebar-user .user-info {
+      flex: 1; overflow: hidden;
+    }
+    .sidebar-user .user-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sidebar-user .user-role {
+      font-size: 0.68rem;
+      color: var(--sidebar-text);
+    }
+    .sidebar-user .user-status {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      flex-shrink: 0;
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    .main-content {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ===== TOPBAR ===== */
+    .topbar {
+      height: var(--topbar-h);
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 1.75rem;
+      gap: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: var(--shadow-sm);
+    }
+    .topbar-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      flex: 1;
+    }
+    .topbar-title span {
+      color: var(--teal-600);
+    }
+    .topbar-search {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg-main);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.4rem 0.75rem;
+      font-size: 0.825rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      min-width: 220px;
+      transition: border-color 0.2s;
+    }
+    .topbar-search:hover { border-color: var(--teal-400); }
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .topbar-btn {
+      width: 36px; height: 36px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .topbar-btn:hover { border-color: var(--teal-400); color: var(--teal-600); }
+    .topbar-btn .notif-dot {
+      position: absolute;
+      top: 6px; right: 6px;
+      width: 7px; height: 7px;
+      background: var(--danger);
+      border-radius: 50%;
+      border: 2px solid var(--bg-card);
+    }
+    .topbar-date {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      padding-left: 0.75rem;
+      border-left: 1px solid var(--border);
+    }
+
+    /* ===== PAGE CONTENT ===== */
+    .page-content {
+      padding: 1.75rem;
+      flex: 1;
+    }
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ===== PAGE HEADER ===== */
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .page-header-left {}
+    .page-header h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+    .page-header p {
+      font-size: 0.825rem;
+      color: var(--text-secondary);
+      margin-top: 0.2rem;
+    }
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+    .breadcrumb span { color: var(--text-primary); font-weight: 500; }
+    .page-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.825rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      white-space: nowrap;
+      text-decoration: none;
+      font-family: inherit;
+    }
+    .btn-primary {
+      background: var(--teal-600);
+      color: #fff;
+    }
+    .btn-primary:hover { background: var(--teal-700); }
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--teal-400); color: var(--teal-600); }
+    .btn-danger {
+      background: var(--danger);
+      color: #fff;
+    }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-success {
+      background: var(--success);
+      color: #fff;
+    }
+    .btn-sm { padding: 0.3rem 0.65rem; font-size: 0.75rem; }
+    .btn-lg { padding: 0.65rem 1.4rem; font-size: 0.9rem; }
+    .btn-icon {
+      width: 32px; height: 32px;
+      padding: 0;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+    }
+
+    /* ===== CARDS ===== */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .card-header {
+      padding: 1.1rem 1.4rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+    .card-title {
+      font-size: 0.925rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .card-title .card-title-icon {
+      width: 28px; height: 28px;
+      border-radius: var(--radius-sm);
+      background: var(--teal-50);
+      color: var(--teal-600);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem;
+    }
+    .card-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.1rem;
+    }
+    .card-body { padding: 1.4rem; }
+    .card-footer {
+      padding: 0.85rem 1.4rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    /* ===== GRID ===== */
+    .grid { display: grid; gap: 1.25rem; }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .grid-5 { grid-template-columns: repeat(5, 1fr); }
+    .col-span-2 { grid-column: span 2; }
+    .col-span-3 { grid-column: span 3; }
+
+    /* ===== KPI CARDS ===== */
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.4rem;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--kpi-color, var(--teal-500));
+    }
+    .kpi-card .kpi-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 0.9rem;
+    }
+    .kpi-card .kpi-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .kpi-card .kpi-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      background: var(--kpi-bg, var(--teal-50));
+      color: var(--kpi-color, var(--teal-600));
+    }
+    .kpi-card .kpi-value {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+    }
+    .kpi-card .kpi-change {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .kpi-card .kpi-change.up { color: var(--success); }
+    .kpi-card .kpi-change.down { color: var(--danger); }
+    .kpi-card .kpi-period {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-left: 0.25rem;
+    }
+
+    /* ===== BADGES ===== */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 99px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .badge-success { background: #dcfce7; color: #15803d; }
+    .badge-warning { background: #fef9c3; color: #a16207; }
+    .badge-danger { background: #fee2e2; color: #b91c1c; }
+    .badge-info { background: #dbeafe; color: #1d4ed8; }
+    .badge-teal { background: var(--teal-50); color: var(--teal-700); }
+    .badge-purple { background: #ede9fe; color: #6d28d9; }
+    .badge-gray { background: #f1f5f9; color: #475569; }
+    .badge-orange { background: #fff7ed; color: #c2410c; }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    /* ===== TABLES ===== */
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: var(--radius);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+    }
+    thead th {
+      background: var(--bg-main);
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+    tbody tr:hover { background: var(--teal-50); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody td {
+      padding: 0.85rem 1rem;
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+    .td-muted { color: var(--text-muted); font-size: 0.78rem; }
+    .td-strong { font-weight: 600; }
+
+    /* ===== AVATAR ===== */
+    .avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--teal-400), var(--teal-700));
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .avatar-sm { width: 28px; height: 28px; font-size: 0.65rem; }
+    .avatar-lg { width: 44px; height: 44px; font-size: 0.9rem; }
+    .avatar-blue { background: linear-gradient(135deg, #60a5fa, #2563eb); }
+    .avatar-purple { background: linear-gradient(135deg, #a78bfa, #7c3aed); }
+    .avatar-orange { background: linear-gradient(135deg, #fb923c, #ea580c); }
+    .avatar-pink { background: linear-gradient(135deg, #f472b6, #db2777); }
+    .avatar-emerald { background: linear-gradient(135deg, #34d399, #059669); }
+
+    /* ===== PROGRESS BARS ===== */
+    .progress-bar {
+      height: 6px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: var(--teal-500);
+      transition: width 0.6s ease;
+    }
+    .progress-fill.warning { background: var(--warning); }
+    .progress-fill.danger { background: var(--danger); }
+    .progress-fill.info { background: var(--info); }
+    .progress-fill.purple { background: var(--purple); }
+    .progress-bar-lg { height: 10px; }
+    .progress-bar-xl { height: 14px; }
+
+    /* ===== CHART BARS (CSS) ===== */
+    .chart-container {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.4rem;
+      height: 160px;
+      padding: 0 0.5rem;
+    }
+    .chart-bar-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      height: 100%;
+      justify-content: flex-end;
+    }
+    .chart-bar {
+      width: 100%;
+      background: var(--teal-400);
+      border-radius: 4px 4px 0 0;
+      min-height: 4px;
+      transition: all 0.3s;
+      position: relative;
+      cursor: pointer;
+    }
+    .chart-bar:hover { background: var(--teal-600); }
+    .chart-bar.secondary { background: #cbd5e1; }
+    .chart-bar.secondary:hover { background: #94a3b8; }
+    .chart-bar-label {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .chart-bar-tooltip {
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--text-primary);
+      color: #fff;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .chart-bar:hover .chart-bar-tooltip { opacity: 1; }
+
+    /* ===== HORIZ CHART ===== */
+    .horiz-chart-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.85rem;
+    }
+    .horiz-chart-label {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      width: 170px;
+      flex-shrink: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .horiz-chart-bar-wrap {
+      flex: 1;
+      height: 22px;
+      background: var(--bg-main);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .horiz-chart-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--teal-500), var(--teal-400));
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      padding: 0 0.4rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #fff;
+      min-width: 40px;
+      transition: width 0.6s ease;
+    }
+    .horiz-chart-value {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      width: 80px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* ===== TABS ===== */
+    .tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.4rem;
+    }
+    .tab {
+      padding: 0.65rem 1.1rem;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: all 0.2s;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .tab:hover { color: var(--teal-600); }
+    .tab.active {
+      color: var(--teal-600);
+      border-bottom-color: var(--teal-600);
+    }
+    .tab-count {
+      background: var(--bg-main);
+      color: var(--text-secondary);
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.05rem 0.4rem;
+      border-radius: 99px;
+    }
+    .tab.active .tab-count {
+      background: var(--teal-50);
+      color: var(--teal-700);
+    }
+
+    /* ===== SEARCH / FILTER BAR ===== */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.45rem 0.85rem;
+      flex: 1;
+      min-width: 200px;
+      max-width: 380px;
+    }
+    .search-box i { color: var(--text-muted); font-size: 0.85rem; }
+    .search-box input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 0.84rem;
+      color: var(--text-primary);
+      font-family: inherit;
+      width: 100%;
+    }
+    .search-box input::placeholder { color: var(--text-muted); }
+    .filter-select {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.45rem 0.85rem;
+      font-size: 0.84rem;
+      color: var(--text-primary);
+      background: var(--bg-card);
+      font-family: inherit;
+      cursor: pointer;
+      outline: none;
+    }
+    .filter-select:focus { border-color: var(--teal-400); }
+
+    /* ===== ALERTS PANEL ===== */
+    .alert-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.85rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .alert-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .alert-item:first-child { padding-top: 0; }
+    .alert-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+    .alert-icon.warning { background: #fff7ed; color: var(--warning); }
+    .alert-icon.danger { background: #fee2e2; color: var(--danger); }
+    .alert-icon.info { background: #dbeafe; color: var(--info); }
+    .alert-icon.success { background: #dcfce7; color: var(--success); }
+    .alert-content { flex: 1; }
+    .alert-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.1rem;
+    }
+    .alert-desc { font-size: 0.75rem; color: var(--text-secondary); }
+    .alert-time {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    /* ===== MINI STATS ===== */
+    .mini-stat {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.82rem;
+    }
+    .mini-stat-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .mini-stat-label { color: var(--text-secondary); }
+    .mini-stat-value { font-weight: 700; color: var(--text-primary); margin-left: auto; }
+
+    /* ===== STOCK ITEM ===== */
+    .stock-item {
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .stock-item:last-child { border-bottom: none; }
+    .stock-item-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      gap: 0.5rem;
+    }
+    .stock-item-name {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .stock-item-meta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+    .stock-item-meta span { display: flex; align-items: center; gap: 0.3rem; }
+    .stock-level {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .stock-level-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      width: 100px;
+    }
+    .stock-level-count {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      width: 50px;
+      text-align: right;
+    }
+
+    /* ===== FINANCE ITEMS ===== */
+    .finance-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+      gap: 0.75rem;
+    }
+    .finance-row:last-child { border-bottom: none; }
+    .finance-row-left { display: flex; align-items: center; gap: 0.75rem; flex: 1; overflow: hidden; }
+    .finance-row-info { overflow: hidden; }
+    .finance-row-title {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .finance-row-sub {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+    }
+    .finance-row-right { text-align: right; flex-shrink: 0; }
+    .finance-row-amount {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .finance-row-amount.positive { color: var(--success); }
+    .finance-row-amount.negative { color: var(--danger); }
+    .finance-row-date { font-size: 0.72rem; color: var(--text-muted); }
+
+    /* ===== REPORT CHARTS ===== */
+    .report-legend {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 0.75rem;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+    .legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    /* ===== DONUT (CSS) ===== */
+    .donut-wrap {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .donut {
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .donut-labels { flex: 1; }
+    .donut-label-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.25rem 0;
+      font-size: 0.78rem;
+    }
+    .donut-label-item .label-left {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--text-secondary);
+    }
+    .donut-label-item .label-value {
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    /* ===== CLIENT CARD ===== */
+    .client-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s;
+    }
+    .client-card:hover {
+      border-color: var(--teal-300);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+    }
+    .client-card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.85rem;
+      margin-bottom: 0.85rem;
+    }
+    .client-card-info { flex: 1; }
+    .client-card-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.15rem;
+    }
+    .client-card-type {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+    }
+    .client-card-body { }
+    .client-stat {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.35rem 0;
+      font-size: 0.78rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .client-stat:last-child { border-bottom: none; }
+    .client-stat-label { color: var(--text-secondary); }
+    .client-stat-value { font-weight: 700; color: var(--text-primary); }
+
+    /* ===== CREDIT BAR ===== */
+    .credit-bar-wrap { margin-top: 0.75rem; }
+    .credit-bar-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+    .credit-bar-labels span { font-weight: 600; }
+
+    /* ===== TIMELINE ===== */
+    .timeline { position: relative; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 15px; top: 0; bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+    .timeline-item {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+    .timeline-dot {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+    .timeline-dot.active {
+      border-color: var(--teal-500);
+      background: var(--teal-50);
+      color: var(--teal-600);
+    }
+    .timeline-dot.done {
+      border-color: var(--success);
+      background: #dcfce7;
+      color: var(--success);
+    }
+    .timeline-content { flex: 1; padding-top: 0.25rem; }
+    .timeline-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .timeline-sub { font-size: 0.72rem; color: var(--text-muted); }
+
+    /* ===== STATUS INDICATOR ===== */
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 0.3rem;
+    }
+    .status-dot.online { background: var(--success); }
+    .status-dot.warning { background: var(--warning); }
+    .status-dot.offline { background: var(--danger); }
+    .status-dot.idle { background: var(--text-muted); }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
+    }
+    .empty-state i { font-size: 2.5rem; margin-bottom: 1rem; }
+    .empty-state h3 { font-size: 1rem; color: var(--text-secondary); margin-bottom: 0.3rem; }
+    .empty-state p { font-size: 0.82rem; }
+
+    /* ===== NF-e ITEMS ===== */
+    .nfe-row {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr 1fr 1fr 0.8fr 0.8fr;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.82rem;
+      transition: background 0.15s;
+    }
+    .nfe-row:hover { background: var(--teal-50); }
+    .nfe-row.header {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--bg-main);
+      cursor: default;
+    }
+    .nfe-row.header:hover { background: var(--bg-main); }
+
+    /* ===== CASHFLOW ===== */
+    .cashflow-bar-wrap {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.5rem;
+      height: 120px;
+      padding-top: 0.5rem;
+    }
+    .cashflow-bar-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      height: 100%;
+      justify-content: flex-end;
+    }
+    .cashflow-bars {
+      display: flex;
+      gap: 2px;
+      align-items: flex-end;
+      width: 100%;
+      justify-content: center;
+    }
+    .cf-bar {
+      width: 14px;
+      border-radius: 2px 2px 0 0;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .cf-bar:hover { opacity: 0.8; }
+    .cf-bar.entrada { background: var(--success); }
+    .cf-bar.saida { background: var(--danger); }
+    .cashflow-label {
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* ===== OFX PANEL ===== */
+    .ofx-panel {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .ofx-panel:hover {
+      border-color: var(--teal-400);
+      background: var(--teal-50);
+    }
+    .ofx-panel i { font-size: 2rem; color: var(--teal-400); margin-bottom: 0.75rem; }
+    .ofx-panel h4 { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+    .ofx-panel p { font-size: 0.78rem; color: var(--text-secondary); }
+
+    /* ===== REPORT TABLE ===== */
+    .report-metric {
+      background: var(--bg-main);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      text-align: center;
+    }
+    .report-metric .metric-value {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+    .report-metric .metric-label {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      margin-top: 0.2rem;
+    }
+    .report-metric .metric-change {
+      font-size: 0.72rem;
+      font-weight: 600;
+      margin-top: 0.25rem;
+    }
+    .report-metric .metric-change.up { color: var(--success); }
+    .report-metric .metric-change.down { color: var(--danger); }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .screen.active { animation: fadeIn 0.25s ease; }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .pulse { animation: pulse-dot 2s infinite; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1200px) {
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .grid-5 { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 900px) {
+      .grid-3 { grid-template-columns: repeat(2, 1fr); }
+      .grid-2 { grid-template-columns: 1fr; }
+      .col-span-2 { grid-column: span 1; }
+      .col-span-3 { grid-column: span 1; }
+    }
+    @media (max-width: 768px) {
+      :root { --sidebar-w: 0px; }
+      .sidebar { transform: translateX(-260px); }
+      .sidebar.open { transform: translateX(0); width: 260px; }
+      .main-content { margin-left: 0; }
+      .grid-4 { grid-template-columns: 1fr 1fr; }
+      .page-content { padding: 1rem; }
+    }
+
+    /* ===== CIRURGIA STATUS ===== */
+    .badge-agendada { background: #dbeafe; color: #1d4ed8; }
+    .badge-andamento { background: #fef9c3; color: #a16207; }
+    .badge-realizada { background: #dcfce7; color: #15803d; }
+    .badge-faturada { background: #ede9fe; color: #6d28d9; }
+
+    /* ===== TAG ===== */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      background: var(--bg-main);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    /* ===== MATERIAIS TAGS ===== */
+    .mat-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      background: var(--teal-50);
+      color: var(--teal-700);
+      border: 1px solid var(--teal-100);
+      white-space: nowrap;
+    }
+
+    /* ===== HOVER UNDERLINE ===== */
+    .link {
+      color: var(--teal-600);
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .link:hover { text-decoration: underline; }
+
+    /* ===== INFO ROW ===== */
+    .info-row {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.82rem;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-row-label { color: var(--text-secondary); width: 180px; flex-shrink: 0; }
+    .info-row-value { font-weight: 600; color: var(--text-primary); }
+
+    /* ===== HIGHLIGHT BOX ===== */
+    .highlight-box {
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1rem;
+      font-size: 0.82rem;
+    }
+    .highlight-box.teal { background: var(--teal-50); border: 1px solid var(--teal-100); color: var(--teal-800); }
+    .highlight-box.warning { background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; }
+    .highlight-box.danger { background: #fee2e2; border: 1px solid #fca5a5; color: #7f1d1d; }
+    .highlight-box.info { background: #dbeafe; border: 1px solid #bfdbfe; color: #1e3a5f; }
+
+    /* ===== TOP PERFORMERS ===== */
+    .perf-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.65rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .perf-item:last-child { border-bottom: none; }
+    .perf-rank {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: var(--bg-main);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+    .perf-rank.gold { background: #fef9c3; color: #a16207; }
+    .perf-rank.silver { background: #f1f5f9; color: #475569; }
+    .perf-rank.bronze { background: #fff7ed; color: #c2410c; }
+    .perf-info { flex: 1; }
+    .perf-name { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); }
+    .perf-sub { font-size: 0.7rem; color: var(--text-muted); }
+    .perf-value { font-size: 0.86rem; font-weight: 800; color: var(--text-primary); }
+    .perf-change { font-size: 0.7rem; }
+    .perf-change.up { color: var(--success); }
+    .perf-change.down { color: var(--danger); }
+
+    /* ===== INPUT STYLES ===== */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      margin-bottom: 1rem;
+    }
+    .form-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .form-input {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.85rem;
+      font-size: 0.84rem;
+      color: var(--text-primary);
+      font-family: inherit;
+      background: var(--bg-card);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus { border-color: var(--teal-400); box-shadow: 0 0 0 3px rgba(13,148,136,0.08); }
+
+    /* ===== CONCILIACAO ===== */
+    .conc-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .conc-item:last-child { border-bottom: none; }
+    .conc-check {
+      width: 18px; height: 18px;
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .conc-check.checked { background: var(--teal-500); color: #fff; }
+    .conc-check.unchecked { background: var(--border); color: transparent; }
+    .conc-info { flex: 1; }
+    .conc-title { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); }
+    .conc-date { font-size: 0.7rem; color: var(--text-muted); }
+    .conc-amount { font-size: 0.86rem; font-weight: 700; }
+    .conc-amount.pos { color: var(--success); }
+    .conc-amount.neg { color: var(--danger); }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar" id="sidebar">
+    <a class="sidebar-logo" href="#" onclick="return false;">
+      <div class="logo-icon"><i class="fa-solid fa-heartbeat"></i></div>
+      <div class="logo-text">
+        <div class="logo-name">SkyMed ERP</div>
+        <div class="logo-sub">v3.2.1 â€” ProduÃ§Ã£o</div>
+      </div>
+    </a>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Principal</div>
+      <div class="nav-item active" onclick="navigate('dashboard', this)">
+        <i class="fa-solid fa-gauge-high nav-icon"></i>
+        Dashboard
+      </div>
+      <div class="nav-item" onclick="navigate('cirurgias', this)">
+        <i class="fa-solid fa-scissors nav-icon"></i>
+        Fichas CirÃºrgicas
+        <span class="nav-badge">5</span>
+      </div>
+      <div class="nav-item" onclick="navigate('estoque', this)">
+        <i class="fa-solid fa-boxes-stacked nav-icon"></i>
+        Estoque
+        <span class="nav-badge">3</span>
+      </div>
+
+      <div class="sidebar-section-label">Financeiro</div>
+      <div class="nav-item" onclick="navigate('financeiro', this)">
+        <i class="fa-solid fa-money-bill-trend-up nav-icon"></i>
+        Financeiro
+      </div>
+
+      <div class="sidebar-section-label">Comercial</div>
+      <div class="nav-item" onclick="navigate('clientes', this)">
+        <i class="fa-solid fa-hospital nav-icon"></i>
+        Clientes
+      </div>
+      <div class="nav-item" onclick="navigate('relatorios', this)">
+        <i class="fa-solid fa-chart-bar nav-icon"></i>
+        RelatÃ³rios
+      </div>
+
+      <div class="sidebar-section-label">Sistema</div>
+      <div class="nav-item" onclick="showToast('ConfiguraÃ§Ãµes em desenvolvimento', 'info')">
+        <i class="fa-solid fa-gear nav-icon"></i>
+        ConfiguraÃ§Ãµes
+      </div>
+      <div class="nav-item" onclick="showToast('IntegraÃ§Ã£o com SEFAZ ativa', 'success')">
+        <i class="fa-solid fa-plug nav-icon"></i>
+        IntegraÃ§Ãµes
+        <span class="nav-badge teal">OK</span>
+      </div>
+      <div class="nav-item" onclick="showToast('Auditoria do sistema', 'info')">
+        <i class="fa-solid fa-shield-halved nav-icon"></i>
+        Auditoria
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar">RS</div>
+        <div class="user-info">
+          <div class="user-name">Rafael Siqueira</div>
+          <div class="user-role">Administrador</div>
+        </div>
+        <div class="user-status"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <div class="main-content">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard <span>/ VisÃ£o Geral</span></div>
+      <div class="topbar-search" onclick="showToast('Busca global em desenvolvimento', 'info')">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <span>Buscar no sistema...</span>
+        <span style="margin-left:auto;font-size:0.68rem;background:#f1f5f9;padding:0.1rem 0.35rem;border-radius:4px;color:#94a3b8;">âŒ˜K</span>
+      </div>
+      <div class="topbar-actions">
+        <div class="topbar-btn" onclick="showToast('3 alertas pendentes', 'warning')" title="NotificaÃ§Ãµes">
+          <i class="fa-solid fa-bell"></i>
+          <span class="notif-dot"></span>
+        </div>
+        <div class="topbar-btn" onclick="showToast('Sincronizado com SPICA', 'success')" title="Sincronizar">
+          <i class="fa-solid fa-rotate"></i>
+        </div>
+        <div class="topbar-btn" onclick="showToast('Suporte: suporte@skymed.com.br', 'info')" title="Ajuda">
+          <i class="fa-solid fa-circle-question"></i>
+        </div>
+      </div>
+      <div class="topbar-date" id="topbar-date"></div>
+    </div>
+
+    <!-- PAGE CONTENT -->
+    <div class="page-content">
+
+      <!-- ==================== DASHBOARD ==================== -->
+      <div class="screen active" id="screen-dashboard">
+        <div class="page-header">
+          <div class="page-header-left">
+            <div class="breadcrumb">
+              <i class="fa-solid fa-house"></i> &rsaquo; <span>Dashboard</span>
+            </div>
+            <h1>VisÃ£o Geral</h1>
+            <p>Fevereiro 2026 â€” dados em tempo real do ERP SkyMed</p>
+          </div>
+          <div class="page-header-actions">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('Exportando relatÃ³rio...', 'info')">
+              <i class="fa-solid fa-arrow-down-to-bracket"></i> Exportar
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="navigate('cirurgias')">
+              <i class="fa-solid fa-plus"></i> Nova Ficha
+            </button>
+          </div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="grid grid-4" style="margin-bottom:1.25rem;">
+          <div class="kpi-card" style="--kpi-color:#0d9488;--kpi-bg:#f0fdfa;">
+            <div class="kpi-header">
+              <div class="kpi-label">Faturamento do MÃªs</div>
+              <div class="kpi-icon"><i class="fa-solid fa-dollar-sign"></i></div>
+            </div>
+            <div class="kpi-value">R$&nbsp;1.247.890</div>
+            <div class="kpi-change up">
+              <i class="fa-solid fa-trending-up"></i> +12,4%
+              <span class="kpi-period">vs. jan/26</span>
+            </div>
+          </div>
+          <div class="kpi-card" style="--kpi-color:#3b82f6;--kpi-bg:#dbeafe;">
+            <div class="kpi-header">
+              <div class="kpi-label">Cirurgias no MÃªs</div>
+              <div class="kpi-icon"><i class="fa-solid fa-scissors"></i></div>
+            </div>
+            <div class="kpi-value">47</div>
+            <div class="kpi-change up">
+              <i class="fa-solid fa-trending-up"></i> +8 cirurgias
+              <span class="kpi-period">vs. jan/26</span>
+            </div>
+          </div>
+          <div class="kpi-card" style="--kpi-color:#f59e0b;--kpi-bg:#fef9c3;">
+            <div class="kpi-header">
+              <div class="kpi-label">Entregas Pendentes</div>
+              <div class="kpi-icon"><i class="fa-solid fa-truck-fast"></i></div>
+            </div>
+            <div class="kpi-value">12</div>
+            <div class="kpi-change down">
+              <i class="fa-solid fa-triangle-exclamation"></i> 3 urgentes
+              <span class="kpi-period">hoje</span>
+            </div>
+          </div>
+          <div class="kpi-card" style="--kpi-color:#ef4444;--kpi-bg:#fee2e2;">
+            <div class="kpi-header">
+              <div class="kpi-label">Contas a Receber</div>
+              <div class="kpi-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+            </div>
+            <div class="kpi-value">R$&nbsp;340.500</div>
+            <div class="kpi-change down">
+              <i class="fa-solid fa-clock"></i> 8 em atraso
+              <span class="kpi-period">hoje</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECOND ROW KPIs -->
+        <div class="grid grid-4" style="margin-bottom:1.5rem;">
+          <div class="kpi-card" style="--kpi-color:#8b5cf6;--kpi-bg:#ede9fe;">
+            <div class="kpi-header">
+              <div class="kpi-label">Ticket MÃ©dio</div>
+              <div class="kpi-icon"><i class="fa-solid fa-receipt"></i></div>
+            </div>
+            <div class="kpi-value">R$&nbsp;26.551</div>
+            <div class="kpi-change up"><i class="fa-solid fa-trending-up"></i> +3,2%</div>
+          </div>
+          <div class="kpi-card" style="--kpi-color:#10b981;--kpi-bg:#dcfce7;">
+            <div class="kpi-header">
+              <div class="kpi-label">Margem Bruta</div>
+              <div class="kpi-icon"><i class="fa-solid fa-chart-pie"></i></div>
+            </div>
+            <div class="kpi-value">34,7%</div>
+            <div class="kpi-change up"><i class="fa-solid fa-trending-up"></i> +1,8pp</div>
+          </div>
+          <div class="kpi-card" style="--kpi-color:#06b6d4;--kpi-bg:#cffafe;">
+            <div class="kpi-header">
+              <div class="kpi-label">Itens em Estoque</div>
+              <div class="kpi-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+            </div>
+            <div class="kpi-value">1.847</div>
+            <div class="kpi-change down"><i class="fa-solid fa-arrow-down"></i> 23 crÃ­ticos</div>
+          </div>
+          <div class="kpi-card" style="--kpi-color:#f97316;--kpi-bg:#fff7ed;">
+            <div class="kpi-header">
+              <div class="kpi-label">NF-e Emitidas</div>
+              <div class="kpi-icon"><i class="fa-solid fa-file-lines"></i></div>
+            </div>
+            <div class="kpi-value">38</div>
+            <div class="kpi-change up"><i class="fa-solid fa-check-circle"></i> 35 aprovadas</div>
+          </div>
+        </div>
+
+        <!-- CHARTS ROW -->
+        <div class="grid grid-2" style="margin-bottom:1.25rem;">
+          <!-- Faturamento Mensal -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">
+                  <div class="card-title-icon"><i class="fa-solid fa-chart-column"></i></div>
+                  Faturamento Mensal 2025â€“2026
+                </div>
+                <div class="card-subtitle">Receita bruta por mÃªs (R$)</div>
+              </div>
+              <div class="report-legend">
+                <div class="legend-item"><div class="legend-dot" style="background:var(--teal-400)"></div> 2026</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#cbd5e1"></div> 2025</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <!-- 2025 e 2026 side by side via stacking labels -->
+                <div class="chart-bar-wrap">
+                  <div class="chart-bar" style="height:62%">
+                    <div class="chart-bar-tooltip">R$ 780K</div>
+                  </div>
+                  <div class="chart-bar-label">Mar</div>
+                </div>
+                <div class="chart-bar-wrap">
+                  <div class="chart-bar" style="height:68%">
+                    <div class="chart-bar-tooltip">R$ 856K</div>
+                  </div>
+                  <div class="chart-bar-label">Abr</div>
+                </div>
+                <div class="chart-bar-wrap">
+                  <div class="chart-bar" style="height:74%">
+                    <div class="chart-bar-tooltip">R$ 931K</div>
+                  </div>
+                  <div class="chart-bar-label">Mai</div>
+                </div>
+                <div class="chart-bar-wrap">
+                  <div class="chart-bar" style="height:79%">
+                    <div class="chart-bar-tooltip">R$ 995K</div>
+                  </div>
+                  <div class="chart-bar-label">Jun</div>
+                </div>
+                <div class="chart-bar-wrap">
+                  <div class="chart-bar" style="height:85%">
+                    <div class="chart-bar-tooltip">R$ 1.07M</div>
+                  </div>
+                  <div class="chart-bar-label">Jul</div>
+                </div>
+                <div class="chart-bar-wrap">
+                  <div class="chart-bar" style="height:72%">
+                    <div class="chart-bar-tooltip">R$ 906K</div>
+                  </div>
+                  <div class="chart-bar-label">Ago</div>
+                </div>
+                <div class="chart-bar-wrap">
+                  <div class="chart-bar" style="height:88%">
+                    <div class="chart-bar-tooltip">R$ 1.11M</div>
+                  </div>
+                  <div class="chart-bar-label">Set</div>
+                </div>
+                <div class="chart-bar-wrap">
+                  <div class="chart-bar" style="height:91%">
+                    <div class="chart-bar-tooltip">R$ 1.15M</div>
+                  </div>
+                  <div class="chart-bar-label">Out</div>
+                </div>
+                <div class="chart-bar-wrap">
+                  <div class="chart-bar" style="height:95%">
+                    <div class="chart-bar-tooltip">R$ 1.20M</div>
+                  </div>
+                  <div class="chart-bar-label">Nov</div>
+                </div>
+                <div class="chart-bar-wrap">
+                  <div class="chart-bar" style="height:100%">
+                    <div class="chart-bar-tooltip">R$ 1.26M</div>
+                  </div>
+                  <div class="chart-bar-label">Dez</div>
+                </div>
+                <div class="chart-bar-wrap">
+                  <div class="chart-bar" style="height:87%">
+                    <div class="chart-bar-tooltip">R$ 1.10M</div>
+                  </div>
+                  <div class="chart-bar-label">Jan</div>
+                </div>
+                <div class="chart-bar-wrap">
+                  <div class="chart-bar" style="height:99%;background:linear-gradient(180deg,#0d9488,#14b8a6)">
+                    <div class="chart-bar-tooltip">R$ 1.247K</div>
+                  </div>
+                  <div class="chart-bar-label" style="color:var(--teal-600);font-weight:700;">Fev</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cirurgias por Hospital -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">
+                  <div class="card-title-icon"><i class="fa-solid fa-hospital"></i></div>
+                  Cirurgias por Hospital
+                </div>
+                <div class="card-subtitle">Fevereiro 2026 â€” top hospitais parceiros</div>
+              </div>
+              <span class="badge badge-teal"><i class="badge-dot"></i> Atualizado</span>
+            </div>
+            <div class="card-body">
+              <div class="horiz-chart-item">
+                <div class="horiz-chart-label">Real Hospital PortuguÃªs</div>
+                <div class="horiz-chart-bar-wrap">
+                  <div class="horiz-chart-fill" style="width:85%">14 cir.</div>
+                </div>
+                <div class="horiz-chart-value">R$ 392K</div>
+              </div>
+              <div class="horiz-chart-item">
+                <div class="horiz-chart-label">Hospital Santa Joana</div>
+                <div class="horiz-chart-bar-wrap">
+                  <div class="horiz-chart-fill" style="width:71%">12 cir.</div>
+                </div>
+                <div class="horiz-chart-value">R$ 280K</div>
+              </div>
+              <div class="horiz-chart-item">
+                <div class="horiz-chart-label">Hospital Memorial</div>
+                <div class="horiz-chart-bar-wrap">
+                  <div class="horiz-chart-fill" style="width:52%">9 cir.</div>
+                </div>
+                <div class="horiz-chart-value">R$ 231K</div>
+              </div>
+              <div class="horiz-chart-item">
+                <div class="horiz-chart-label">Hospital EsperanÃ§a</div>
+                <div class="horiz-chart-bar-wrap">
+                  <div class="horiz-chart-fill" style="width:42%">7 cir.</div>
+                </div>
+                <div class="horiz-chart-value">R$ 185K</div>
+              </div>
+              <div class="horiz-chart-item">
+                <div class="horiz-chart-label">ClÃ­nica OrtopÃ©dica PE</div>
+                <div class="horiz-chart-bar-wrap">
+                  <div class="horiz-chart-fill" style="width:30%">5 cir.</div>
+                </div>
+                <div class="horiz-chart-value">R$ 159K</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTTOM ROW -->
+        <div class="grid grid-2" style="margin-bottom:1.25rem;">
+          <!-- Alertas -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">
+                  <div class="card-title-icon" style="background:#fee2e2;color:#ef4444;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                  Central de Alertas
+                </div>
+              </div>
+              <span class="badge badge-danger">8 ativos</span>
+            </div>
+            <div class="card-body" style="padding-top:0.5rem;padding-bottom:0.5rem;">
+              <div class="alert-item">
+                <div class="alert-icon danger"><i class="fa-solid fa-skull-crossbones"></i></div>
+                <div class="alert-content">
+                  <div class="alert-title">Parafuso Pedicular Ti 6.5Ã—45 â€” Lote vencendo</div>
+                  <div class="alert-desc">Lote #LT-2024-0892 vence em 12 dias â€” 23 unidades afetadas</div>
+                </div>
+                <div class="alert-time">Hoje</div>
+              </div>
+              <div class="alert-item">
+                <div class="alert-icon danger"><i class="fa-solid fa-clock"></i></div>
+                <div class="alert-content">
+                  <div class="alert-title">Pagamento atrasado â€” Real HP</div>
+                  <div class="alert-desc">NF-e 004.521 â€” R$ 48.900 â€” 7 dias em atraso</div>
+                </div>
+                <div class="alert-time">7d</div>
+              </div>
+              <div class="alert-item">
+                <div class="alert-icon warning"><i class="fa-solid fa-box-open"></i></div>
+                <div class="alert-content">
+                  <div class="alert-title">Estoque crÃ­tico â€” Haste Femoral 12mm</div>
+                  <div class="alert-desc">Apenas 4 unidades â€” mÃ­nimo 10 â€” reposiÃ§Ã£o urgente</div>
+                </div>
+                <div class="alert-time">2d</div>
+              </div>
+              <div class="alert-item">
+                <div class="alert-icon warning"><i class="fa-solid fa-truck"></i></div>
+                <div class="alert-content">
+                  <div class="alert-title">Entrega pendente â€” Hosp. EsperanÃ§a</div>
+                  <div class="alert-desc">Cirurgia amanhÃ£ 07h â€” kit coluna nÃ£o enviado</div>
+                </div>
+                <div class="alert-time">Agora</div>
+              </div>
+              <div class="alert-item">
+                <div class="alert-icon info"><i class="fa-solid fa-file-invoice"></i></div>
+                <div class="alert-content">
+                  <div class="alert-title">NF-e pendente de autorizaÃ§Ã£o</div>
+                  <div class="alert-desc">3 notas aguardando SEFAZ â€” NF 004.789, 004.790, 004.791</div>
+                </div>
+                <div class="alert-time">3h</div>
+              </div>
+              <div class="alert-item">
+                <div class="alert-icon success"><i class="fa-solid fa-check-circle"></i></div>
+                <div class="alert-content">
+                  <div class="alert-title">Pagamento recebido â€” Santa Joana</div>
+                  <div class="alert-desc">R$ 127.400 â€” NF-e 004.512 â€” conciliado automaticamente</div>
+                </div>
+                <div class="alert-time">1h</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PrÃ³ximas Cirurgias -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">
+                  <div class="card-title-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                  PrÃ³ximas Cirurgias
+                </div>
+                <div class="card-subtitle">Agenda dos prÃ³ximos 5 dias</div>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="navigate('cirurgias')">Ver todas</button>
+            </div>
+            <div class="card-body" style="padding-top:0.5rem;padding-bottom:0.5rem;">
+              <div class="alert-item">
+                <div class="alert-icon" style="background:#dbeafe;color:#1d4ed8;"><i class="fa-solid fa-calendar"></i></div>
+                <div class="alert-content">
+                  <div class="alert-title">Artroplastia Total Joelho â€” Dr. Meneses</div>
+                  <div class="alert-desc">AmanhÃ£ 07:00 â€” Real Hospital PortuguÃªs â€” Sala 3</div>
+                </div>
+                <span class="badge badge-agendada">Agendada</span>
+              </div>
+              <div class="alert-item">
+                <div class="alert-icon" style="background:#dbeafe;color:#1d4ed8;"><i class="fa-solid fa-calendar"></i></div>
+                <div class="alert-content">
+                  <div class="alert-title">FusÃ£o Vertebral L4â€“L5 â€” Dr. Cavalcanti</div>
+                  <div class="alert-desc">22/02 08:30 â€” Hospital Santa Joana â€” Sala 1</div>
+                </div>
+                <span class="badge badge-agendada">Agendada</span>
+              </div>
+              <div class="alert-item">
+                <div class="alert-icon" style="background:#fef9c3;color:#a16207;"><i class="fa-solid fa-clock"></i></div>
+                <div class="alert-content">
+                  <div class="alert-title">OsteossÃ­ntese FÃªmur â€” Dr. Brito</div>
+                  <div class="alert-desc">22/02 14:00 â€” Hospital Memorial â€” Sala 2</div>
+                </div>
+                <span class="badge badge-andamento">Em andamento</span>
+              </div>
+              <div class="alert-item">
+                <div class="alert-icon" style="background:#dbeafe;color:#1d4ed8;"><i class="fa-solid fa-calendar"></i></div>
+                <div class="alert-content">
+                  <div class="alert-title">PrÃ³tese Total Quadril â€” Dr. Andrade</div>
+                  <div class="alert-desc">23/02 06:00 â€” Hospital EsperanÃ§a â€” Sala 4</div>
+                </div>
+                <span class="badge badge-agendada">Agendada</span>
+              </div>
+              <div class="alert-item">
+                <div class="alert-icon" style="background:#dcfce7;color:#15803d;"><i class="fa-solid fa-check"></i></div>
+                <div class="alert-content">
+                  <div class="alert-title">Artroscopia Joelho â€” Dr. Melo</div>
+                  <div class="alert-desc">Hoje 10:30 â€” Hospital Santa Joana â€” Sala 2</div>
+                </div>
+                <span class="badge badge-realizada">Realizada</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MINI STATS ROW -->
+        <div class="grid grid-4">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title" style="font-size:0.82rem;"><i class="fa-solid fa-layer-group"></i> Estoque por Categoria</div>
+            </div>
+            <div class="card-body">
+              <div class="mini-stat" style="margin-bottom:0.65rem;"><div class="mini-stat-dot" style="background:#0d9488;"></div><span class="mini-stat-label">Coluna Vertebral</span><span class="mini-stat-value">512</span></div>
+              <div class="mini-stat" style="margin-bottom:0.65rem;"><div class="mini-stat-dot" style="background:#3b82f6;"></div><span class="mini-stat-label">Joelho</span><span class="mini-stat-value">348</span></div>
+              <div class="mini-stat" style="margin-bottom:0.65rem;"><div class="mini-stat-dot" style="background:#8b5cf6;"></div><span class="mini-stat-label">Quadril</span><span class="mini-stat-value">289</span></div>
+              <div class="mini-stat" style="margin-bottom:0;"><div class="mini-stat-dot" style="background:#f59e0b;"></div><span class="mini-stat-label">Trauma</span><span class="mini-stat-value">698</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title" style="font-size:0.82rem;"><i class="fa-solid fa-handshake"></i> Top CirurgiÃµes</div>
+            </div>
+            <div class="card-body" style="padding-top:0.75rem;padding-bottom:0.75rem;">
+              <div class="perf-item">
+                <div class="perf-rank gold">1</div>
+                <div class="perf-info"><div class="perf-name">Dr. Cavalcanti</div><div class="perf-sub">Coluna â€” 12 cir.</div></div>
+                <div><div class="perf-value">R$ 320K</div><div class="perf-change up">+18%</div></div>
+              </div>
+              <div class="perf-item">
+                <div class="perf-rank silver">2</div>
+                <div class="perf-info"><div class="perf-name">Dr. Meneses</div><div class="perf-sub">Joelho â€” 10 cir.</div></div>
+                <div><div class="perf-value">R$ 267K</div><div class="perf-change up">+9%</div></div>
+              </div>
+              <div class="perf-item">
+                <div class="perf-rank bronze">3</div>
+                <div class="perf-info"><div class="perf-name">Dr. Andrade</div><div class="perf-sub">Quadril â€” 8 cir.</div></div>
+                <div><div class="perf-value">R$ 224K</div><div class="perf-change down">-3%</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title" style="font-size:0.82rem;"><i class="fa-solid fa-file-invoice-dollar"></i> Status Financeiro</div>
+            </div>
+            <div class="card-body">
+              <div style="margin-bottom:0.8rem;">
+                <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:0.3rem;">
+                  <span style="color:var(--text-secondary);">A receber no mÃªs</span>
+                  <span style="font-weight:700;color:var(--success);">R$ 1.08M</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width:86%"></div></div>
+              </div>
+              <div style="margin-bottom:0.8rem;">
+                <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:0.3rem;">
+                  <span style="color:var(--text-secondary);">A pagar no mÃªs</span>
+                  <span style="font-weight:700;color:var(--danger);">R$ 748K</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill danger" style="width:60%"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:0.3rem;">
+                  <span style="color:var(--text-secondary);">Saldo previsto</span>
+                  <span style="font-weight:700;color:var(--teal-600);">R$ 332K</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" style="width:27%"></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title" style="font-size:0.82rem;"><i class="fa-solid fa-plug"></i> Status IntegraÃ§Ãµes</div>
+            </div>
+            <div class="card-body">
+              <div class="mini-stat" style="margin-bottom:0.7rem;"><span class="status-dot online"></span><span class="mini-stat-label">SEFAZ â€” NF-e</span><span class="badge badge-success" style="margin-left:auto;font-size:0.65rem;">Online</span></div>
+              <div class="mini-stat" style="margin-bottom:0.7rem;"><span class="status-dot online"></span><span class="mini-stat-label">Banco ItaÃº OFX</span><span class="badge badge-success" style="margin-left:auto;font-size:0.65rem;">Sync</span></div>
+              <div class="mini-stat" style="margin-bottom:0.7rem;"><span class="status-dot warning"></span><span class="mini-stat-label">Bradesco API</span><span class="badge badge-warning" style="margin-left:auto;font-size:0.65rem;">Lento</span></div>
+              <div class="mini-stat" style="margin-bottom:0;"><span class="status-dot online"></span><span class="mini-stat-label">SPICA Legado</span><span class="badge badge-gray" style="margin-left:auto;font-size:0.65rem;">Migrado</span></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /dashboard -->
+
+
+      <!-- ==================== FICHAS CIRÃšRGICAS ==================== -->
+      <div class="screen" id="screen-cirurgias">
+        <div class="page-header">
+          <div class="page-header-left">
+            <div class="breadcrumb"><i class="fa-solid fa-house"></i> &rsaquo; <span>Fichas CirÃºrgicas</span></div>
+            <h1>Fichas CirÃºrgicas</h1>
+            <p>GestÃ£o completa de procedimentos OPME â€” materiais, logÃ­stica e faturamento</p>
+          </div>
+          <div class="page-header-actions">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('Exportando fichas...', 'info')"><i class="fa-solid fa-file-excel"></i> Excel</button>
+            <button class="btn btn-primary" onclick="showToast('FormulÃ¡rio de nova ficha aberto', 'success')"><i class="fa-solid fa-plus"></i> Nova Ficha CirÃºrgica</button>
+          </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs">
+          <div class="tab active" onclick="setTab(this,'tab-todas')">Todas <span class="tab-count">47</span></div>
+          <div class="tab" onclick="setTab(this,'tab-agendadas')">Agendadas <span class="tab-count">14</span></div>
+          <div class="tab" onclick="setTab(this,'tab-andamento')">Em Andamento <span class="tab-count">5</span></div>
+          <div class="tab" onclick="setTab(this,'tab-realizadas')">Realizadas <span class="tab-count">21</span></div>
+          <div class="tab" onclick="setTab(this,'tab-faturadas')">Faturadas <span class="tab-count">7</span></div>
+        </div>
+
+        <!-- FILTER BAR -->
+        <div class="filter-bar">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Buscar por paciente, cirurgiÃ£o, hospital...">
+          </div>
+          <select class="filter-select">
+            <option>Todos os hospitais</option>
+            <option>Real Hospital PortuguÃªs</option>
+            <option>Hospital Santa Joana</option>
+            <option>Hospital Memorial</option>
+            <option>Hospital EsperanÃ§a</option>
+          </select>
+          <select class="filter-select">
+            <option>Todos os procedimentos</option>
+            <option>Coluna Vertebral</option>
+            <option>Artroplastia Joelho</option>
+            <option>Artroplastia Quadril</option>
+            <option>Trauma / Fraturas</option>
+          </select>
+          <select class="filter-select">
+            <option>Fev 2026</option>
+            <option>Jan 2026</option>
+            <option>Dez 2025</option>
+          </select>
+        </div>
+
+        <!-- FICHAS TABLE -->
+        <div class="card">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>NÂº Ficha</th>
+                  <th>Paciente</th>
+                  <th>Hospital</th>
+                  <th>CirurgiÃ£o</th>
+                  <th>Procedimento</th>
+                  <th>Data / Hora</th>
+                  <th>Materiais</th>
+                  <th>Valor</th>
+                  <th>Status</th>
+                  <th>AÃ§Ãµes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="link">#FC-2026-0247</span></td>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:0.6rem;">
+                      <div class="avatar avatar-sm">MS</div>
+                      <div>
+                        <div class="td-strong">Maria Souza</div>
+                        <div class="td-muted">65 anos â€” F</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="td-strong" style="font-size:0.8rem;">Real Hospital PortuguÃªs</div>
+                    <div class="td-muted">Sala 3 â€” Centro CirÃºrgico</div>
+                  </td>
+                  <td>
+                    <div class="td-strong">Dr. Meneses</div>
+                    <div class="td-muted">CRM 18.432-PE</div>
+                  </td>
+                  <td><span class="tag">Artroplastia Total Joelho</span></td>
+                  <td>
+                    <div class="td-strong">21/02/2026</div>
+                    <div class="td-muted">07:00h</div>
+                  </td>
+                  <td>
+                    <div style="display:flex;flex-wrap:wrap;gap:0.2rem;">
+                      <span class="mat-tag">PrÃ³tese Joelho Sigma</span>
+                      <span class="mat-tag">Cimento Ã³sseo</span>
+                    </div>
+                  </td>
+                  <td><div class="td-strong">R$ 42.800</div><div class="td-muted">2 itens</div></td>
+                  <td><span class="badge badge-agendada"><span class="badge-dot"></span>Agendada</span></td>
+                  <td>
+                    <div style="display:flex;gap:0.3rem;">
+                      <button class="btn btn-secondary btn-sm" onclick="showToast('Ficha #FC-2026-0247 aberta', 'info')"><i class="fa-solid fa-eye"></i></button>
+                      <button class="btn btn-secondary btn-sm" onclick="showToast('Editando ficha...', 'info')"><i class="fa-solid fa-pen"></i></button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><span class="link">#FC-2026-0246</span></td>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:0.6rem;">
+                      <div class="avatar avatar-sm avatar-blue">JN</div>
+                      <div>
+                        <div class="td-strong">JoÃ£o Neto</div>
+                        <div class="td-muted">52 anos â€” M</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="td-strong" style="font-size:0.8rem;">Hospital Santa Joana</div>
+                    <div class="td-muted">Sala 1 â€” Bloco B</div>
+                  </td>
+                  <td>
+                    <div class="td-strong">Dr. Cavalcanti</div>
+                    <div class="td-muted">CRM 21.087-PE</div>
+                  </td>
+                  <td><span class="tag">FusÃ£o Vertebral L4â€“L5</span></td>
+                  <td>
+                    <div class="td-strong">22/02/2026</div>
+                    <div class="td-muted">08:30h</div>
+                  </td>
+                  <td>
+                    <div style="display:flex;flex-wrap:wrap;gap:0.2rem;">
+                      <span class="mat-tag">Parafuso Pedicular 6.5</span>
+                      <span class="mat-tag">Placa Lombar</span>
+                      <span class="mat-tag">+3</span>
+                    </div>
+                  </td>
+                  <td><div class="td-strong">R$ 87.500</div><div class="td-muted">5 itens</div></td>
+                  <td><span class="badge badge-agendada"><span class="badge-dot"></span>Agendada</span></td>
+                  <td>
+                    <div style="display:flex;gap:0.3rem;">
+                      <button class="btn btn-secondary btn-sm" onclick="showToast('Ficha #FC-2026-0246 aberta', 'info')"><i class="fa-solid fa-eye"></i></button>
+                      <button class="btn btn-secondary btn-sm" onclick="showToast('Editando ficha...', 'info')"><i class="fa-solid fa-pen"></i></button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><span class="link">#FC-2026-0245</span></td>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:0.6rem;">
+                      <div class="avatar avatar-sm avatar-purple">CS</div>
+                      <div>
+                        <div class="td-strong">Carla Santos</div>
+                        <div class="td-muted">71 anos â€” F</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="td-strong" style="font-size:0.8rem;">Hospital Memorial</div>
+                    <div class="td-muted">Sala 2 â€” Bloco A</div>
+                  </td>
+                  <td>
+                    <div class="td-strong">Dr. Brito</div>
+                    <div class="td-muted">CRM 15.340-PE</div>
+                  </td>
+                  <td><span class="tag">OsteossÃ­ntese FÃªmur</span></td>
+                  <td>
+                    <div class="td-strong">22/02/2026</div>
+                    <div class="td-muted">14:00h</div>
+                  </td>
+                  <td>
+                    <div style="display:flex;flex-wrap:wrap;gap:0.2rem;">
+                      <span class="mat-tag">Haste Femoral 12mm</span>
+                      <span class="mat-tag">Parafusos 6.5</span>
+                    </div>
+                  </td>
+                  <td><div class="td-strong">R$ 28.300</div><div class="td-muted">2 itens</div></td>
+                  <td><span class="badge badge-andamento"><span class="badge-dot"></span>Em Andamento</span></td>
+                  <td>
+                    <div style="display:flex;gap:0.3rem;">
+                      <button class="btn btn-secondary btn-sm" onclick="showToast('Ficha #FC-2026-0245 aberta', 'info')"><i class="fa-solid fa-eye"></i></button>
+                      <button class="btn btn-secondary btn-sm" onclick="showToast('Editando ficha...', 'info')"><i class="fa-solid fa-pen"></i></button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><span class="link">#FC-2026-0244</span></td>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:0.6rem;">
+                      <div class="avatar avatar-sm avatar-orange">PL</div>
+                      <div>
+                        <div class="td-strong">Paulo Lima</div>
+                        <div class="td-muted">58 anos â€” M</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="td-strong" style="font-size:0.8rem;">Hospital EsperanÃ§a</div>
+                    <div class="td-muted">Sala 4 â€” Centro CirÃºrgico</div>
+                  </td>
+                  <td>
+                    <div class="td-strong">Dr. Andrade</div>
+                    <div class="td-muted">CRM 19.217-PE</div>
+                  </td>
+                  <td><span class="tag">PrÃ³tese Total Quadril</span></td>
+                  <td>
+                    <div class="td-strong">23/02/2026</div>
+                    <div class="td-muted">06:00h</div>
+                  </td>
+                  <td>
+                    <div style="display:flex;flex-wrap:wrap;gap:0.2rem;">
+                      <span class="mat-tag">PrÃ³tese Quadril Bimet.</span>
+                      <span class="mat-tag">Cimento Ã³sseo</span>
+                      <span class="mat-tag">+1</span>
+                    </div>
+                  </td>
+                  <td><div class="td-strong">R$ 55.700</div><div class="td-muted">3 itens</div></td>
+                  <td><span class="badge badge-agendada"><span class="badge-dot"></span>Agendada</span></td>
+                  <td>
+                    <div style="display:flex;gap:0.3rem;">
+                      <button class="btn btn-secondary btn-sm" onclick="showToast('Ficha #FC-2026-0244 aberta', 'info')"><i class="fa-solid fa-eye"></i></button>
+                      <button class="btn btn-secondary btn-sm" onclick="showToast('Editando ficha...', 'info')"><i class="fa-solid fa-pen"></i></button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><span class="link">#FC-2026-0243</span></td>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:0.6rem;">
+                      <div class="avatar avatar-sm avatar-emerald">RA</div>
+                      <div>
+                        <div class="td-strong">Regina Alves</div>
+                        <div class="td-muted">44 anos â€” F</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="td-strong" style="font-size:0.8rem;">Hospital Santa Joana</div>
+                    <div class="td-muted">Sala 2 â€” Bloco B</div>
+                  </td>
+                  <td>
+                    <div class="td-strong">Dr. Melo</div>
+                    <div class="td-muted">CRM 22.891-PE</div>
+                  </td>
+                  <td><span class="tag">Artroscopia Joelho</span></td>
+                  <td>
+                    <div class="td-strong">21/02/2026</div>
+                    <div class="td-muted">10:30h</div>
+                  </td>
+                  <td>
+                    <div style="display:flex;flex-wrap:wrap;gap:0.2rem;">
+                      <span class="mat-tag">Kit Artroscopia</span>
+                      <span class="mat-tag">Ã‚ncoras</span>
+                    </div>
+                  </td>
+                  <td><div class="td-strong">R$ 12.400</div><div class="td-muted">2 itens</div></td>
+                  <td><span class="badge badge-realizada"><span class="badge-dot"></span>Realizada</span></td>
+                  <td>
+                    <div style="display:flex;gap:0.3rem;">
+                      <button class="btn btn-secondary btn-sm" onclick="showToast('Ficha #FC-2026-0243 aberta', 'info')"><i class="fa-solid fa-eye"></i></button>
+                      <button class="btn btn-primary btn-sm" onclick="showToast('Gerando NF-e...', 'success')"><i class="fa-solid fa-file-invoice"></i></button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><span class="link">#FC-2026-0242</span></td>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:0.6rem;">
+                      <div class="avatar avatar-sm" style="background:linear-gradient(135deg,#e879f9,#a21caf)">FM</div>
+                      <div>
+                        <div class="td-strong">Francisco Maia</div>
+                        <div class="td-muted">63 anos â€” M</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="td-strong" style="font-size:0.8rem;">Real Hospital PortuguÃªs</div>
+                    <div class="td-muted">Sala 5 â€” Neurocirurgia</div>
+                  </td>
+                  <td>
+                    <div class="td-strong">Dr. Cavalcanti</div>
+                    <div class="td-muted">CRM 21.087-PE</div>
+                  </td>
+                  <td><span class="tag">Discectomia Cervical C5-C6</span></td>
+                  <td>
+                    <div class="td-strong">20/02/2026</div>
+                    <div class="td-muted">09:00h</div>
+                  </td>
+                  <td>
+                    <div style="display:flex;flex-wrap:wrap;gap:0.2rem;">
+                      <span class="mat-tag">Placa Cervical ACDF</span>
+                      <span class="mat-tag">Parafusos 4.0</span>
+                      <span class="mat-tag">Cage PEEK</span>
+                    </div>
+                  </td>
+                  <td><div class="td-strong">R$ 63.200</div><div class="td-muted">3 itens</div></td>
+                  <td><span class="badge badge-faturada"><span class="badge-dot"></span>Faturada</span></td>
+                  <td>
+                    <div style="display:flex;gap:0.3rem;">
+                      <button class="btn btn-secondary btn-sm" onclick="showToast('Ficha #FC-2026-0242 aberta', 'info')"><i class="fa-solid fa-eye"></i></button>
+                      <button class="btn btn-secondary btn-sm" onclick="showToast('NF-e 004.765 aberta', 'info')"><i class="fa-solid fa-receipt"></i></button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><span class="link">#FC-2026-0241</span></td>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:0.6rem;">
+                      <div class="avatar avatar-sm avatar-pink">LB</div>
+                      <div>
+                        <div class="td-strong">Luciana Barros</div>
+                        <div class="td-muted">49 anos â€” F</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="td-strong" style="font-size:0.8rem;">Hospital Memorial</div>
+                    <div class="td-muted">Sala 3 â€” Bloco A</div>
+                  </td>
+                  <td>
+                    <div class="td-strong">Dr. Meneses</div>
+                    <div class="td-muted">CRM 18.432-PE</div>
+                  </td>
+                  <td><span class="tag">RevisÃ£o PrÃ³tese Joelho</span></td>
+                  <td>
+                    <div class="td-strong">19/02/2026</div>
+                    <div class="td-muted">13:00h</div>
+                  </td>
+                  <td>
+                    <div style="display:flex;flex-wrap:wrap;gap:0.2rem;">
+                      <span class="mat-tag">PrÃ³tese RevisÃ£o NRG+</span>
+                      <span class="mat-tag">+4</span>
+                    </div>
+                  </td>
+                  <td><div class="td-strong">R$ 98.700</div><div class="td-muted">5 itens</div></td>
+                  <td><span class="badge badge-realizada"><span class="badge-dot"></span>Realizada</span></td>
+                  <td>
+                    <div style="display:flex;gap:0.3rem;">
+                      <button class="btn btn-secondary btn-sm" onclick="showToast('Ficha aberta', 'info')"><i class="fa-solid fa-eye"></i></button>
+                      <button class="btn btn-primary btn-sm" onclick="showToast('Gerando NF-e para FC-0241...', 'success')"><i class="fa-solid fa-file-invoice"></i></button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card-footer">
+            <span style="font-size:0.78rem;color:var(--text-secondary);">Mostrando 7 de 47 fichas</span>
+            <div style="display:flex;gap:0.3rem;">
+              <button class="btn btn-secondary btn-sm"><i class="fa-solid fa-chevron-left"></i></button>
+              <button class="btn btn-primary btn-sm">1</button>
+              <button class="btn btn-secondary btn-sm">2</button>
+              <button class="btn btn-secondary btn-sm">3</button>
+              <button class="btn btn-secondary btn-sm">...</button>
+              <button class="btn btn-secondary btn-sm">7</button>
+              <button class="btn btn-secondary btn-sm"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+          </div>
+        </div>
+      </div><!-- /cirurgias -->
+
+
+      <!-- ==================== ESTOQUE ==================== -->
+      <div class="screen" id="screen-estoque">
+        <div class="page-header">
+          <div class="page-header-left">
+            <div class="breadcrumb"><i class="fa-solid fa-house"></i> &rsaquo; <span>Estoque</span></div>
+            <h1>GestÃ£o de Estoque</h1>
+            <p>Implantes ortopÃ©dicos OPME â€” rastreabilidade por lote e validade</p>
+          </div>
+          <div class="page-header-actions">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('RelatÃ³rio de estoque exportado', 'success')"><i class="fa-solid fa-file-excel"></i> Exportar</button>
+            <button class="btn btn-secondary btn-sm" onclick="showToast('InventÃ¡rio iniciado', 'info')"><i class="fa-solid fa-clipboard-list"></i> InventÃ¡rio</button>
+            <button class="btn btn-primary" onclick="showToast('FormulÃ¡rio de entrada aberto', 'success')"><i class="fa-solid fa-plus"></i> Entrada de Material</button>
+          </div>
+        </div>
+
+        <!-- KPIs ESTOQUE -->
+        <div class="grid grid-4" style="margin-bottom:1.25rem;">
+          <div class="kpi-card" style="--kpi-color:#0d9488;--kpi-bg:#f0fdfa;">
+            <div class="kpi-header"><div class="kpi-label">Total Itens</div><div class="kpi-icon"><i class="fa-solid fa-boxes-stacked"></i></div></div>
+            <div class="kpi-value">1.847</div>
+            <div class="kpi-change up"><i class="fa-solid fa-trending-up"></i> +127 este mÃªs</div>
+          </div>
+          <div class="kpi-card" style="--kpi-color:#ef4444;--kpi-bg:#fee2e2;">
+            <div class="kpi-header"><div class="kpi-label">Estoque CrÃ­tico</div><div class="kpi-icon"><i class="fa-solid fa-triangle-exclamation"></i></div></div>
+            <div class="kpi-value">23</div>
+            <div class="kpi-change down"><i class="fa-solid fa-arrow-up"></i> 8 novos alertas</div>
+          </div>
+          <div class="kpi-card" style="--kpi-color:#f59e0b;--kpi-bg:#fef9c3;">
+            <div class="kpi-header"><div class="kpi-label">Vencendo em 30d</div><div class="kpi-icon"><i class="fa-solid fa-calendar-xmark"></i></div></div>
+            <div class="kpi-value">67</div>
+            <div class="kpi-change down"><i class="fa-solid fa-exclamation"></i> 12 crÃ­ticos</div>
+          </div>
+          <div class="kpi-card" style="--kpi-color:#8b5cf6;--kpi-bg:#ede9fe;">
+            <div class="kpi-header"><div class="kpi-label">Valor em Estoque</div><div class="kpi-icon"><i class="fa-solid fa-vault"></i></div></div>
+            <div class="kpi-value">R$&nbsp;2,8M</div>
+            <div class="kpi-change up"><i class="fa-solid fa-trending-up"></i> Valorizado</div>
+          </div>
+        </div>
+
+        <!-- FILTER -->
+        <div class="filter-bar">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Buscar implante, cÃ³digo, lote...">
+          </div>
+          <select class="filter-select">
+            <option>Todas as categorias</option>
+            <option>Coluna Vertebral</option>
+            <option>Joelho</option>
+            <option>Quadril</option>
+            <option>Trauma</option>
+          </select>
+          <select class="filter-select">
+            <option>Todos os status</option>
+            <option>Normal</option>
+            <option>Baixo</option>
+            <option>CrÃ­tico</option>
+            <option>Vencendo</option>
+          </select>
+          <select class="filter-select">
+            <option>Todos os fornecedores</option>
+            <option>Stryker Brasil</option>
+            <option>Zimmer Biomet</option>
+            <option>DePuy Synthes</option>
+            <option>Medtronic</option>
+          </select>
+          <button class="btn btn-secondary btn-sm"><i class="fa-solid fa-qrcode"></i> Ler CÃ³digo</button>
+        </div>
+
+        <!-- CATEGORIAS TABS -->
+        <div class="tabs">
+          <div class="tab active" onclick="setTab(this,'tab-estq-todos')">Todos <span class="tab-count">1847</span></div>
+          <div class="tab" onclick="setTab(this,'tab-estq-coluna')"><i class="fa-solid fa-bone" style="font-size:0.75rem;"></i> Coluna <span class="tab-count">512</span></div>
+          <div class="tab" onclick="setTab(this,'tab-estq-joelho')"><i class="fa-solid fa-person-running" style="font-size:0.75rem;"></i> Joelho <span class="tab-count">348</span></div>
+          <div class="tab" onclick="setTab(this,'tab-estq-quadril')">Quadril <span class="tab-count">289</span></div>
+          <div class="tab" onclick="setTab(this,'tab-estq-trauma')">Trauma <span class="tab-count">698</span></div>
+        </div>
+
+        <div class="grid grid-2">
+          <!-- COLUNA -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title"><div class="card-title-icon"><i class="fa-solid fa-bone"></i></div> Coluna Vertebral</div>
+                <div class="card-subtitle">Implantes para cirurgia da coluna</div>
+              </div>
+              <span class="badge badge-teal">512 itens</span>
+            </div>
+            <div class="card-body" style="padding-top:0.5rem;padding-bottom:0.5rem;">
+              <!-- Item 1 -->
+              <div class="stock-item">
+                <div class="stock-item-header">
+                  <div>
+                    <div class="stock-item-name">Parafuso Pedicular TitÃ¢nio 6.5Ã—45mm</div>
+                    <div class="stock-item-meta">
+                      <span><i class="fa-solid fa-tag"></i> SKY-COL-001</span>
+                      <span><i class="fa-solid fa-industry"></i> Stryker Brasil</span>
+                    </div>
+                    <div class="stock-item-meta">
+                      <span><i class="fa-solid fa-barcode"></i> Lote: LT-2024-0892</span>
+                      <span style="color:var(--danger);font-weight:600;"><i class="fa-solid fa-calendar-xmark"></i> Vence: 05/03/2026</span>
+                    </div>
+                  </div>
+                  <span class="badge badge-danger">Vencendo</span>
+                </div>
+                <div class="stock-level">
+                  <span class="stock-level-label" style="font-size:0.72rem;color:var(--text-muted);">Estoque atual</span>
+                  <div class="progress-bar" style="flex:1;height:8px;">
+                    <div class="progress-fill danger" style="width:18%;"></div>
+                  </div>
+                  <span class="stock-level-count" style="color:var(--danger);">23/130</span>
+                </div>
+                <div style="margin-top:0.4rem;font-size:0.72rem;color:var(--danger);"><i class="fa-solid fa-triangle-exclamation"></i> Abaixo do mÃ­nimo (50 un.) â€” ReposiÃ§Ã£o urgente</div>
+              </div>
+
+              <!-- Item 2 -->
+              <div class="stock-item">
+                <div class="stock-item-header">
+                  <div>
+                    <div class="stock-item-name">Parafuso Pedicular TitÃ¢nio 6.5Ã—55mm</div>
+                    <div class="stock-item-meta">
+                      <span><i class="fa-solid fa-tag"></i> SKY-COL-002</span>
+                      <span><i class="fa-solid fa-industry"></i> Stryker Brasil</span>
+                    </div>
+                    <div class="stock-item-meta">
+                      <span><i class="fa-solid fa-barcode"></i> Lote: LT-2025-1247</span>
+                      <span><i class="fa-solid fa-calendar"></i> Vence: 15/08/2027</span>
+                    </div>
+                  </div>
+                  <span class="badge badge-success">Normal</span>
+                </div>
+                <div class="stock-level">
+                  <span class="stock-level-label" style="font-size:0.72rem;color:var(--text-muted);">Estoque atual</span>
+                  <div class="progress-bar" style="flex:1;height:8px;">
+                    <div class="progress-fill" style="width:78%;"></div>
+                  </div>
+                  <span class="stock-level-count">102/130</span>
+                </div>
+              </div>
+
+              <!-- Item 3 -->
+              <div class="stock-item">
+                <div class="stock-item-header">
+                  <div>
+                    <div class="stock-item-name">Placa Cervical ACDF Titanium 4 nÃ­veis</div>
+                    <div class="stock-item-meta">
+                      <span><i class="fa-solid fa-tag"></i> SKY-COL-014</span>
+                      <span><i class="fa-solid fa-industry"></i> Medtronic</span>
+                    </div>
+                    <div class="stock-item-meta">
+                      <span><i class="fa-solid fa-barcode"></i> Lote: MDT-2025-0341</span>
+                      <span><i class="fa-solid fa-calendar"></i> Vence: 20/11/2027</span>
+                    </div>
+                  </div>
+                  <span class="badge badge-success">Normal</span>
+                </div>
+                <div class="stock-level">
+                  <span class="stock-level-label" style="font-size:0.72rem;color:var(--text-muted);">Estoque atual</span>
+                  <div class="progress-bar" style="flex:1;height:8px;">
+                    <div class="progress-fill" style="width:55%;"></div>
+                  </div>
+                  <span class="stock-level-count">22/40</span>
+                </div>
+              </div>
+
+              <!-- Item 4 -->
+              <div class="stock-item">
+                <div class="stock-item-header">
+                  <div>
+                    <div class="stock-item-name">Cage PEEK IntersomÃ¡tico Lombar</div>
+                    <div class="stock-item-meta">
+                      <span><i class="fa-solid fa-tag"></i> SKY-COL-023</span>
+                      <span><i class="fa-solid fa-industry"></i> DePuy Synthes</span>
+                    </div>
+                    <div class="stock-item-meta">
+                      <span><i class="fa-solid fa-barcode"></i> Lote: DPS-2025-0198</span>
+                      <span><i class="fa-solid fa-calendar"></i> Vence: 10/05/2028</span>
+                    </div>
+                  </div>
+                  <span class="badge badge-warning">Baixo</span>
+                </div>
+                <div class="stock-level">
+                  <span class="stock-level-label" style="font-size:0.72rem;color:var(--text-muted);">Estoque atual</span>
+                  <div class="progress-bar" style="flex:1;height:8px;">
+                    <div class="progress-fill warning" style="width:30%;"></div>
+                  </div>
+                  <span class="stock-level-count" style="color:var(--warning);">6/20</span>
+                </div>
+                <div style="margin-top:0.4rem;font-size:0.72rem;color:var(--warning);"><i class="fa-solid fa-triangle-exclamation"></i> Pedido de reposiÃ§Ã£o gerado automaticamente</div>
+              </div>
+
+              <!-- Item 5 -->
+              <div class="stock-item">
+                <div class="stock-item-header">
+                  <div>
+                    <div class="stock-item-name">Haste Longitudinal Titanium 4.75mm</div>
+                    <div class="stock-item-meta">
+                      <span><i class="fa-solid fa-tag"></i> SKY-COL-031</span>
+                      <span><i class="fa-solid fa-industry"></i> Stryker Brasil</span>
+                    </div>
+                    <div class="stock-item-meta">
+                      <span><i class="fa-solid fa-barcode"></i> Lote: STR-2025-2891</span>
+                      <span><i class="fa-solid fa-calendar"></i> Vence: 08/07/2028</span>
+                    </div>
+                  </div>
+                  <span class="badge badge-success">Normal</span>
+                </div>
+                <div class="stock-level">
+                  <span class="stock-level-label" style="font-size:0.72rem;color:var(--text-muted);">Estoque atual</span>
+                  <div class="progress-bar" style="flex:1;height:8px;">
+                    <div class="progress-fill" style="width:67%;"></div>
+                  </div>
+                  <span class="stock-level-count">48/72</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <span style="font-size:0.75rem;color:var(--text-muted);">Mostrando 5 de 512 itens de coluna</span>
+              <button class="btn btn-secondary btn-sm" onclick="showToast('Carregando mais itens...', 'info')">Ver todos</button>
+            </div>
+          </div>
+
+          <!-- JOELHO + QUADRIL -->
+          <div style="display:flex;flex-direction:column;gap:1.25rem;">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title"><div class="card-title-icon" style="background:#dbeafe;color:#2563eb;"><i class="fa-solid fa-person-running"></i></div> Joelho</div>
+                  <div class="card-subtitle">PrÃ³teses e implantes de joelho</div>
+                </div>
+                <span class="badge badge-info">348 itens</span>
+              </div>
+              <div class="card-body" style="padding-top:0.5rem;padding-bottom:0.5rem;">
+                <div class="stock-item">
+                  <div class="stock-item-header">
+                    <div>
+                      <div class="stock-item-name">PrÃ³tese Total Joelho â€” Sigma RP NRG+</div>
+                      <div class="stock-item-meta">
+                        <span><i class="fa-solid fa-tag"></i> SKY-JOE-001</span>
+                        <span><i class="fa-solid fa-industry"></i> DePuy Synthes</span>
+                        <span><i class="fa-solid fa-barcode"></i> LT-DPS-2025-0091</span>
+                      </div>
+                    </div>
+                    <span class="badge badge-success">Normal</span>
+                  </div>
+                  <div class="stock-level">
+                    <span class="stock-level-label" style="font-size:0.72rem;color:var(--text-muted);">Estoque</span>
+                    <div class="progress-bar" style="flex:1;height:8px;"><div class="progress-fill info" style="width:72%;"></div></div>
+                    <span class="stock-level-count">18/25</span>
+                  </div>
+                </div>
+                                <div class="stock-item">
+                  <div class="stock-item-header">
+                    <div>
+                      <div class="stock-item-name">Componente Tibial PCR Flex 65mm</div>
+                      <div class="stock-item-meta">
+                        <span><i class="fa-solid fa-tag"></i> SKY-JOE-002</span>
+                        <span><i class="fa-solid fa-industry"></i> Zimmer Biomet</span>
+                        <span><i class="fa-solid fa-barcode"></i> ZB-2025-0471</span>
+                      </div>
+                    </div>
+                    <span class="badge badge-danger">Crítico</span>
+                  </div>
+                  <div class="stock-level">
+                    <span class="stock-level-label" style="font-size:0.72rem;color:var(--text-muted);">Estoque</span>
+                    <div class="progress-bar" style="flex:1;height:8px;"><div class="progress-fill danger" style="width:20%;"></div></div>
+                    <span class="stock-level-count" style="color:var(--danger);">2/10</span>
+                  </div>
+                  <div style="margin-top:0.4rem;font-size:0.72rem;color:var(--danger);"><i class="fa-solid fa-triangle-exclamation"></i> Estoque crítico — 2 cirurgias agendadas</div>
+                </div>
+                <div class="stock-item">
+                  <div class="stock-item-header">
+                    <div>
+                      <div class="stock-item-name">Kit Artroscopia Joelho Completo</div>
+                      <div class="stock-item-meta">
+                        <span><i class="fa-solid fa-tag"></i> SKY-JOE-009</span>
+                        <span><i class="fa-solid fa-industry"></i> Stryker Brasil</span>
+                        <span><i class="fa-solid fa-barcode"></i> STR-2025-1122</span>
+                      </div>
+                    </div>
+                    <span class="badge badge-success">Normal</span>
+                  </div>
+                  <div class="stock-level">
+                    <span class="stock-level-label" style="font-size:0.72rem;color:var(--text-muted);">Estoque</span>
+                    <div class="progress-bar" style="flex:1;height:8px;"><div class="progress-fill info" style="width:85%;"></div></div>
+                    <span class="stock-level-count">17/20</span>
+                  </div>
+                </div>
+              </div>
+              <div class="card-footer">
+                <span style="font-size:0.75rem;color:var(--text-muted);">Mostrando 3 de 348 itens</span>
+                <button class="btn btn-secondary btn-sm" onclick="showToast('Ver todos os itens de joelho','info')">Ver todos</button>
+              </div>
+            </div>
+
+            <!-- QUADRIL -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title"><div class="card-title-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fa-solid fa-circle-half-stroke"></i></div> Quadril</div>
+                  <div class="card-subtitle">Próteses e implantes de quadril</div>
+                </div>
+                <span class="badge badge-purple">289 itens</span>
+              </div>
+              <div class="card-body" style="padding-top:0.5rem;padding-bottom:0.5rem;">
+                <div class="stock-item">
+                  <div class="stock-item-header">
+                    <div>
+                      <div class="stock-item-name">Prótese Total Quadril Bimetálica — Cementada</div>
+                      <div class="stock-item-meta">
+                        <span><i class="fa-solid fa-tag"></i> SKY-QUA-001</span>
+                        <span><i class="fa-solid fa-industry"></i> Zimmer Biomet</span>
+                        <span><i class="fa-solid fa-barcode"></i> ZB-2025-HIP-0089</span>
+                      </div>
+                    </div>
+                    <span class="badge badge-success">Normal</span>
+                  </div>
+                  <div class="stock-level">
+                    <span class="stock-level-label" style="font-size:0.72rem;color:var(--text-muted);">Estoque</span>
+                    <div class="progress-bar" style="flex:1;height:8px;"><div class="progress-fill purple" style="width:60%;"></div></div>
+                    <span class="stock-level-count">12/20</span>
+                  </div>
+                </div>
+                <div class="stock-item">
+                  <div class="stock-item-header">
+                    <div>
+                      <div class="stock-item-name">Haste Femoral Não Cimentada 12mm</div>
+                      <div class="stock-item-meta">
+                        <span><i class="fa-solid fa-tag"></i> SKY-QUA-004</span>
+                        <span><i class="fa-solid fa-industry"></i> DePuy Synthes</span>
+                        <span><i class="fa-solid fa-barcode"></i> DPS-2025-FEM-0043</span>
+                      </div>
+                    </div>
+                    <span class="badge badge-danger">Crítico</span>
+                  </div>
+                  <div class="stock-level">
+                    <span class="stock-level-label" style="font-size:0.72rem;color:var(--text-muted);">Estoque</span>
+                    <div class="progress-bar" style="flex:1;height:8px;"><div class="progress-fill danger" style="width:27%;"></div></div>
+                    <span class="stock-level-count" style="color:var(--danger);">4/15</span>
+                  </div>
+                  <div style="margin-top:0.4rem;font-size:0.72rem;color:var(--danger);"><i class="fa-solid fa-triangle-exclamation"></i> Reposição solicitada — aguarda aprovação</div>
+                </div>
+                <div class="stock-item">
+                  <div class="stock-item-header">
+                    <div>
+                      <div class="stock-item-name">Cabeça Femoral Cerâmica 32mm</div>
+                      <div class="stock-item-meta">
+                        <span><i class="fa-solid fa-tag"></i> SKY-QUA-007</span>
+                        <span><i class="fa-solid fa-industry"></i> Stryker Brasil</span>
+                        <span><i class="fa-solid fa-barcode"></i> STR-2025-CER-0215</span>
+                      </div>
+                    </div>
+                    <span class="badge badge-success">Normal</span>
+                  </div>
+                  <div class="stock-level">
+                    <span class="stock-level-label" style="font-size:0.72rem;color:var(--text-muted);">Estoque</span>
+                    <div class="progress-bar" style="flex:1;height:8px;"><div class="progress-fill purple" style="width:75%;"></div></div>
+                    <span class="stock-level-count">15/20</span>
+                  </div>
+                </div>
+              </div>
+              <div class="card-footer">
+                <span style="font-size:0.75rem;color:var(--text-muted);">Mostrando 3 de 289 itens</span>
+                <button class="btn btn-secondary btn-sm" onclick="showToast('Ver todos os itens de quadril','info')">Ver todos</button>
+              </div>
+            </div>
+          </div><!-- /grid -->
+
+          <!-- TRAUMA TABLE -->
+          <div class="card" style="margin-top:1.25rem;">
+            <div class="card-header">
+              <div>
+                <div class="card-title"><div class="card-title-icon" style="background:#fff7ed;color:#f97316;"><i class="fa-solid fa-bandage"></i></div> Trauma / Fraturas</div>
+                <div class="card-subtitle">Placas, hastes, parafusos para trauma ortopédico</div>
+              </div>
+              <span class="badge badge-orange">698 itens</span>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Código</th><th>Descrição</th><th>Fornecedor</th><th>Lote</th><th>Validade</th><th>Estoque</th><th>Mínimo</th><th>Status</th><th>Custo Unit.</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="link">SKY-TRA-001</span></td>
+                    <td><div class="td-strong">Placa DCP 4.5mm — 6 furos</div><div class="td-muted">DePuy Synthes — AO Standard</div></td>
+                    <td>DePuy Synthes</td>
+                    <td class="td-muted">DPS-2025-0089</td>
+                    <td>15/12/2028</td>
+                    <td><div style="display:flex;align-items:center;gap:0.5rem;"><div class="progress-bar" style="width:60px;"><div class="progress-fill" style="width:80%;"></div></div><span>80</span></div></td>
+                    <td>20</td>
+                    <td><span class="badge badge-success">Normal</span></td>
+                    <td class="td-strong">R$ 380</td>
+                  </tr>
+                  <tr>
+                    <td><span class="link">SKY-TRA-003</span></td>
+                    <td><div class="td-strong">Haste Femoral Anterógrada 11mm×420mm</div><div class="td-muted">Stryker Gamma3</div></td>
+                    <td>Stryker Brasil</td>
+                    <td class="td-muted">STR-2025-0441</td>
+                    <td>08/09/2028</td>
+                    <td><div style="display:flex;align-items:center;gap:0.5rem;"><div class="progress-bar" style="width:60px;"><div class="progress-fill warning" style="width:35%;"></div></div><span>7</span></div></td>
+                    <td>10</td>
+                    <td><span class="badge badge-warning">Baixo</span></td>
+                    <td class="td-strong">R$ 2.140</td>
+                  </tr>
+                  <tr>
+                    <td><span class="link">SKY-TRA-007</span></td>
+                    <td><div class="td-strong">Parafuso Cortical 4.5mm×60mm</div><div class="td-muted">AO Synthes Universal</div></td>
+                    <td>DePuy Synthes</td>
+                    <td class="td-muted">DPS-2025-0234</td>
+                    <td>22/06/2029</td>
+                    <td><div style="display:flex;align-items:center;gap:0.5rem;"><div class="progress-bar" style="width:60px;"><div class="progress-fill" style="width:95%;"></div></div><span>285</span></div></td>
+                    <td>50</td>
+                    <td><span class="badge badge-success">Normal</span></td>
+                    <td class="td-strong">R$ 48</td>
+                  </tr>
+                  <tr>
+                    <td><span class="link">SKY-TRA-011</span></td>
+                    <td><div class="td-strong">Placa de Bloqueio LCP 3.5mm — 8 furos</div><div class="td-muted">Locking Compression Plate</div></td>
+                    <td>Stryker Brasil</td>
+                    <td class="td-muted">STR-2025-0897</td>
+                    <td>30/10/2028</td>
+                    <td><div style="display:flex;align-items:center;gap:0.5rem;"><div class="progress-bar" style="width:60px;"><div class="progress-fill" style="width:60%;"></div></div><span>36</span></div></td>
+                    <td>15</td>
+                    <td><span class="badge badge-success">Normal</span></td>
+                    <td class="td-strong">R$ 920</td>
+                  </tr>
+                  <tr>
+                    <td><span class="link">SKY-TRA-014</span></td>
+                    <td><div class="td-strong">Cimento Ósseo PMMA — Kit Simplex</div><div class="td-muted">Stryker — 20 porções</div></td>
+                    <td>Stryker Brasil</td>
+                    <td class="td-muted">STR-2025-0112</td>
+                    <td style="color:var(--warning);font-weight:600;">15/04/2026</td>
+                    <td><div style="display:flex;align-items:center;gap:0.5rem;"><div class="progress-bar" style="width:60px;"><div class="progress-fill warning" style="width:40%;"></div></div><span>12</span></div></td>
+                    <td>10</td>
+                    <td><span class="badge badge-warning">Vencendo</span></td>
+                    <td class="td-strong">R$ 1.800</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+      </div><!-- /screen-estoque -->
+
+      <!-- ==================== FINANCEIRO ==================== -->
+      <div class="screen" id="screen-financeiro">
+        <div class="page-header">
+          <div class="page-header-left">
+            <div class="breadcrumb"><i class="fa-solid fa-house"></i> &rsaquo; <span>Financeiro</span></div>
+            <h1>Módulo Financeiro</h1>
+            <p>Contas a receber, pagar, NF-e e conciliação bancária</p>
+          </div>
+          <div class="page-header-actions">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('Exportando DRE...','info')"><i class="fa-solid fa-file-excel"></i> DRE</button>
+            <button class="btn btn-primary" onclick="showToast('Nova cobrança criada','success')"><i class="fa-solid fa-plus"></i> Nova Cobrança</button>
+          </div>
+        </div>
+
+        <!-- KPIs FINANCEIRO -->
+        <div class="grid grid-4" style="margin-bottom:1.25rem;">
+          <div class="kpi-card" style="--kpi-color:#10b981;--kpi-bg:#dcfce7;">
+            <div class="kpi-header"><div class="kpi-label">A Receber (Total)</div><div class="kpi-icon"><i class="fa-solid fa-arrow-trend-up"></i></div></div>
+            <div class="kpi-value">R$&nbsp;340.500</div>
+            <div class="kpi-change down"><i class="fa-solid fa-clock"></i> R$ 87.200 atrasado</div>
+          </div>
+          <div class="kpi-card" style="--kpi-color:#ef4444;--kpi-bg:#fee2e2;">
+            <div class="kpi-header"><div class="kpi-label">A Pagar (Total)</div><div class="kpi-icon"><i class="fa-solid fa-arrow-trend-down"></i></div></div>
+            <div class="kpi-value">R$&nbsp;198.750</div>
+            <div class="kpi-change down"><i class="fa-solid fa-clock"></i> R$ 32.400 vencido</div>
+          </div>
+          <div class="kpi-card" style="--kpi-color:#3b82f6;--kpi-bg:#dbeafe;">
+            <div class="kpi-header"><div class="kpi-label">Saldo Bancário</div><div class="kpi-icon"><i class="fa-solid fa-building-columns"></i></div></div>
+            <div class="kpi-value">R$&nbsp;412.890</div>
+            <div class="kpi-change up"><i class="fa-solid fa-check"></i> Conciliado hoje</div>
+          </div>
+          <div class="kpi-card" style="--kpi-color:#8b5cf6;--kpi-bg:#ede9fe;">
+            <div class="kpi-header"><div class="kpi-label">NF-e Emitidas (mês)</div><div class="kpi-icon"><i class="fa-solid fa-file-invoice"></i></div></div>
+            <div class="kpi-value">38</div>
+            <div class="kpi-change up"><i class="fa-solid fa-check-circle"></i> 35 autorizadas</div>
+          </div>
+        </div>
+
+        <div class="grid grid-2" style="margin-bottom:1.25rem;">
+          <!-- CONTAS A RECEBER -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title"><div class="card-title-icon" style="background:#dcfce7;color:#15803d;"><i class="fa-solid fa-file-invoice-dollar"></i></div> Contas a Receber</div>
+                <div class="card-subtitle">Vencimentos nos próximos 30 dias</div>
+              </div>
+              <span class="badge badge-success">R$ 340.500</span>
+            </div>
+            <div class="card-body" style="padding-top:0.5rem;padding-bottom:0.5rem;">
+              <div class="finance-row">
+                <div class="finance-row-left">
+                  <div class="avatar avatar-sm">RHP</div>
+                  <div class="finance-row-info">
+                    <div class="finance-row-title">Real Hospital Português</div>
+                    <div class="finance-row-sub">NF-e 004.521 — Cirurgia Coluna #FC-0242</div>
+                  </div>
+                </div>
+                <div class="finance-row-right">
+                  <div class="finance-row-amount negative">R$ 48.900</div>
+                  <div class="finance-row-date"><span class="badge badge-danger" style="font-size:0.62rem;">7d atrasado</span></div>
+                </div>
+              </div>
+              <div class="finance-row">
+                <div class="finance-row-left">
+                  <div class="avatar avatar-sm avatar-blue">HSJ</div>
+                  <div class="finance-row-info">
+                    <div class="finance-row-title">Hospital Santa Joana</div>
+                    <div class="finance-row-sub">NF-e 004.534 — Prótese Joelho #FC-0231</div>
+                  </div>
+                </div>
+                <div class="finance-row-right">
+                  <div class="finance-row-amount">R$ 42.800</div>
+                  <div class="finance-row-date">Vence 25/02/2026</div>
+                </div>
+              </div>
+              <div class="finance-row">
+                <div class="finance-row-left">
+                  <div class="avatar avatar-sm avatar-purple">HME</div>
+                  <div class="finance-row-info">
+                    <div class="finance-row-title">Hospital Memorial</div>
+                    <div class="finance-row-sub">NF-e 004.548 — Trauma Ortopédico #FC-0225</div>
+                  </div>
+                </div>
+                <div class="finance-row-right">
+                  <div class="finance-row-amount">R$ 28.300</div>
+                  <div class="finance-row-date">Vence 28/02/2026</div>
+                </div>
+              </div>
+              <div class="finance-row">
+                <div class="finance-row-left">
+                  <div class="avatar avatar-sm avatar-orange">HES</div>
+                  <div class="finance-row-info">
+                    <div class="finance-row-title">Hospital Esperança</div>
+                    <div class="finance-row-sub">NF-e 004.561 — Quadril Bimet. #FC-0219</div>
+                  </div>
+                </div>
+                <div class="finance-row-right">
+                  <div class="finance-row-amount">R$ 55.700</div>
+                  <div class="finance-row-date">Vence 05/03/2026</div>
+                </div>
+              </div>
+              <div class="finance-row">
+                <div class="finance-row-left">
+                  <div class="avatar avatar-sm avatar-emerald">UPE</div>
+                  <div class="finance-row-info">
+                    <div class="finance-row-title">IMIP — Instituto de Medicina Integral</div>
+                    <div class="finance-row-sub">NF-e 004.572 — Kit Coluna L4-L5</div>
+                  </div>
+                </div>
+                <div class="finance-row-right">
+                  <div class="finance-row-amount">R$ 87.500</div>
+                  <div class="finance-row-date">Vence 10/03/2026</div>
+                </div>
+              </div>
+              <div class="finance-row">
+                <div class="finance-row-left">
+                  <div class="avatar avatar-sm">UPE</div>
+                  <div class="finance-row-info">
+                    <div class="finance-row-title">Clínica Ortopédica Pernambuco</div>
+                    <div class="finance-row-sub">NF-e 004.589 — Materiais Artroscopia</div>
+                  </div>
+                </div>
+                <div class="finance-row-right">
+                  <div class="finance-row-amount">R$ 77.300</div>
+                  <div class="finance-row-date">Vence 15/03/2026</div>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <span style="font-size:0.75rem;color:var(--text-muted);">6 títulos — 1 em atraso</span>
+              <button class="btn btn-secondary btn-sm" onclick="showToast('Ver todas as contas a receber','info')">Ver todas</button>
+            </div>
+          </div>
+
+          <!-- CONTAS A PAGAR -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title"><div class="card-title-icon" style="background:#fee2e2;color:#ef4444;"><i class="fa-solid fa-credit-card"></i></div> Contas a Pagar</div>
+                <div class="card-subtitle">Fornecedores e despesas operacionais</div>
+              </div>
+              <span class="badge badge-danger">R$ 198.750</span>
+            </div>
+            <div class="card-body" style="padding-top:0.5rem;padding-bottom:0.5rem;">
+              <div class="finance-row">
+                <div class="finance-row-left">
+                  <div class="avatar avatar-sm" style="background:linear-gradient(135deg,#60a5fa,#2563eb)">STR</div>
+                  <div class="finance-row-info">
+                    <div class="finance-row-title">Stryker Brasil Ltda.</div>
+                    <div class="finance-row-sub">Fatura #STR-2026-0284 — Pedido PO-2024-0891</div>
+                  </div>
+                </div>
+                <div class="finance-row-right">
+                  <div class="finance-row-amount negative">R$ 72.400</div>
+                  <div class="finance-row-date"><span class="badge badge-danger" style="font-size:0.62rem;">Vencido</span></div>
+                </div>
+              </div>
+              <div class="finance-row">
+                <div class="finance-row-left">
+                  <div class="avatar avatar-sm" style="background:linear-gradient(135deg,#a78bfa,#7c3aed)">ZB</div>
+                  <div class="finance-row-info">
+                    <div class="finance-row-title">Zimmer Biomet Brasil</div>
+                    <div class="finance-row-sub">Fatura #ZB-2026-0127 — Próteses Quadril</div>
+                  </div>
+                </div>
+                <div class="finance-row-right">
+                  <div class="finance-row-amount negative">R$ 45.200</div>
+                  <div class="finance-row-date">Vence 24/02/2026</div>
+                </div>
+              </div>
+              <div class="finance-row">
+                <div class="finance-row-left">
+                  <div class="avatar avatar-sm" style="background:linear-gradient(135deg,#fb923c,#ea580c)">DPS</div>
+                  <div class="finance-row-info">
+                    <div class="finance-row-title">DePuy Synthes — J&J</div>
+                    <div class="finance-row-sub">Fatura #DPS-2026-0098 — Trauma Kit</div>
+                  </div>
+                </div>
+                <div class="finance-row-right">
+                  <div class="finance-row-amount negative">R$ 38.900</div>
+                  <div class="finance-row-date">Vence 28/02/2026</div>
+                </div>
+              </div>
+              <div class="finance-row">
+                <div class="finance-row-left">
+                  <div class="avatar avatar-sm" style="background:linear-gradient(135deg,#34d399,#059669)">MDT</div>
+                  <div class="finance-row-info">
+                    <div class="finance-row-title">Medtronic Brasil</div>
+                    <div class="finance-row-sub">Fatura #MDT-2026-0201 — Neuro Coluna</div>
+                  </div>
+                </div>
+                <div class="finance-row-right">
+                  <div class="finance-row-amount negative">R$ 29.500</div>
+                  <div class="finance-row-date">Vence 05/03/2026</div>
+                </div>
+              </div>
+              <div class="finance-row">
+                <div class="finance-row-left">
+                  <div class="avatar avatar-sm avatar-pink">ALU</div>
+                  <div class="finance-row-info">
+                    <div class="finance-row-title">Aluguel — Galpão Logístico</div>
+                    <div class="finance-row-sub">Competência Fev/2026 — Rua Visconde 400</div>
+                  </div>
+                </div>
+                <div class="finance-row-right">
+                  <div class="finance-row-amount negative">R$ 8.750</div>
+                  <div class="finance-row-date">Vence 15/03/2026</div>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <span style="font-size:0.75rem;color:var(--text-muted);">5 títulos — 1 vencido</span>
+              <button class="btn btn-secondary btn-sm" onclick="showToast('Ver todas as contas a pagar','info')">Ver todas</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- NF-e TABLE + FLUXO CAIXA -->
+        <div class="grid grid-2" style="margin-bottom:1.25rem;">
+          <!-- NF-e -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title"><div class="card-title-icon"><i class="fa-solid fa-file-lines"></i></div> NF-e Emitidas</div>
+                <div class="card-subtitle">Notas fiscais eletrônicas — Fev/2026</div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="showToast('Emitindo nova NF-e...','success')"><i class="fa-solid fa-plus"></i> Emitir NF-e</button>
+            </div>
+            <div class="card-body" style="padding:0;">
+              <div class="nfe-row header">
+                <span>Número</span><span>Destinatário</span><span>Emissão</span><span>Valor</span><span>Status</span><span>Ações</span>
+              </div>
+              <div class="nfe-row">
+                <span class="link">#004.521</span><span style="font-weight:600;">Real Hospital Português</span><span class="td-muted">14/02/2026</span><span style="font-weight:700;">R$ 48.900</span><span><span class="badge badge-danger">Atrasado</span></span><span><button class="btn btn-secondary btn-sm" onclick="showToast('NF-e 004.521 aberta','info')"><i class="fa-solid fa-eye"></i></button></span>
+              </div>
+              <div class="nfe-row">
+                <span class="link">#004.534</span><span style="font-weight:600;">Hospital Santa Joana</span><span class="td-muted">16/02/2026</span><span style="font-weight:700;">R$ 42.800</span><span><span class="badge badge-warning">Pendente</span></span><span><button class="btn btn-secondary btn-sm" onclick="showToast('NF-e 004.534 aberta','info')"><i class="fa-solid fa-eye"></i></button></span>
+              </div>
+              <div class="nfe-row">
+                <span class="link">#004.548</span><span style="font-weight:600;">Hospital Memorial</span><span class="td-muted">17/02/2026</span><span style="font-weight:700;">R$ 28.300</span><span><span class="badge badge-success">Pago</span></span><span><button class="btn btn-secondary btn-sm" onclick="showToast('NF-e 004.548 aberta','info')"><i class="fa-solid fa-eye"></i></button></span>
+              </div>
+              <div class="nfe-row">
+                <span class="link">#004.561</span><span style="font-weight:600;">Hospital Esperança</span><span class="td-muted">18/02/2026</span><span style="font-weight:700;">R$ 55.700</span><span><span class="badge badge-warning">Pendente</span></span><span><button class="btn btn-secondary btn-sm" onclick="showToast('NF-e 004.561 aberta','info')"><i class="fa-solid fa-eye"></i></button></span>
+              </div>
+              <div class="nfe-row">
+                <span class="link">#004.572</span><span style="font-weight:600;">IMIP Pernambuco</span><span class="td-muted">19/02/2026</span><span style="font-weight:700;">R$ 87.500</span><span><span class="badge badge-teal">Autorizada</span></span><span><button class="btn btn-secondary btn-sm" onclick="showToast('NF-e 004.572 aberta','info')"><i class="fa-solid fa-eye"></i></button></span>
+              </div>
+              <div class="nfe-row">
+                <span class="link">#004.765</span><span style="font-weight:600;">Real Hospital Português</span><span class="td-muted">20/02/2026</span><span style="font-weight:700;">R$ 63.200</span><span><span class="badge badge-success">Pago</span></span><span><button class="btn btn-secondary btn-sm" onclick="showToast('NF-e 004.765 aberta','info')"><i class="fa-solid fa-eye"></i></button></span>
+              </div>
+              <div class="nfe-row">
+                <span class="link">#004.789</span><span style="font-weight:600;">Clínica Ortopédica PE</span><span class="td-muted">21/02/2026</span><span style="font-weight:700;">R$ 12.400</span><span><span class="badge badge-gray">Em proc.</span></span><span><button class="btn btn-secondary btn-sm" onclick="showToast('NF-e processando no SEFAZ','info')"><i class="fa-solid fa-rotate"></i></button></span>
+              </div>
+            </div>
+            <div class="card-footer">
+              <span style="font-size:0.75rem;color:var(--text-muted);">7 de 38 NF-e — fev/2026</span>
+              <button class="btn btn-secondary btn-sm" onclick="showToast('Abrindo todas as NF-e','info')">Ver todas</button>
+            </div>
+          </div>
+
+          <!-- FLUXO DE CAIXA + OFX -->
+          <div style="display:flex;flex-direction:column;gap:1.25rem;">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title"><div class="card-title-icon"><i class="fa-solid fa-chart-line"></i></div> Fluxo de Caixa — Fev/2026</div>
+                </div>
+                <div class="report-legend">
+                  <div class="legend-item"><div class="legend-dot" style="background:var(--success)"></div> Entradas</div>
+                  <div class="legend-item"><div class="legend-dot" style="background:var(--danger)"></div> Saídas</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="cashflow-bar-wrap">
+                  <div class="cashflow-bar-group">
+                    <div class="cashflow-bars">
+                      <div class="cf-bar entrada" style="height:45px;" title="R$ 112K"></div>
+                      <div class="cf-bar saida" style="height:38px;" title="R$ 95K"></div>
+                    </div>
+                    <div class="cashflow-label">S1</div>
+                  </div>
+                  <div class="cashflow-bar-group">
+                    <div class="cashflow-bars">
+                      <div class="cf-bar entrada" style="height:65px;" title="R$ 163K"></div>
+                      <div class="cf-bar saida" style="height:42px;" title="R$ 105K"></div>
+                    </div>
+                    <div class="cashflow-label">S2</div>
+                  </div>
+                  <div class="cashflow-bar-group">
+                    <div class="cashflow-bars">
+                      <div class="cf-bar entrada" style="height:80px;" title="R$ 200K"></div>
+                      <div class="cf-bar saida" style="height:55px;" title="R$ 138K"></div>
+                    </div>
+                    <div class="cashflow-label">S3</div>
+                  </div>
+                  <div class="cashflow-bar-group">
+                    <div class="cashflow-bars">
+                      <div class="cf-bar entrada" style="height:55px;" title="R$ 138K"></div>
+                      <div class="cf-bar saida" style="height:32px;" title="R$ 80K"></div>
+                    </div>
+                    <div class="cashflow-label">S4</div>
+                  </div>
+                </div>
+                <div style="margin-top:0.75rem;display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;text-align:center;">
+                  <div style="background:var(--bg-main);border-radius:6px;padding:0.6rem;">
+                    <div style="font-size:0.68rem;color:var(--text-muted);">Total Entradas</div>
+                    <div style="font-size:0.95rem;font-weight:800;color:var(--success);">R$ 613K</div>
+                  </div>
+                  <div style="background:var(--bg-main);border-radius:6px;padding:0.6rem;">
+                    <div style="font-size:0.68rem;color:var(--text-muted);">Total Saídas</div>
+                    <div style="font-size:0.95rem;font-weight:800;color:var(--danger);">R$ 418K</div>
+                  </div>
+                  <div style="background:var(--teal-50);border-radius:6px;padding:0.6rem;border:1px solid var(--teal-100);">
+                    <div style="font-size:0.68rem;color:var(--teal-600);">Saldo</div>
+                    <div style="font-size:0.95rem;font-weight:800;color:var(--teal-700);">R$ 195K</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- OFX / CONCILIAÇÃO -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title"><div class="card-title-icon" style="background:#dbeafe;color:#2563eb;"><i class="fa-solid fa-building-columns"></i></div> Conciliação Bancária</div>
+                  <div class="card-subtitle">Itaú — Conta 12.345-8 — Atualizado 21/02 09:47</div>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="showToast('Importando OFX do Itaú...','success')"><i class="fa-solid fa-upload"></i> Import OFX</button>
+              </div>
+              <div class="card-body" style="padding-top:0.5rem;padding-bottom:0.5rem;">
+                <div class="conc-item">
+                  <div class="conc-check checked"><i class="fa-solid fa-check" style="font-size:0.6rem;"></i></div>
+                  <div class="conc-info"><div class="conc-title">TED — Hospital Santa Joana</div><div class="conc-date">21/02/2026 09:12</div></div>
+                  <div class="conc-amount pos">+ R$ 127.400</div>
+                </div>
+                <div class="conc-item">
+                  <div class="conc-check checked"><i class="fa-solid fa-check" style="font-size:0.6rem;"></i></div>
+                  <div class="conc-info"><div class="conc-title">PIX — Stryker Brasil</div><div class="conc-date">20/02/2026 14:32</div></div>
+                  <div class="conc-amount neg">- R$ 72.400</div>
+                </div>
+                <div class="conc-item">
+                  <div class="conc-check unchecked"><i class="fa-solid fa-check" style="font-size:0.6rem;"></i></div>
+                  <div class="conc-info"><div class="conc-title">TED — Hospital Esperança</div><div class="conc-date">20/02/2026 11:05</div></div>
+                  <div class="conc-amount pos">+ R$ 55.700</div>
+                </div>
+                <div class="conc-item">
+                  <div class="conc-check checked"><i class="fa-solid fa-check" style="font-size:0.6rem;"></i></div>
+                  <div class="conc-info"><div class="conc-title">Boleto — Zimmer Biomet</div><div class="conc-date">19/02/2026 17:00</div></div>
+                  <div class="conc-amount neg">- R$ 45.200</div>
+                </div>
+                <div style="margin-top:0.75rem;padding:0.75rem;background:var(--teal-50);border-radius:6px;border:1px solid var(--teal-100);">
+                  <div style="display:flex;justify-content:space-between;font-size:0.8rem;">
+                    <span style="color:var(--teal-700);font-weight:600;"><i class="fa-solid fa-circle-check"></i> 3/4 lançamentos conciliados</span>
+                    <span style="color:var(--teal-600);font-weight:700;">Saldo: R$ 412.890</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /financeiro -->
+
+      <!-- ==================== CLIENTES ==================== -->
+      <div class="screen" id="screen-clientes">
+        <div class="page-header">
+          <div class="page-header-left">
+            <div class="breadcrumb"><i class="fa-solid fa-house"></i> &rsaquo; <span>Clientes</span></div>
+            <h1>Clientes e Hospitais</h1>
+            <p>Hospitais, clínicas e parceiros comerciais da SkyMed</p>
+          </div>
+          <div class="page-header-actions">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('Exportando carteira...','info')"><i class="fa-solid fa-file-excel"></i> Exportar</button>
+            <button class="btn btn-primary" onclick="showToast('Cadastro de novo cliente','success')"><i class="fa-solid fa-plus"></i> Novo Cliente</button>
+          </div>
+        </div>
+
+        <!-- KPIs CLIENTES -->
+        <div class="grid grid-4" style="margin-bottom:1.25rem;">
+          <div class="kpi-card" style="--kpi-color:#0d9488;--kpi-bg:#f0fdfa;">
+            <div class="kpi-header"><div class="kpi-label">Total Clientes Ativos</div><div class="kpi-icon"><i class="fa-solid fa-hospital"></i></div></div>
+            <div class="kpi-value">24</div>
+            <div class="kpi-change up"><i class="fa-solid fa-trending-up"></i> +2 este trimestre</div>
+          </div>
+          <div class="kpi-card" style="--kpi-color:#3b82f6;--kpi-bg:#dbeafe;">
+            <div class="kpi-header"><div class="kpi-label">Contratos Vigentes</div><div class="kpi-icon"><i class="fa-solid fa-file-contract"></i></div></div>
+            <div class="kpi-value">18</div>
+            <div class="kpi-change up"><i class="fa-solid fa-check"></i> 3 em renovação</div>
+          </div>
+          <div class="kpi-card" style="--kpi-color:#8b5cf6;--kpi-bg:#ede9fe;">
+            <div class="kpi-header"><div class="kpi-label">Volume Total (2025)</div><div class="kpi-icon"><i class="fa-solid fa-sack-dollar"></i></div></div>
+            <div class="kpi-value">R$&nbsp;11,2M</div>
+            <div class="kpi-change up"><i class="fa-solid fa-trending-up"></i> +22% vs. 2024</div>
+          </div>
+          <div class="kpi-card" style="--kpi-color:#f59e0b;--kpi-bg:#fef9c3;">
+            <div class="kpi-header"><div class="kpi-label">Limit. Crédito Total</div><div class="kpi-icon"><i class="fa-solid fa-credit-card"></i></div></div>
+            <div class="kpi-value">R$&nbsp;4,8M</div>
+            <div class="kpi-change down"><i class="fa-solid fa-circle-info"></i> 72% utilizado</div>
+          </div>
+        </div>
+
+        <!-- FILTER -->
+        <div class="filter-bar">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Buscar hospital, clínica, CNPJ...">
+          </div>
+          <select class="filter-select">
+            <option>Todos os tipos</option>
+            <option>Hospital Privado</option>
+            <option>Clínica</option>
+            <option>Hospital Público</option>
+          </select>
+          <select class="filter-select">
+            <option>Todos os status</option>
+            <option>Contrato Ativo</option>
+            <option>Em Renovação</option>
+            <option>Sem Contrato</option>
+          </select>
+          <button class="btn btn-secondary btn-sm" onclick="showToast('Filtros aplicados','info')"><i class="fa-solid fa-filter"></i> Filtrar</button>
+        </div>
+
+        <!-- CLIENTES GRID -->
+        <div class="grid grid-3">
+          <!-- Card 1 -->
+          <div class="client-card">
+            <div class="client-card-header">
+              <div class="avatar avatar-lg" style="border-radius:10px;">RHP</div>
+              <div class="client-card-info">
+                <div class="client-card-name">Real Hospital Português</div>
+                <div class="client-card-type">Hospital Privado — Recife, PE</div>
+                <div style="margin-top:0.3rem;"><span class="badge badge-success"><span class="badge-dot"></span> Contrato Ativo</span></div>
+              </div>
+            </div>
+            <div class="client-card-body">
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-phone"></i> Contato</span><span class="client-stat-value">(81) 3416-6700</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-user-tie"></i> Compras</span><span class="client-stat-value">Dra. Patrícia Leal</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-scissors"></i> Cirurgias/mês</span><span class="client-stat-value">14 proc.</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-chart-line"></i> Volume 2025</span><span class="client-stat-value" style="color:var(--teal-600);">R$ 3,2M</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-calendar-check"></i> Contrato até</span><span class="client-stat-value">31/12/2026</span></div>
+            </div>
+            <div class="credit-bar-wrap">
+              <div class="credit-bar-labels">
+                <span>Limite: <span>R$ 800K</span></span>
+                <span>Usado: <span style="color:var(--warning);">R$ 612K (77%)</span></span>
+              </div>
+              <div class="progress-bar progress-bar-lg"><div class="progress-fill warning" style="width:77%;"></div></div>
+            </div>
+            <div style="display:flex;gap:0.5rem;margin-top:0.85rem;">
+              <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="showToast('Perfil RHP aberto','info')"><i class="fa-solid fa-eye"></i> Ver perfil</button>
+              <button class="btn btn-primary btn-sm" style="flex:1;" onclick="showToast('Nova ficha para RHP','success')"><i class="fa-solid fa-plus"></i> Nova ficha</button>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="client-card">
+            <div class="client-card-header">
+              <div class="avatar avatar-lg avatar-blue" style="border-radius:10px;">HSJ</div>
+              <div class="client-card-info">
+                <div class="client-card-name">Hospital Santa Joana</div>
+                <div class="client-card-type">Hospital Privado — Recife, PE</div>
+                <div style="margin-top:0.3rem;"><span class="badge badge-success"><span class="badge-dot"></span> Contrato Ativo</span></div>
+              </div>
+            </div>
+            <div class="client-card-body">
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-phone"></i> Contato</span><span class="client-stat-value">(81) 3216-8000</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-user-tie"></i> Compras</span><span class="client-stat-value">Eng. Carlos Rocha</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-scissors"></i> Cirurgias/mês</span><span class="client-stat-value">12 proc.</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-chart-line"></i> Volume 2025</span><span class="client-stat-value" style="color:var(--teal-600);">R$ 2,8M</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-calendar-check"></i> Contrato até</span><span class="client-stat-value">30/06/2026</span></div>
+            </div>
+            <div class="credit-bar-wrap">
+              <div class="credit-bar-labels">
+                <span>Limite: <span>R$ 700K</span></span>
+                <span>Usado: <span style="color:var(--success);">R$ 350K (50%)</span></span>
+              </div>
+              <div class="progress-bar progress-bar-lg"><div class="progress-fill" style="width:50%;"></div></div>
+            </div>
+            <div style="display:flex;gap:0.5rem;margin-top:0.85rem;">
+              <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="showToast('Perfil HSJ aberto','info')"><i class="fa-solid fa-eye"></i> Ver perfil</button>
+              <button class="btn btn-primary btn-sm" style="flex:1;" onclick="showToast('Nova ficha para HSJ','success')"><i class="fa-solid fa-plus"></i> Nova ficha</button>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="client-card">
+            <div class="client-card-header">
+              <div class="avatar avatar-lg avatar-purple" style="border-radius:10px;">HME</div>
+              <div class="client-card-info">
+                <div class="client-card-name">Hospital Memorial</div>
+                <div class="client-card-type">Hospital Privado — Caruaru, PE</div>
+                <div style="margin-top:0.3rem;"><span class="badge badge-success"><span class="badge-dot"></span> Contrato Ativo</span></div>
+              </div>
+            </div>
+            <div class="client-card-body">
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-phone"></i> Contato</span><span class="client-stat-value">(81) 2122-5600</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-user-tie"></i> Compras</span><span class="client-stat-value">Sr. Marcos Silva</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-scissors"></i> Cirurgias/mês</span><span class="client-stat-value">9 proc.</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-chart-line"></i> Volume 2025</span><span class="client-stat-value" style="color:var(--teal-600);">R$ 1,9M</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-calendar-check"></i> Contrato até</span><span class="client-stat-value">31/12/2026</span></div>
+            </div>
+            <div class="credit-bar-wrap">
+              <div class="credit-bar-labels">
+                <span>Limite: <span>R$ 500K</span></span>
+                <span>Usado: <span style="color:var(--success);">R$ 180K (36%)</span></span>
+              </div>
+              <div class="progress-bar progress-bar-lg"><div class="progress-fill" style="width:36%;"></div></div>
+            </div>
+            <div style="display:flex;gap:0.5rem;margin-top:0.85rem;">
+              <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="showToast('Perfil Memorial aberto','info')"><i class="fa-solid fa-eye"></i> Ver perfil</button>
+              <button class="btn btn-primary btn-sm" style="flex:1;" onclick="showToast('Nova ficha para Memorial','success')"><i class="fa-solid fa-plus"></i> Nova ficha</button>
+            </div>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="client-card">
+            <div class="client-card-header">
+              <div class="avatar avatar-lg avatar-orange" style="border-radius:10px;">HES</div>
+              <div class="client-card-info">
+                <div class="client-card-name">Hospital Esperança</div>
+                <div class="client-card-type">Hospital Privado — Recife, PE</div>
+                <div style="margin-top:0.3rem;"><span class="badge badge-warning"><span class="badge-dot"></span> Em Renovação</span></div>
+              </div>
+            </div>
+            <div class="client-card-body">
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-phone"></i> Contato</span><span class="client-stat-value">(81) 3421-0900</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-user-tie"></i> Compras</span><span class="client-stat-value">Sra. Fernanda Paz</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-scissors"></i> Cirurgias/mês</span><span class="client-stat-value">7 proc.</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-chart-line"></i> Volume 2025</span><span class="client-stat-value" style="color:var(--teal-600);">R$ 1,4M</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-calendar-check"></i> Contrato até</span><span class="client-stat-value" style="color:var(--warning);">28/02/2026 ⚠</span></div>
+            </div>
+            <div class="credit-bar-wrap">
+              <div class="credit-bar-labels">
+                <span>Limite: <span>R$ 400K</span></span>
+                <span>Usado: <span style="color:var(--danger);">R$ 332K (83%)</span></span>
+              </div>
+              <div class="progress-bar progress-bar-lg"><div class="progress-fill danger" style="width:83%;"></div></div>
+            </div>
+            <div style="display:flex;gap:0.5rem;margin-top:0.85rem;">
+              <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="showToast('Perfil Esperança aberto','info')"><i class="fa-solid fa-eye"></i> Ver perfil</button>
+              <button class="btn btn-warning btn-sm" style="flex:1;background:var(--warning);color:#fff;" onclick="showToast('Abrindo renovação de contrato','info')"><i class="fa-solid fa-rotate"></i> Renovar</button>
+            </div>
+          </div>
+
+          <!-- Card 5 -->
+          <div class="client-card">
+            <div class="client-card-header">
+              <div class="avatar avatar-lg avatar-emerald" style="border-radius:10px;">IMP</div>
+              <div class="client-card-info">
+                <div class="client-card-name">IMIP — Inst. de Medicina Integral</div>
+                <div class="client-card-type">Hospital Público — Recife, PE</div>
+                <div style="margin-top:0.3rem;"><span class="badge badge-success"><span class="badge-dot"></span> Contrato Ativo</span></div>
+              </div>
+            </div>
+            <div class="client-card-body">
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-phone"></i> Contato</span><span class="client-stat-value">(81) 2122-4600</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-user-tie"></i> Compras</span><span class="client-stat-value">Dr. Henrique Lima</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-scissors"></i> Cirurgias/mês</span><span class="client-stat-value">5 proc.</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-chart-line"></i> Volume 2025</span><span class="client-stat-value" style="color:var(--teal-600);">R$ 980K</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-calendar-check"></i> Contrato até</span><span class="client-stat-value">31/03/2027</span></div>
+            </div>
+            <div class="credit-bar-wrap">
+              <div class="credit-bar-labels">
+                <span>Limite: <span>R$ 350K</span></span>
+                <span>Usado: <span style="color:var(--success);">R$ 140K (40%)</span></span>
+              </div>
+              <div class="progress-bar progress-bar-lg"><div class="progress-fill" style="width:40%;"></div></div>
+            </div>
+            <div style="display:flex;gap:0.5rem;margin-top:0.85rem;">
+              <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="showToast('Perfil IMIP aberto','info')"><i class="fa-solid fa-eye"></i> Ver perfil</button>
+              <button class="btn btn-primary btn-sm" style="flex:1;" onclick="showToast('Nova ficha para IMIP','success')"><i class="fa-solid fa-plus"></i> Nova ficha</button>
+            </div>
+          </div>
+
+          <!-- Card 6 -->
+          <div class="client-card">
+            <div class="client-card-header">
+              <div class="avatar avatar-lg avatar-pink" style="border-radius:10px;">COP</div>
+              <div class="client-card-info">
+                <div class="client-card-name">Clínica Ortopédica PE</div>
+                <div class="client-card-type">Clínica Especializada — Olinda, PE</div>
+                <div style="margin-top:0.3rem;"><span class="badge badge-gray"><span class="badge-dot"></span> Sem Contrato</span></div>
+              </div>
+            </div>
+            <div class="client-card-body">
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-phone"></i> Contato</span><span class="client-stat-value">(81) 3492-0011</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-user-tie"></i> Compras</span><span class="client-stat-value">Dr. Renato Feitosa</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-scissors"></i> Cirurgias/mês</span><span class="client-stat-value">3 proc.</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-chart-line"></i> Volume 2025</span><span class="client-stat-value" style="color:var(--teal-600);">R$ 420K</span></div>
+              <div class="client-stat"><span class="client-stat-label"><i class="fa-solid fa-calendar-check"></i> Contrato até</span><span class="client-stat-value" style="color:var(--text-muted);">—</span></div>
+            </div>
+            <div class="credit-bar-wrap">
+              <div class="credit-bar-labels">
+                <span>Limite: <span>R$ 150K</span></span>
+                <span>Usado: <span style="color:var(--success);">R$ 77K (51%)</span></span>
+              </div>
+              <div class="progress-bar progress-bar-lg"><div class="progress-fill" style="width:51%;"></div></div>
+            </div>
+            <div style="display:flex;gap:0.5rem;margin-top:0.85rem;">
+              <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="showToast('Perfil Clínica aberto','info')"><i class="fa-solid fa-eye"></i> Ver perfil</button>
+              <button class="btn btn-primary btn-sm" style="flex:1;" onclick="showToast('Proposta de contrato gerada','success')"><i class="fa-solid fa-file-contract"></i> Proposta</button>
+            </div>
+          </div>
+        </div>
+      </div><!-- /clientes -->
+
+      <!-- ==================== RELATÓRIOS ==================== -->
+      <div class="screen" id="screen-relatorios">
+        <div class="page-header">
+          <div class="page-header-left">
+            <div class="breadcrumb"><i class="fa-solid fa-house"></i> &rsaquo; <span>Relatórios</span></div>
+            <h1>Central de Relatórios</h1>
+            <p>Análises gerenciais, lucratividade e performance comercial SkyMed</p>
+          </div>
+          <div class="page-header-actions">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('Gerando PDF...','info')"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+            <button class="btn btn-secondary btn-sm" onclick="showToast('Exportando Excel...','info')"><i class="fa-solid fa-file-excel"></i> Excel</button>
+            <button class="btn btn-primary btn-sm" onclick="showToast('Relatório personalizado','success')"><i class="fa-solid fa-wand-magic-sparkles"></i> Personalizar</button>
+          </div>
+        </div>
+
+        <!-- PERÍODO FILTER -->
+        <div class="filter-bar" style="margin-bottom:1.5rem;">
+          <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.84rem;font-weight:600;color:var(--text-secondary);">
+            <i class="fa-solid fa-calendar-range"></i> Período:
+          </div>
+          <select class="filter-select">
+            <option>Fevereiro 2026</option>
+            <option>Janeiro 2026</option>
+            <option>Dezembro 2025</option>
+            <option>Novembro 2025</option>
+            <option>Q4 2025</option>
+            <option>Ano 2025</option>
+          </select>
+          <select class="filter-select">
+            <option>Todos os hospitais</option>
+            <option>Real Hospital Português</option>
+            <option>Hospital Santa Joana</option>
+            <option>Hospital Memorial</option>
+          </select>
+          <select class="filter-select">
+            <option>Todas as categorias</option>
+            <option>Coluna Vertebral</option>
+            <option>Joelho</option>
+            <option>Quadril</option>
+            <option>Trauma</option>
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="showToast('Relatório atualizado','success')"><i class="fa-solid fa-rotate"></i> Atualizar</button>
+        </div>
+
+        <!-- MÉTRICAS PRINCIPAIS -->
+        <div class="grid grid-4" style="margin-bottom:1.5rem;">
+          <div class="report-metric">
+            <div class="metric-value" style="color:var(--teal-600);">R$ 14,1M</div>
+            <div class="metric-label">Faturamento 12 meses</div>
+            <div class="metric-change up"><i class="fa-solid fa-arrow-up"></i> +18,4% vs. 2024</div>
+          </div>
+          <div class="report-metric">
+            <div class="metric-value" style="color:var(--success);">34,7%</div>
+            <div class="metric-label">Margem Bruta Média</div>
+            <div class="metric-change up"><i class="fa-solid fa-arrow-up"></i> +2,1pp</div>
+          </div>
+          <div class="report-metric">
+            <div class="metric-value" style="color:var(--info);">512</div>
+            <div class="metric-label">Cirurgias no Período</div>
+            <div class="metric-change up"><i class="fa-solid fa-arrow-up"></i> +67 vs. 2024</div>
+          </div>
+          <div class="report-metric">
+            <div class="metric-value" style="color:var(--purple);">R$ 27.500</div>
+            <div class="metric-label">Ticket Médio</div>
+            <div class="metric-change up"><i class="fa-solid fa-arrow-up"></i> +4,2%</div>
+          </div>
+        </div>
+
+        <!-- CHARTS ROW -->
+        <div class="grid grid-2" style="margin-bottom:1.25rem;">
+          <!-- Vendas por Hospital -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title"><div class="card-title-icon"><i class="fa-solid fa-chart-bar"></i></div> Vendas por Hospital — 2025</div>
+                <div class="card-subtitle">Faturamento acumulado por cliente</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="horiz-chart-item">
+                <div class="horiz-chart-label">Real Hospital Português</div>
+                <div class="horiz-chart-bar-wrap"><div class="horiz-chart-fill" style="width:100%">R$ 3,2M</div></div>
+                <div class="horiz-chart-value">29%</div>
+              </div>
+              <div class="horiz-chart-item">
+                <div class="horiz-chart-label">Hospital Santa Joana</div>
+                <div class="horiz-chart-bar-wrap"><div class="horiz-chart-fill" style="width:87%">R$ 2,8M</div></div>
+                <div class="horiz-chart-value">25%</div>
+              </div>
+              <div class="horiz-chart-item">
+                <div class="horiz-chart-label">Hospital Memorial</div>
+                <div class="horiz-chart-bar-wrap"><div class="horiz-chart-fill" style="width:59%">R$ 1,9M</div></div>
+                <div class="horiz-chart-value">17%</div>
+              </div>
+              <div class="horiz-chart-item">
+                <div class="horiz-chart-label">Hospital Esperança</div>
+                <div class="horiz-chart-bar-wrap"><div class="horiz-chart-fill" style="width:44%">R$ 1,4M</div></div>
+                <div class="horiz-chart-value">13%</div>
+              </div>
+              <div class="horiz-chart-item">
+                <div class="horiz-chart-label">IMIP</div>
+                <div class="horiz-chart-bar-wrap"><div class="horiz-chart-fill" style="width:31%">R$ 980K</div></div>
+                <div class="horiz-chart-value">9%</div>
+              </div>
+              <div class="horiz-chart-item">
+                <div class="horiz-chart-label">Demais clientes</div>
+                <div class="horiz-chart-bar-wrap"><div class="horiz-chart-fill" style="width:23%">R$ 750K</div></div>
+                <div class="horiz-chart-value">7%</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Vendas por Categoria -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title"><div class="card-title-icon"><i class="fa-solid fa-chart-pie"></i></div> Mix de Produtos — 2025</div>
+                <div class="card-subtitle">Distribuição de receita por categoria</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div style="display:flex;flex-direction:column;gap:1rem;">
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:0.4rem;">
+                    <span style="font-weight:600;color:var(--teal-700);"><i class="fa-solid fa-bone"></i> Coluna Vertebral</span>
+                    <span style="font-weight:700;">R$ 4,9M — 43%</span>
+                  </div>
+                  <div class="progress-bar progress-bar-xl"><div class="progress-fill" style="width:100%;"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:0.4rem;">
+                    <span style="font-weight:600;color:#2563eb;"><i class="fa-solid fa-person-running"></i> Joelho</span>
+                    <span style="font-weight:700;">R$ 3,1M — 28%</span>
+                  </div>
+                  <div class="progress-bar progress-bar-xl"><div class="progress-fill info" style="width:65%;"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:0.4rem;">
+                    <span style="font-weight:600;color:#7c3aed;">Quadril</span>
+                    <span style="font-weight:700;">R$ 1,9M — 17%</span>
+                  </div>
+                  <div class="progress-bar progress-bar-xl"><div class="progress-fill purple" style="width:40%;"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:0.4rem;">
+                    <span style="font-weight:600;color:#ea580c;">Trauma / Fraturas</span>
+                    <span style="font-weight:700;">R$ 1,4M — 12%</span>
+                  </div>
+                  <div class="progress-bar progress-bar-xl"><div class="progress-fill" style="width:28%;background:var(--warning);"></div></div>
+                </div>
+              </div>
+              <div style="margin-top:1rem;padding:0.75rem;background:var(--bg-main);border-radius:8px;font-size:0.8rem;">
+                <div style="font-weight:700;color:var(--text-primary);margin-bottom:0.3rem;">💡 Insight</div>
+                <div style="color:var(--text-secondary);">Categoria Coluna cresceu 24% vs. 2024, impulsionada por Dr. Cavalcanti (Real HP e Santa Joana). Recomenda-se ampliar estoque de parafusos pediculares.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LUCRATIVIDADE + TOP PRODUTOS -->
+        <div class="grid grid-2" style="margin-bottom:1.25rem;">
+          <!-- Lucratividade por Categoria -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title"><div class="card-title-icon" style="background:#dcfce7;color:#15803d;"><i class="fa-solid fa-sack-dollar"></i></div> Análise de Lucratividade</div>
+                <div class="card-subtitle">Margem por categoria — Fev/2026</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr><th>Categoria</th><th>Receita</th><th>Custo</th><th>Margem Bruta</th><th>%</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><div class="td-strong" style="display:flex;align-items:center;gap:0.4rem;"><div class="mini-stat-dot" style="background:var(--teal-500);"></div> Coluna</div></td>
+                      <td class="td-strong">R$ 536.900</td>
+                      <td class="td-muted">R$ 337.100</td>
+                      <td style="color:var(--success);font-weight:700;">R$ 199.800</td>
+                      <td><span class="badge badge-success">37,2%</span></td>
+                    </tr>
+                    <tr>
+                      <td><div class="td-strong" style="display:flex;align-items:center;gap:0.4rem;"><div class="mini-stat-dot" style="background:#3b82f6;"></div> Joelho</div></td>
+                      <td class="td-strong">R$ 349.400</td>
+                      <td class="td-muted">R$ 231.000</td>
+                      <td style="color:var(--success);font-weight:700;">R$ 118.400</td>
+                      <td><span class="badge badge-success">33,9%</span></td>
+                    </tr>
+                    <tr>
+                      <td><div class="td-strong" style="display:flex;align-items:center;gap:0.4rem;"><div class="mini-stat-dot" style="background:#8b5cf6;"></div> Quadril</div></td>
+                      <td class="td-strong">R$ 212.100</td>
+                      <td class="td-muted">R$ 143.700</td>
+                      <td style="color:var(--success);font-weight:700;">R$ 68.400</td>
+                      <td><span class="badge badge-success">32,2%</span></td>
+                    </tr>
+                    <tr>
+                      <td><div class="td-strong" style="display:flex;align-items:center;gap:0.4rem;"><div class="mini-stat-dot" style="background:#f59e0b;"></div> Trauma</div></td>
+                      <td class="td-strong">R$ 149.490</td>
+                      <td class="td-muted">R$ 107.600</td>
+                      <td style="color:var(--warning);font-weight:700;">R$ 41.890</td>
+                      <td><span class="badge badge-warning">28,0%</span></td>
+                    </tr>
+                    <tr style="background:var(--teal-50);">
+                      <td><div class="td-strong" style="color:var(--teal-700);">TOTAL</div></td>
+                      <td style="font-weight:800;color:var(--teal-700);">R$ 1.247.890</td>
+                      <td class="td-muted">R$ 819.400</td>
+                      <td style="color:var(--teal-700);font-weight:800;">R$ 428.490</td>
+                      <td><span class="badge badge-teal" style="font-size:0.8rem;">34,3%</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top Produtos -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title"><div class="card-title-icon"><i class="fa-solid fa-trophy"></i></div> Top 10 Produtos — Fev/2026</div>
+                <div class="card-subtitle">Por receita gerada</div>
+              </div>
+            </div>
+            <div class="card-body" style="padding-top:0.5rem;padding-bottom:0.5rem;">
+              <div class="perf-item">
+                <div class="perf-rank gold">1</div>
+                <div class="perf-info"><div class="perf-name">Kit Fusão Vertebral L4-L5</div><div class="perf-sub">Coluna — 6 cirurgias</div></div>
+                <div><div class="perf-value">R$ 87.500</div><div class="perf-change up">Margem 38%</div></div>
+              </div>
+              <div class="perf-item">
+                <div class="perf-rank silver">2</div>
+                <div class="perf-info"><div class="perf-name">Prótese Revisão Joelho NRG+</div><div class="perf-sub">Joelho — 3 cirurgias</div></div>
+                <div><div class="perf-value">R$ 98.700</div><div class="perf-change up">Margem 41%</div></div>
+              </div>
+              <div class="perf-item">
+                <div class="perf-rank bronze">3</div>
+                <div class="perf-info"><div class="perf-name">Kit Discectomia Cervical</div><div class="perf-sub">Coluna — 4 cirurgias</div></div>
+                <div><div class="perf-value">R$ 63.200</div><div class="perf-change up">Margem 36%</div></div>
+              </div>
+              <div class="perf-item">
+                <div class="perf-rank">4</div>
+                <div class="perf-info"><div class="perf-name">Prótese Total Quadril Bimet.</div><div class="perf-sub">Quadril — 3 cirurgias</div></div>
+                <div><div class="perf-value">R$ 55.700</div><div class="perf-change up">Margem 34%</div></div>
+              </div>
+              <div class="perf-item">
+                <div class="perf-rank">5</div>
+                <div class="perf-info"><div class="perf-name">Artroplastia Total Joelho Sigma</div><div class="perf-sub">Joelho — 4 cirurgias</div></div>
+                <div><div class="perf-value">R$ 42.800</div><div class="perf-change up">Margem 33%</div></div>
+              </div>
+              <div class="perf-item">
+                <div class="perf-rank">6</div>
+                <div class="perf-info"><div class="perf-name">Osteossíntese Fêmur Haste</div><div class="perf-sub">Trauma — 5 cirurgias</div></div>
+                <div><div class="perf-value">R$ 28.300</div><div class="perf-change up">Margem 28%</div></div>
+              </div>
+              <div class="perf-item">
+                <div class="perf-rank">7</div>
+                <div class="perf-info"><div class="perf-name">Kit Artroscopia Joelho</div><div class="perf-sub">Joelho — 8 cirurgias</div></div>
+                <div><div class="perf-value">R$ 22.400</div><div class="perf-change up">Margem 42%</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- EVOLUÇÃO MENSAL TABELA -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title"><div class="card-title-icon"><i class="fa-solid fa-table"></i></div> Evolução Mensal de Resultados — 2025 e 2026</div>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="showToast('Exportando tabela...','info')"><i class="fa-solid fa-file-excel"></i> Excel</button>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Mês</th><th>Cirurgias</th><th>Faturamento</th><th>Custo</th><th>Margem Bruta</th><th>% Margem</th><th>NF-e</th><th>Inadimpl.</th><th>vs. Anterior</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><div class="td-strong">Fev/2026</div><div class="td-muted">atual</div></td>
+                  <td><span class="badge badge-teal">47</span></td>
+                  <td class="td-strong">R$ 1.247.890</td>
+                  <td class="td-muted">R$ 819.400</td>
+                  <td style="color:var(--success);font-weight:700;">R$ 428.490</td>
+                  <td><span class="badge badge-success">34,3%</span></td>
+                  <td>38</td>
+                  <td style="color:var(--warning);font-weight:600;">R$ 87.200</td>
+                  <td><span style="color:var(--success);font-weight:700;font-size:0.8rem;"><i class="fa-solid fa-arrow-up"></i> +12,4%</span></td>
+                </tr>
+                <tr>
+                  <td class="td-strong">Jan/2026</td>
+                  <td>39</td>
+                  <td class="td-strong">R$ 1.109.400</td>
+                  <td class="td-muted">R$ 743.600</td>
+                  <td style="color:var(--success);font-weight:700;">R$ 365.800</td>
+                  <td><span class="badge badge-success">33,0%</span></td>
+                  <td>32</td>
+                  <td style="color:var(--success);">R$ 42.100</td>
+                  <td><span style="color:var(--success);font-size:0.8rem;"><i class="fa-solid fa-arrow-up"></i> +7,2%</span></td>
+                </tr>
+                <tr>
+                  <td class="td-strong">Dez/2025</td>
+                  <td>45</td>
+                  <td class="td-strong">R$ 1.234.700</td>
+                  <td class="td-muted">R$ 831.900</td>
+                  <td style="color:var(--success);font-weight:700;">R$ 402.800</td>
+                  <td><span class="badge badge-success">32,6%</span></td>
+                  <td>41</td>
+                  <td style="color:var(--success);">R$ 18.400</td>
+                  <td><span style="color:var(--success);font-size:0.8rem;"><i class="fa-solid fa-arrow-up"></i> +8,1%</span></td>
+                </tr>
+                <tr>
+                  <td class="td-strong">Nov/2025</td>
+                  <td>42</td>
+                  <td class="td-strong">R$ 1.141.200</td>
+                  <td class="td-muted">R$ 781.400</td>
+                  <td style="color:var(--success);font-weight:700;">R$ 359.800</td>
+                  <td><span class="badge badge-success">31,5%</span></td>
+                  <td>37</td>
+                  <td style="color:var(--warning);">R$ 55.300</td>
+                  <td><span style="color:var(--success);font-size:0.8rem;"><i class="fa-solid fa-arrow-up"></i> +4,3%</span></td>
+                </tr>
+                <tr>
+                  <td class="td-strong">Out/2025</td>
+                  <td>38</td>
+                  <td class="td-strong">R$ 1.094.500</td>
+                  <td class="td-muted">R$ 756.200</td>
+                  <td style="color:var(--success);font-weight:700;">R$ 338.300</td>
+                  <td><span class="badge badge-success">30,9%</span></td>
+                  <td>35</td>
+                  <td style="color:var(--success);">R$ 21.200</td>
+                  <td><span style="color:var(--success);font-size:0.8rem;"><i class="fa-solid fa-arrow-up"></i> +6,7%</span></td>
+                </tr>
+                <tr>
+                  <td class="td-strong">Set/2025</td>
+                  <td>36</td>
+                  <td class="td-strong">R$ 1.025.800</td>
+                  <td class="td-muted">R$ 714.900</td>
+                  <td style="color:var(--success);font-weight:700;">R$ 310.900</td>
+                  <td><span class="badge badge-warning">30,3%</span></td>
+                  <td>31</td>
+                  <td style="color:var(--success);">R$ 12.000</td>
+                  <td><span style="color:var(--success);font-size:0.8rem;"><i class="fa-solid fa-arrow-up"></i> +13,2%</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card-footer">
+            <span style="font-size:0.75rem;color:var(--text-muted);">Total acumulado 6 meses: R$ 6.853.490 — Meta 2026: R$ 15M</span>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <span style="font-size:0.78rem;color:var(--text-secondary);">Progresso meta anual:</span>
+              <div class="progress-bar" style="width:120px;height:8px;">
+                <div class="progress-fill" style="width:46%;"></div>
+              </div>
+              <span style="font-size:0.78rem;font-weight:700;color:var(--teal-600);">46%</span>
+            </div>
+          </div>
+        </div>
+      </div><!-- /relatorios -->
+
+    </div><!-- /page-content -->
+  </div><!-- /main-content -->
+</div><!-- /app-layout -->
+
+<!-- ===== TOAST NOTIFICATION ===== -->
+<div id="toast-container" style="position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:0.5rem;"></div>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+  // ---- Navigation ----
+  function navigate(screen, navEl) {
+    // Update screens
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById('screen-' + screen);
+    if (target) target.classList.add('active');
+
+    // Update nav items
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    if (navEl) {
+      navEl.classList.add('active');
+    } else {
+      // Find nav item by screen name
+      document.querySelectorAll('.nav-item').forEach(n => {
+        if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + screen + "'")) {
+          n.classList.add('active');
+        }
+      });
+    }
+
+    // Update topbar title
+    const titles = {
+      dashboard: 'Dashboard <span>/ Visão Geral</span>',
+      cirurgias: 'Fichas Cirúrgicas <span>/ Procedimentos OPME</span>',
+      estoque: 'Estoque <span>/ Implantes Ortopédicos</span>',
+      financeiro: 'Financeiro <span>/ Contas e NF-e</span>',
+      clientes: 'Clientes <span>/ Hospitais e Clínicas</span>',
+      relatorios: 'Relatórios <span>/ Análises Gerenciais</span>'
+    };
+    const tb = document.getElementById('topbar-title');
+    if (tb && titles[screen]) tb.innerHTML = titles[screen];
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ---- Tabs ----
+  function setTab(el, tabId) {
+    const parent = el.closest('.tabs');
+    if (!parent) return;
+    parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    showToast('Filtrando por: ' + el.textContent.trim().split('\n')[0], 'info');
+  }
+
+  // ---- Toast ----
+  function showToast(msg, type) {
+    type = type || 'info';
+    const colors = {
+      success: { bg: '#dcfce7', border: '#86efac', text: '#15803d', icon: 'fa-circle-check' },
+      danger:  { bg: '#fee2e2', border: '#fca5a5', text: '#b91c1c', icon: 'fa-circle-xmark' },
+      warning: { bg: '#fff7ed', border: '#fed7aa', text: '#c2410c', icon: 'fa-triangle-exclamation' },
+      info:    { bg: '#dbeafe', border: '#93c5fd', text: '#1d4ed8', icon: 'fa-circle-info' }
+    };
+    const c = colors[type] || colors.info;
+    const id = 'toast-' + Date.now();
+    const container = document.getElementById('toast-container');
+
+    const toast = document.createElement('div');
+    toast.id = id;
+    toast.style.cssText = [
+      'display:flex', 'align-items:center', 'gap:0.6rem',
+      'padding:0.75rem 1.1rem',
+      'background:' + c.bg,
+      'border:1px solid ' + c.border,
+      'color:' + c.text,
+      'border-radius:8px',
+      'font-size:0.82rem',
+      'font-weight:600',
+      'max-width:320px',
+      'box-shadow:0 8px 24px rgba(0,0,0,0.12)',
+      'animation:slideIn 0.25s ease',
+      'font-family:Inter,sans-serif',
+      'cursor:pointer'
+    ].join(';');
+
+    toast.innerHTML = '<i class="fa-solid ' + c.icon + '" style="font-size:0.9rem;flex-shrink:0;"></i><span>' + msg + '</span>';
+    toast.onclick = () => removeToast(id);
+    container.appendChild(toast);
+
+    setTimeout(() => removeToast(id), 3500);
+  }
+
+  function removeToast(id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.animation = 'fadeOut 0.2s ease forwards';
+      setTimeout(() => el.remove(), 200);
+    }
+  }
+
+  // ---- Date ----
+  function updateDate() {
+    const now = new Date();
+    const opts = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
+    const dateStr = now.toLocaleDateString('pt-BR', opts);
+    const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const el = document.getElementById('topbar-date');
+    if (el) el.textContent = dateStr + ' — ' + timeStr;
+  }
+  updateDate();
+  setInterval(updateDate, 1000);
+
+  // ---- CSS Animations for toast ----
+  const styleEl = document.createElement('style');
+  styleEl.textContent = `
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; transform: translateX(0); }
+      to { opacity: 0; transform: translateX(20px); }
+    }
+  `;
+  document.head.appendChild(styleEl);
+
+  // ---- Progress bars animate on load ----
+  window.addEventListener('DOMContentLoaded', () => {
+    // Add micro-interactions to KPI cards
+    document.querySelectorAll('.kpi-card').forEach(card => {
+      card.addEventListener('click', () => {
+        showToast('Carregando detalhes...', 'info');
+      });
+    });
+
+    // Animate progress bars
+    setTimeout(() => {
+      document.querySelectorAll('.progress-fill').forEach(bar => {
+        const w = bar.style.width;
+        bar.style.width = '0%';
+        setTimeout(() => { bar.style.width = w; }, 50);
+      });
+    }, 100);
+
+    // Animate chart bars
+    setTimeout(() => {
+      document.querySelectorAll('.chart-bar, .horiz-chart-fill, .cf-bar').forEach(bar => {
+        bar.style.transition = 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      });
+    }, 200);
+  });
+
+  // ---- Show welcome toast ----
+  setTimeout(() => {
+    showToast('Bem-vindo ao SkyMed ERP v3.2.1 — Sistema carregado ✓', 'success');
+  }, 800);
+  setTimeout(() => {
+    showToast('3 alertas pendentes aguardam sua atenção', 'warning');
+  }, 2000);
+
+  // ---- Keyboard shortcuts ----
+  document.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey) {
+      if (e.key === '1') { e.preventDefault(); navigate('dashboard'); }
+      if (e.key === '2') { e.preventDefault(); navigate('cirurgias'); }
+      if (e.key === '3') { e.preventDefault(); navigate('estoque'); }
+      if (e.key === '4') { e.preventDefault(); navigate('financeiro'); }
+      if (e.key === '5') { e.preventDefault(); navigate('clientes'); }
+      if (e.key === '6') { e.preventDefault(); navigate('relatorios'); }
+    }
+  });
+
+  // ---- Stock simulation (fake real-time) ----
+  let alertCount = 8;
+  setInterval(() => {
+    // Simulate live data pulse
+    const dots = document.querySelectorAll('.user-status');
+    dots.forEach(d => {
+      d.style.opacity = d.style.opacity === '0.4' ? '1' : '0.4';
+    });
+  }, 1500);
+
+  // ---- Search box focus ----
+  document.querySelectorAll('.search-box input').forEach(input => {
+    input.addEventListener('focus', () => {
+      input.closest('.search-box').style.borderColor = 'var(--teal-400)';
+      input.closest('.search-box').style.boxShadow = '0 0 0 3px rgba(13,148,136,0.08)';
+    });
+    input.addEventListener('blur', () => {
+      input.closest('.search-box').style.borderColor = '';
+      input.closest('.search-box').style.boxShadow = '';
+    });
+  });
+
+  // ---- Filter selects ----
+  document.querySelectorAll('.filter-select').forEach(sel => {
+    sel.addEventListener('change', () => {
+      showToast('Filtro aplicado: ' + sel.value, 'info');
+    });
+  });
+
+  // ---- Sidebar mobile toggle ----
+  function toggleSidebar() {
+    const s = document.getElementById('sidebar');
+    s.classList.toggle('open');
+  }
+
+  // ---- Client card hover ripple ----
+  document.querySelectorAll('.client-card, .kpi-card').forEach(card => {
+    card.style.cursor = 'default';
+  });
+
+  // ---- OFX drop zone ----
+  const ofxPanels = document.querySelectorAll('.ofx-panel');
+  ofxPanels.forEach(panel => {
+    panel.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      panel.style.borderColor = 'var(--teal-500)';
+      panel.style.background = 'var(--teal-50)';
+    });
+    panel.addEventListener('dragleave', () => {
+      panel.style.borderColor = '';
+      panel.style.background = '';
+    });
+    panel.addEventListener('drop', (e) => {
+      e.preventDefault();
+      panel.style.borderColor = '';
+      panel.style.background = '';
+      showToast('Arquivo OFX recebido — processando...', 'success');
+    });
+  });
+
+  // ---- Format currency helper ----
+  function formatCurrency(val) {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+  }
+
+  // ---- Simulated sync ----
+  let syncInterval = setInterval(() => {
+    const now = new Date();
+    const mins = now.getMinutes();
+    if (mins % 5 === 0 && now.getSeconds() < 2) {
+      showToast('Sincronização automática concluída — ' + now.toLocaleTimeString('pt-BR'), 'success');
+    }
+  }, 2000);
+
+  // ---- Table row click ----
+  document.querySelectorAll('tbody tr').forEach(row => {
+    row.style.cursor = 'pointer';
+  });
+
+  // ---- Handle responsive sidebar ----
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) {
+      document.getElementById('sidebar').classList.remove('open');
+    }
+  });
+
+  console.log('%c SkyMed ERP v3.2.1 ', 'background:#0d9488;color:#fff;padding:4px 8px;border-radius:4px;font-weight:bold;');
+  console.log('%c Sistema ERP para Distribuidora de Materiais Médicos Ortopédicos OPME', 'color:#0d9488;');
+  console.log('%c Desenvolvido por Rafael Siqueira — SkyMed Distribuidora Ltda.', 'color:#64748b;font-size:0.85em;');
+</script>
+</body>
+</html>
