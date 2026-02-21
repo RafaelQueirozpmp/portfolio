@@ -3,33 +3,51 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Portfolio — Rafael Queiroz</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>Portfolio — Rafael Queiroz | Software Architect</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Inter',sans-serif;background:#FAFAFA;color:#1a1a2e}
-.container{max-width:1100px;margin:0 auto;padding:40px 24px}
-.hero{text-align:center;padding:60px 0 40px}
-.hero h1{font-size:2.4rem;font-weight:800;margin-bottom:12px}
-.hero p{font-size:1.1rem;color:#666;max-width:600px;margin:0 auto}
+.container{max-width:1200px;margin:0 auto;padding:40px 24px}
+.hero{text-align:center;padding:60px 0 20px}
+.hero h1{font-family:'Playfair Display',serif;font-size:2.6rem;font-weight:700;margin-bottom:12px}
+.hero p{font-size:1.1rem;color:#666;max-width:650px;margin:0 auto;line-height:1.6}
 .badge{display:inline-block;background:#E8F5E9;color:#2E7D32;padding:4px 14px;border-radius:20px;font-size:.8rem;font-weight:600;margin-bottom:20px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:24px;margin-top:40px}
-.card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.06);transition:transform .2s,box-shadow .2s}
+.stats{display:flex;gap:40px;justify-content:center;margin:30px 0;flex-wrap:wrap}
+.stat{text-align:center}
+.stat strong{display:block;font-size:1.8rem;font-weight:800;color:#1a1a2e}
+.stat span{font-size:.8rem;color:#888}
+.section-title{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;margin:50px 0 8px;padding-bottom:8px;border-bottom:2px solid #E0E0E0}
+.section-subtitle{font-size:.9rem;color:#888;margin-bottom:24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:24px;margin-top:16px}
+.card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.06);transition:transform .2s,box-shadow .2s;position:relative}
 .card:hover{transform:translateY(-4px);box-shadow:0 8px 30px rgba(0,0,0,.1)}
-.card-img{width:100%;height:200px;object-fit:cover;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:3rem}
+.card-img{width:100%;height:200px;object-fit:cover;display:flex;align-items:center;justify-content:center;font-size:3rem}
+.card-img.dark{background:#0D1117;color:#58A6FF}
+.card-img.blue{background:linear-gradient(135deg,#1B2A4A,#2d4a7a);color:#C9A96E}
+.card-img.green{background:linear-gradient(135deg,#0F766E,#14B8A6);color:#fff}
+.card-img.purple{background:linear-gradient(135deg,#7C3AED,#A78BFA);color:#fff}
+.card-img.orange{background:linear-gradient(135deg,#1A1A2E,#FF6B35);color:#FF6B35}
+.card-img.teal{background:linear-gradient(135deg,#2563EB,#3B82F6);color:#fff}
+.card-img.whatsapp{background:linear-gradient(135deg,#1E293B,#25D366);color:#25D366}
+.card-img.pink{background:linear-gradient(135deg,#D4A0A0,#C4787A);color:#fff}
+.card-img.skymed{background:linear-gradient(135deg,#1565C0,#0D47A1);color:#fff}
+.card-img.thulep{background:linear-gradient(135deg,#004D40,#00897B);color:#fff}
 .card-body{padding:20px}
 .card-body h3{font-size:1.15rem;font-weight:700;margin-bottom:6px}
 .card-body p{font-size:.9rem;color:#666;margin-bottom:14px;line-height:1.5}
 .card-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
 .tag{background:#f0f0f0;color:#555;padding:3px 10px;border-radius:12px;font-size:.75rem;font-weight:500}
+.badge-live{position:absolute;top:12px;right:12px;background:#2E7D32;color:#fff;padding:3px 10px;border-radius:12px;font-size:.7rem;font-weight:600;letter-spacing:.5px}
+.badge-demo{position:absolute;top:12px;right:12px;background:#1a1a2e;color:#fff;padding:3px 10px;border-radius:12px;font-size:.7rem;font-weight:600;letter-spacing:.5px}
 .btn{display:inline-block;padding:10px 20px;background:#1a1a2e;color:#fff;border-radius:10px;text-decoration:none;font-size:.85rem;font-weight:600;transition:background .2s}
 .btn:hover{background:#2d2d4e}
-.stats{display:flex;gap:40px;justify-content:center;margin:30px 0;flex-wrap:wrap}
-.stat{text-align:center}
-.stat strong{display:block;font-size:1.8rem;font-weight:800;color:#1a1a2e}
-.stat span{font-size:.8rem;color:#888}
+.btn-outline{background:transparent;color:#1a1a2e;border:2px solid #1a1a2e}
+.btn-outline:hover{background:#1a1a2e;color:#fff}
 footer{text-align:center;padding:40px 0 20px;color:#999;font-size:.8rem}
-@media(max-width:768px){.hero h1{font-size:1.8rem}.grid{grid-template-columns:1fr}}
+footer a{color:#666;text-decoration:none}
+@media(max-width:768px){.hero h1{font-size:1.8rem}.grid{grid-template-columns:1fr}.stats{gap:24px}}
 </style>
 </head>
 <body>
@@ -37,61 +55,182 @@ footer{text-align:center;padding:40px 0 20px;color:#999;font-size:.8rem}
   <div class="hero">
     <span class="badge">✨ Portfolio Interativo</span>
     <h1>Rafael Queiroz</h1>
-    <p>Software Architect & Full-Stack Developer. Protótipos e projetos reais — navegue e explore.</p>
+    <p>Software Architect & Full-Stack Developer com +20 anos de experiência. MBA em Gerenciamento de Projetos (FGV), PMP®, CPA-20 ANBIMA. Especialista em SaaS, automação e sistemas de gestão.</p>
     <div class="stats">
-      <div class="stat"><strong>10+</strong><span>Anos experiência</span></div>
+      <div class="stat"><strong>20+</strong><span>Anos experiência</span></div>
       <div class="stat"><strong>50+</strong><span>Projetos entregues</span></div>
       <div class="stat"><strong>PMP®</strong><span>Certificado</span></div>
+      <div class="stat"><strong>MBA</strong><span>FGV</span></div>
     </div>
   </div>
 
+  <!-- PRODUÇÃO -->
+  <h2 class="section-title"><i class="fas fa-globe"></i> Em Produção</h2>
+  <p class="section-subtitle">Sites e sistemas ativos, rodando em produção real</p>
   <div class="grid">
     <div class="card">
-      <div class="card-img">🔮</div>
-      <div class="card-body">
-        <h3>MysticConnect</h3>
-        <p>Plataforma de assinatura para consultores espirituais. Vitrine digital com busca, perfis, dashboard e planos recorrentes.</p>
-        <div class="card-tags">
-          <span class="tag">HTML/CSS/JS</span>
-          <span class="tag">Responsivo</span>
-          <span class="tag">SaaS</span>
-          <span class="tag">UX/UI</span>
-        </div>
-        <a href="mysticconnect/" class="btn">Ver demo →</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-img">🏥</div>
+      <span class="badge-live">🟢 LIVE</span>
+      <div class="card-img thulep"><i class="fas fa-procedures fa-3x"></i></div>
       <div class="card-body">
         <h3>ThuLEP Brasil</h3>
-        <p>Site institucional para clínica de urologia com técnica ThuLEP. Design moderno, informativo e responsivo.</p>
+        <p>Site institucional para procedimento urológico a laser. Design premium, SEO otimizado, tabelas comparativas interativas, busca de profissionais por cidade.</p>
         <div class="card-tags">
-          <span class="tag">Landing Page</span>
-          <span class="tag">Saúde</span>
+          <span class="tag">HTML5/CSS3/JS</span>
           <span class="tag">Responsivo</span>
+          <span class="tag">SEO</span>
+          <span class="tag">Saúde</span>
         </div>
         <a href="https://thulep.com.br" class="btn" target="_blank">Ver site →</a>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-img">💜</div>
+      <span class="badge-live">🟢 LIVE</span>
+      <div class="card-img skymed"><i class="fas fa-heartbeat fa-3x"></i></div>
       <div class="card-body">
-        <h3>Clyna</h3>
-        <p>Plataforma de saúde feminina com landing page e blog integrado. Identidade visual delicada e moderna.</p>
+        <h3>SkyMed Global Import</h3>
+        <p>Site institucional de distribuidora de materiais médicos ortopédicos e próteses. Presença digital corporativa para o setor de OPME.</p>
         <div class="card-tags">
-          <span class="tag">Landing + Blog</span>
-          <span class="tag">Health Tech</span>
+          <span class="tag">Institucional</span>
+          <span class="tag">OPME</span>
+          <span class="tag">Healthcare</span>
           <span class="tag">Responsivo</span>
         </div>
-        <a href="https://clyna.com.br" class="btn" target="_blank">Ver site →</a>
+        <a href="https://skymedbr.com.br" class="btn" target="_blank">Ver site →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEMOS SaaS -->
+  <h2 class="section-title"><i class="fas fa-laptop-code"></i> Demos — Sistemas SaaS</h2>
+  <p class="section-subtitle">Protótipos navegáveis de sistemas completos</p>
+  <div class="grid">
+    <div class="card">
+      <span class="badge-demo">DEMO</span>
+      <div class="card-img blue"><i class="fas fa-balance-scale fa-3x"></i></div>
+      <div class="card-body">
+        <h3>JurisFlow</h3>
+        <p>SaaS de gestão jurídica completo. Dashboard, processos, agenda, financeiro, documentos e planos de assinatura para escritórios de advocacia.</p>
+        <div class="card-tags">
+          <span class="tag">SaaS</span>
+          <span class="tag">Jurídico</span>
+          <span class="tag">Dashboard</span>
+          <span class="tag">Multi-tenant</span>
+        </div>
+        <a href="jurisflow/" class="btn">Ver demo →</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="badge-demo">DEMO</span>
+      <div class="card-img teal"><i class="fas fa-calculator fa-3x"></i></div>
+      <div class="card-body">
+        <h3>ContaFlow</h3>
+        <p>SaaS para escritórios de contabilidade. Gestão de clientes, obrigações fiscais, documentos, honorários e portal do cliente.</p>
+        <div class="card-tags">
+          <span class="tag">SaaS</span>
+          <span class="tag">Contabilidade</span>
+          <span class="tag">Dashboard</span>
+          <span class="tag">Portal</span>
+        </div>
+        <a href="contaflow/" class="btn">Ver demo →</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="badge-demo">DEMO</span>
+      <div class="card-img pink"><i class="fas fa-star fa-3x"></i></div>
+      <div class="card-body">
+        <h3>MysticConnect</h3>
+        <p>Plataforma de assinatura para consultores espirituais. Vitrine digital com busca, perfis, dashboard e planos recorrentes R$20/50/70.</p>
+        <div class="card-tags">
+          <span class="tag">SaaS</span>
+          <span class="tag">Marketplace</span>
+          <span class="tag">Assinaturas</span>
+          <span class="tag">UX/UI</span>
+        </div>
+        <a href="mysticconnect/" class="btn">Ver demo →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEMOS Automação/Tech -->
+  <h2 class="section-title"><i class="fas fa-robot"></i> Demos — Automação & Dashboards</h2>
+  <p class="section-subtitle">Soluções de automação, bots e monitoramento</p>
+  <div class="grid">
+    <div class="card">
+      <span class="badge-demo">DEMO</span>
+      <div class="card-img dark"><i class="fab fa-bitcoin fa-3x"></i></div>
+      <div class="card-body">
+        <h3>CryptoPanel</h3>
+        <p>Dashboard de monitoramento Binance Futures. Posições, P&L, equity curve, alertas e integração com bot Telegram. Dark theme.</p>
+        <div class="card-tags">
+          <span class="tag">Dashboard</span>
+          <span class="tag">Crypto</span>
+          <span class="tag">Chart.js</span>
+          <span class="tag">Bot</span>
+        </div>
+        <a href="cryptopanel/" class="btn">Ver demo →</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="badge-demo">DEMO</span>
+      <div class="card-img whatsapp"><i class="fab fa-whatsapp fa-3x"></i></div>
+      <div class="card-body">
+        <h3>AutoBot Pro</h3>
+        <p>Plataforma de chatbot e automação WhatsApp com IA. Conversas, fluxos visuais, base de conhecimento e integrações multi-canal.</p>
+        <div class="card-tags">
+          <span class="tag">Chatbot</span>
+          <span class="tag">WhatsApp</span>
+          <span class="tag">IA</span>
+          <span class="tag">Automação</span>
+        </div>
+        <a href="autobot/" class="btn">Ver demo →</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="badge-demo">DEMO</span>
+      <div class="card-img orange"><i class="fas fa-project-diagram fa-3x"></i></div>
+      <div class="card-body">
+        <h3>FlowBuilder</h3>
+        <p>Dashboard de automação e integrações estilo N8N/Zapier. Editor visual de workflows, conectores, execuções e monitoramento.</p>
+        <div class="card-tags">
+          <span class="tag">Automação</span>
+          <span class="tag">N8N</span>
+          <span class="tag">Workflows</span>
+          <span class="tag">APIs</span>
+        </div>
+        <a href="flowbuilder/" class="btn">Ver demo →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SITES -->
+  <h2 class="section-title"><i class="fas fa-stethoscope"></i> Demos — Sites Institucionais</h2>
+  <p class="section-subtitle">Templates premium para profissionais de saúde</p>
+  <div class="grid">
+    <div class="card">
+      <span class="badge-demo">DEMO</span>
+      <div class="card-img green"><i class="fas fa-user-md fa-3x"></i></div>
+      <div class="card-body">
+        <h3>MedPremium</h3>
+        <p>Site institucional premium para médicos e clínicas. Hero, especialidades, procedimentos, depoimentos, convênios e formulário de contato.</p>
+        <div class="card-tags">
+          <span class="tag">Landing Page</span>
+          <span class="tag">Saúde</span>
+          <span class="tag">SEO</span>
+          <span class="tag">Responsivo</span>
+        </div>
+        <a href="medpremium/" class="btn">Ver demo →</a>
       </div>
     </div>
   </div>
 
   <footer>
-    © 2026 Rafael Queiroz · Software Architect · PMP® · Full-Stack Developer
+    <p>© 2026 Rafael Queiroz · Software Architect · PMP® · MBA FGV · CPA-20 ANBIMA</p>
+    <p style="margin-top:8px"><a href="https://www.linkedin.com/in/rafaelqueirozpmp" target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a> &nbsp;·&nbsp; <a href="https://github.com/RafaelQueirozpmp" target="_blank"><i class="fab fa-github"></i> GitHub</a></p>
   </footer>
 </div>
 </body>

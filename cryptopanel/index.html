@@ -1,0 +1,3409 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CryptoPanel — Binance Futures Dashboard</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <style>
+    /* ============================================
+       CSS CUSTOM PROPERTIES & RESET
+    ============================================ */
+    :root {
+      --bg-primary:    #0D1117;
+      --bg-card:       #161B22;
+      --bg-card-hover: #1C2330;
+      --bg-input:      #0D1117;
+      --border:        #21262D;
+      --border-focus:  #388BFD;
+      --green:         #00D68F;
+      --green-dim:     rgba(0, 214, 143, 0.12);
+      --red:           #FF6B6B;
+      --red-dim:       rgba(255, 107, 107, 0.12);
+      --yellow:        #FFD93D;
+      --yellow-dim:    rgba(255, 217, 61, 0.12);
+      --blue:          #58A6FF;
+      --blue-dim:      rgba(88, 166, 255, 0.12);
+      --text-primary:  #E6EDF3;
+      --text-secondary:#8B949E;
+      --text-muted:    #484F58;
+      --font-mono:     'JetBrains Mono', monospace;
+      --font-sans:     'Inter', sans-serif;
+      --radius-sm:     6px;
+      --radius-md:     10px;
+      --radius-lg:     16px;
+      --shadow:        0 4px 24px rgba(0,0,0,.4);
+      --transition:    0.2s ease;
+      --sidebar-w:     240px;
+    }
+
+    [data-theme="light"] {
+      --bg-primary:    #F0F2F5;
+      --bg-card:       #FFFFFF;
+      --bg-card-hover: #F8F9FA;
+      --bg-input:      #F0F2F5;
+      --border:        #D1D9E0;
+      --text-primary:  #1C2128;
+      --text-secondary:#57606A;
+      --text-muted:    #8C959F;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { font-size: 15px; scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+    }
+
+    /* ============================================
+       SCROLLBAR
+    ============================================ */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    /* ============================================
+       SIDEBAR
+    ============================================ */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      left: 0; top: 0; bottom: 0;
+      z-index: 100;
+      transition: transform var(--transition), width var(--transition);
+      overflow: hidden;
+    }
+
+    .sidebar.collapsed { width: 64px; }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 18px;
+      border-bottom: 1px solid var(--border);
+      min-height: 68px;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--blue), var(--green));
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .logo-text {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+    }
+
+    .logo-sub {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      font-weight: 400;
+      display: block;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 0;
+    }
+
+    .nav-section-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 10px 18px 6px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .sidebar.collapsed .nav-section-label { opacity: 0; }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 18px;
+      margin: 2px 8px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition);
+      white-space: nowrap;
+      overflow: hidden;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+
+    .nav-item:hover {
+      background: var(--bg-card-hover);
+      color: var(--text-primary);
+    }
+
+    .nav-item.active {
+      background: var(--blue-dim);
+      color: var(--blue);
+    }
+
+    .nav-item.active .nav-icon { color: var(--blue); }
+
+    .nav-icon {
+      width: 18px;
+      text-align: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--red);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 99px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-footer {
+      border-top: 1px solid var(--border);
+      padding: 14px;
+    }
+
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow: hidden;
+    }
+
+    .user-avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--green));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+      color: #fff;
+    }
+
+    .user-info { overflow: hidden; }
+
+    .user-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-role {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+    }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      flex-shrink: 0;
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* ============================================
+       MAIN CONTENT
+    ============================================ */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      transition: margin-left var(--transition);
+    }
+
+    .main.expanded { margin-left: 64px; }
+
+    /* ============================================
+       TOPBAR
+    ============================================ */
+    .topbar {
+      height: 68px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+    }
+
+    .topbar-toggle {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 6px;
+      border-radius: var(--radius-sm);
+      transition: color var(--transition), background var(--transition);
+    }
+
+    .topbar-toggle:hover { color: var(--text-primary); background: var(--bg-card-hover); }
+
+    .topbar-title {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .topbar-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .ticker-bar {
+      display: flex;
+      gap: 20px;
+      overflow: hidden;
+    }
+
+    .ticker-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      white-space: nowrap;
+    }
+
+    .ticker-pair { color: var(--text-secondary); font-weight: 600; }
+    .ticker-price { color: var(--text-primary); font-weight: 500; }
+    .ticker-change.up { color: var(--green); }
+    .ticker-change.down { color: var(--red); }
+
+    .topbar-btn {
+      background: var(--bg-card-hover);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      border-radius: var(--radius-sm);
+      padding: 7px 10px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all var(--transition);
+      position: relative;
+    }
+
+    .topbar-btn:hover { color: var(--text-primary); border-color: var(--border-focus); }
+
+    .notif-badge {
+      position: absolute;
+      top: 2px; right: 2px;
+      width: 8px; height: 8px;
+      background: var(--red);
+      border-radius: 50%;
+      border: 2px solid var(--bg-card);
+    }
+
+    /* ============================================
+       PAGE CONTENT
+    ============================================ */
+    .page-content {
+      padding: 24px;
+      flex: 1;
+    }
+
+    /* SCREENS */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ============================================
+       PAGE HEADER
+    ============================================ */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .page-header h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .page-header p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .page-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    /* ============================================
+       BUTTONS
+    ============================================ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all var(--transition);
+      white-space: nowrap;
+      font-family: var(--font-sans);
+    }
+
+    .btn-primary {
+      background: var(--blue);
+      color: #fff;
+    }
+    .btn-primary:hover { background: #79B8FF; }
+
+    .btn-success {
+      background: var(--green);
+      color: #000;
+    }
+    .btn-success:hover { background: #00F5A0; }
+
+    .btn-danger {
+      background: var(--red);
+      color: #fff;
+    }
+    .btn-danger:hover { background: #FF8585; }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+    .btn-outline:hover { border-color: var(--blue); color: var(--blue); }
+
+    .btn-sm { padding: 5px 10px; font-size: 0.75rem; }
+    .btn-icon { padding: 8px; }
+
+    /* ============================================
+       CARDS
+    ============================================ */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      transition: border-color var(--transition);
+    }
+
+    .card:hover { border-color: var(--border-focus); }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .card-icon {
+      width: 32px; height: 32px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem;
+    }
+
+    /* ============================================
+       STAT CARDS
+    ============================================ */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: all var(--transition);
+    }
+
+    .stat-card:hover {
+      border-color: var(--border-focus);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      opacity: 0.06;
+      transform: translate(20px, -20px);
+    }
+
+    .stat-card.green::before { background: var(--green); }
+    .stat-card.red::before   { background: var(--red); }
+    .stat-card.blue::before  { background: var(--blue); }
+    .stat-card.yellow::before{ background: var(--yellow); }
+
+    .stat-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-family: var(--font-mono);
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-value.green { color: var(--green); }
+    .stat-value.red   { color: var(--red); }
+    .stat-value.blue  { color: var(--blue); }
+    .stat-value.yellow{ color: var(--yellow); }
+
+    .stat-change {
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .stat-change.up   { color: var(--green); }
+    .stat-change.down { color: var(--red); }
+
+    .stat-icon {
+      position: absolute;
+      top: 18px; right: 18px;
+      font-size: 1.4rem;
+      opacity: 0.3;
+    }
+
+    /* ============================================
+       CHARTS GRID
+    ============================================ */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+    }
+
+    .chart-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .chart-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .chart-subtitle {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .chart-filter-group {
+      display: flex;
+      gap: 4px;
+    }
+
+    .chart-filter {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: all var(--transition);
+      font-family: var(--font-mono);
+    }
+
+    .chart-filter.active, .chart-filter:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+      background: var(--blue-dim);
+    }
+
+    .chart-container {
+      position: relative;
+      height: 220px;
+    }
+
+    /* ============================================
+       TABLE
+    ============================================ */
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    thead th {
+      background: var(--bg-card);
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    thead th.sortable { cursor: pointer; user-select: none; }
+    thead th.sortable:hover { color: var(--text-primary); }
+    thead th.sort-asc::after  { content: ' ↑'; color: var(--blue); }
+    thead th.sort-desc::after { content: ' ↓'; color: var(--blue); }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background var(--transition);
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--bg-card-hover); }
+
+    tbody td {
+      padding: 12px 16px;
+      white-space: nowrap;
+    }
+
+    /* ============================================
+       BADGES & PILLS
+    ============================================ */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 99px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .badge-green  { background: var(--green-dim);  color: var(--green); }
+    .badge-red    { background: var(--red-dim);    color: var(--red); }
+    .badge-blue   { background: var(--blue-dim);   color: var(--blue); }
+    .badge-yellow { background: var(--yellow-dim); color: var(--yellow); }
+    .badge-gray   { background: rgba(139,148,158,.12); color: var(--text-muted); }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 0.7rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+
+    .tag-long  { background: var(--green-dim); color: var(--green); }
+    .tag-short { background: var(--red-dim);   color: var(--red); }
+
+    /* ============================================
+       PAIR CELL
+    ============================================ */
+    .pair-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pair-icon {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800;
+      font-size: 0.7rem;
+      flex-shrink: 0;
+      font-family: var(--font-mono);
+    }
+
+    .pair-icon.btc  { background: rgba(247,147,26,.15);  color: #F7931A; }
+    .pair-icon.eth  { background: rgba(98,126,234,.15);  color: #627EEA; }
+    .pair-icon.sol  { background: rgba(155,114,255,.15); color: #9B72FF; }
+    .pair-icon.bnb  { background: rgba(240,185,11,.15);  color: #F0B90B; }
+    .pair-icon.arb  { background: rgba(41,160,240,.15);  color: #29A0F0; }
+    .pair-icon.link { background: rgba(55,91,211,.15);   color: #375BD3; }
+    .pair-icon.op   { background: rgba(255,4,32,.15);    color: #FF0420; }
+    .pair-icon.matic{ background: rgba(130,71,229,.15);  color: #8247E5; }
+
+    .pair-name { font-weight: 600; font-size: 0.85rem; }
+    .pair-type { font-size: 0.68rem; color: var(--text-muted); margin-top: 1px; }
+
+    /* ============================================
+       MONO VALUES
+    ============================================ */
+    .mono { font-family: var(--font-mono); }
+    .text-green { color: var(--green); }
+    .text-red   { color: var(--red); }
+    .text-blue  { color: var(--blue); }
+    .text-yellow{ color: var(--yellow); }
+    .text-muted { color: var(--text-muted); }
+    .text-secondary { color: var(--text-secondary); }
+
+    /* ============================================
+       PROGRESS BAR
+    ============================================ */
+    .progress-bar {
+      height: 4px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.6s ease;
+    }
+
+    /* ============================================
+       FORMS & INPUTS
+    ============================================ */
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 7px;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 9px 12px;
+      color: var(--text-primary);
+      font-size: 0.82rem;
+      font-family: var(--font-sans);
+      transition: border-color var(--transition);
+      outline: none;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(88,166,255,.1);
+    }
+
+    .form-input.mono { font-family: var(--font-mono); }
+
+    .form-hint {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 0;
+    }
+
+    .input-group .form-input { border-radius: var(--radius-sm) 0 0 var(--radius-sm); }
+    .input-group .btn        { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; flex-shrink: 0; }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+
+    /* Toggle Switch */
+    .toggle-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .toggle-wrap:last-child { border-bottom: none; }
+
+    .toggle-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .toggle-desc {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: var(--border);
+      border-radius: 99px;
+      transition: 0.3s;
+    }
+
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      left: 3px; top: 3px;
+      width: 18px; height: 18px;
+      background: #fff;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+
+    .toggle-switch input:checked + .toggle-slider { background: var(--green); }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+    /* ============================================
+       ALERTS SCREEN
+    ============================================ */
+    .alerts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .alert-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      transition: all var(--transition);
+    }
+
+    .alert-item:hover { border-color: var(--blue); }
+
+    .alert-item.active-alert { border-color: var(--green); }
+    .alert-item.triggered { border-color: var(--yellow); }
+
+    .alert-icon-wrap {
+      width: 40px; height: 40px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .alert-body { flex: 1; }
+
+    .alert-title {
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-bottom: 3px;
+    }
+
+    .alert-desc {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .alert-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* ============================================
+       TELEGRAM BOT SCREEN
+    ============================================ */
+    .bot-status-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .bot-avatar {
+      width: 56px; height: 56px;
+      background: linear-gradient(135deg, #229ED9, #2AABEE);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .bot-info { flex: 1; }
+    .bot-name { font-size: 1rem; font-weight: 700; }
+    .bot-handle { font-size: 0.78rem; color: var(--text-muted); font-family: var(--font-mono); }
+
+    .bot-status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .bot-stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .bot-stat {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      text-align: center;
+    }
+
+    .bot-stat-val {
+      font-family: var(--font-mono);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--blue);
+    }
+
+    .bot-stat-label {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .commands-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .command-log {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .command-log-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .command-item {
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      transition: background var(--transition);
+    }
+
+    .command-item:last-child { border-bottom: none; }
+    .command-item:hover { background: var(--bg-card-hover); }
+
+    .cmd-user-icon {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--blue-dim);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem;
+      color: var(--blue);
+      flex-shrink: 0;
+      font-weight: 700;
+    }
+
+    .cmd-text {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--green);
+    }
+
+    .cmd-user { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
+    .cmd-time { font-size: 0.68rem; color: var(--text-muted); margin-left: auto; white-space: nowrap; }
+
+    /* ============================================
+       SETTINGS SCREEN
+    ============================================ */
+    .settings-layout {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 20px;
+    }
+
+    .settings-nav {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 8px;
+      height: fit-content;
+    }
+
+    .settings-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: all var(--transition);
+    }
+
+    .settings-nav-item:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+    .settings-nav-item.active { background: var(--blue-dim); color: var(--blue); }
+
+    .settings-panel { display: none; }
+    .settings-panel.active { display: block; }
+
+    .settings-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    .settings-section-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ============================================
+       PAGINATION
+    ============================================ */
+    .pagination {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .page-btn {
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all var(--transition);
+      font-family: var(--font-mono);
+    }
+
+    .page-btn:hover, .page-btn.active { border-color: var(--blue); color: var(--blue); background: var(--blue-dim); }
+
+    /* ============================================
+       HISTORY FILTERS
+    ============================================ */
+    .filter-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      align-items: flex-end;
+    }
+
+    .filter-bar .form-group { margin-bottom: 0; flex: 1; min-width: 140px; }
+
+    /* ============================================
+       POSITIONS SCREEN
+    ============================================ */
+    .position-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .liq-risk-bar {
+      height: 6px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .liq-risk-fill {
+      height: 100%;
+      border-radius: 99px;
+    }
+
+    /* ============================================
+       NOTIFICATIONS / TOAST
+    ============================================ */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      min-width: 280px;
+      max-width: 380px;
+      box-shadow: var(--shadow);
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to   { transform: translateX(0);   opacity: 1; }
+    }
+
+    .toast.removing {
+      animation: slideOut 0.3s ease forwards;
+    }
+
+    @keyframes slideOut {
+      from { transform: translateX(0);   opacity: 1; }
+      to   { transform: translateX(100%); opacity: 0; }
+    }
+
+    .toast-icon { font-size: 1.1rem; margin-top: 1px; flex-shrink: 0; }
+    .toast-title { font-size: 0.82rem; font-weight: 700; }
+    .toast-body  { font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px; }
+
+    .toast.success { border-color: var(--green); }
+    .toast.success .toast-icon { color: var(--green); }
+    .toast.error   { border-color: var(--red); }
+    .toast.error   .toast-icon { color: var(--red); }
+    .toast.info    { border-color: var(--blue); }
+    .toast.info    .toast-icon { color: var(--blue); }
+    .toast.warning { border-color: var(--yellow); }
+    .toast.warning .toast-icon { color: var(--yellow); }
+
+    /* ============================================
+       MOBILE OVERLAY
+    ============================================ */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.6);
+      z-index: 99;
+    }
+
+    /* ============================================
+       LOADING SKELETON
+    ============================================ */
+    .skeleton {
+      background: linear-gradient(90deg, var(--border) 25%, var(--bg-card-hover) 50%, var(--border) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: var(--radius-sm);
+    }
+
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ============================================
+       MINI CHART (sparkline placeholder)
+    ============================================ */
+    .mini-chart { height: 40px; opacity: 0.7; }
+
+    /* ============================================
+       LIVE INDICATOR
+    ============================================ */
+    .live-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.7rem;
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    .live-dot::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 1.5s infinite;
+    }
+
+    /* ============================================
+       EQUITY CARD SPECIAL
+    ============================================ */
+    .equity-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .equity-value {
+      font-family: var(--font-mono);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    .equity-change-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    /* ============================================
+       RESPONSIVE
+    ============================================ */
+    @media (max-width: 1100px) {
+      .charts-grid { grid-template-columns: 1fr; }
+      .bot-stats-row { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 900px) {
+      .alerts-grid { grid-template-columns: 1fr; }
+      .commands-grid { grid-template-columns: 1fr; }
+      .settings-layout { grid-template-columns: 1fr; }
+      .settings-nav { display: flex; flex-wrap: wrap; gap: 4px; }
+      .position-summary { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      :root { --sidebar-w: 240px; }
+
+      .sidebar {
+        transform: translateX(-100%);
+        box-shadow: var(--shadow);
+      }
+
+      .sidebar.mobile-open {
+        transform: translateX(0);
+      }
+
+      .sidebar-overlay { display: block; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+      .sidebar-overlay.visible { opacity: 1; pointer-events: all; }
+
+      .main { margin-left: 0 !important; }
+
+      .ticker-bar { display: none; }
+
+      .page-content { padding: 16px; }
+
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+
+      .position-summary { grid-template-columns: 1fr; }
+
+      .bot-stats-row { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .equity-value { font-size: 1.5rem; }
+    }
+
+    /* ============================================
+       EXTRA UTILITIES
+    ============================================ */
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-2 { gap: 8px; }
+    .gap-3 { gap: 12px; }
+    .mb-4 { margin-bottom: 16px; }
+    .mb-6 { margin-bottom: 24px; }
+    .mt-2 { margin-top: 8px; }
+    .w-full { width: 100%; }
+    .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 16px 0;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-muted);
+    }
+
+    .empty-state i { font-size: 2.5rem; margin-bottom: 12px; display: block; }
+    .empty-state p { font-size: 0.85rem; }
+
+    /* API Key masked */
+    .api-key-display {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Positions table color rows */
+    tr.long-row td:first-child { border-left: 3px solid var(--green); }
+    tr.short-row td:first-child { border-left: 3px solid var(--red); }
+
+    /* Chart.js tooltip override */
+    .chartjs-tooltip {
+      background: var(--bg-card) !important;
+      border: 1px solid var(--border) !important;
+      border-radius: var(--radius-sm) !important;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar Overlay (mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+<!-- ============================================
+     SIDEBAR
+============================================ -->
+<aside class="sidebar" id="sidebar">
+  <!-- Logo -->
+  <div class="sidebar-logo">
+    <div class="logo-icon">
+      <i class="fa-solid fa-chart-line" style="color:#fff;"></i>
+    </div>
+    <div>
+      <div class="logo-text">CryptoPanel</div>
+      <span class="logo-sub">Binance Futures</span>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Monitoramento</div>
+
+    <a class="nav-item active" onclick="navigate('dashboard')" id="nav-dashboard">
+      <i class="nav-icon fa-solid fa-gauge-high"></i>
+      <span>Dashboard</span>
+    </a>
+
+    <a class="nav-item" onclick="navigate('positions')" id="nav-positions">
+      <i class="nav-icon fa-solid fa-layer-group"></i>
+      <span>Posições</span>
+      <span class="nav-badge">8</span>
+    </a>
+
+    <a class="nav-item" onclick="navigate('history')" id="nav-history">
+      <i class="nav-icon fa-solid fa-clock-rotate-left"></i>
+      <span>Histórico</span>
+    </a>
+
+    <div class="nav-section-label" style="margin-top:8px;">Automação</div>
+
+    <a class="nav-item" onclick="navigate('alerts')" id="nav-alerts">
+      <i class="nav-icon fa-solid fa-bell"></i>
+      <span>Alertas</span>
+      <span class="nav-badge" style="background:var(--yellow);color:#000;">3</span>
+    </a>
+
+    <a class="nav-item" onclick="navigate('telegram')" id="nav-telegram">
+      <i class="nav-icon fa-brands fa-telegram"></i>
+      <span>Bot Telegram</span>
+    </a>
+
+    <div class="nav-section-label" style="margin-top:8px;">Sistema</div>
+
+    <a class="nav-item" onclick="navigate('settings')" id="nav-settings">
+      <i class="nav-icon fa-solid fa-sliders"></i>
+      <span>Configurações</span>
+    </a>
+  </nav>
+
+  <!-- User Footer -->
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="user-avatar">RF</div>
+      <div class="user-info">
+        <div class="user-name">Rafael Trader</div>
+        <div class="user-role">Pro Account</div>
+      </div>
+      <div class="status-dot"></div>
+    </div>
+  </div>
+</aside>
+
+<!-- ============================================
+     MAIN
+============================================ -->
+<div class="main" id="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <button class="topbar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <div class="topbar-title" id="topbarTitle">Dashboard</div>
+
+    <!-- Ticker -->
+    <div class="ticker-bar" id="tickerBar">
+      <div class="ticker-item">
+        <span class="ticker-pair">BTC/USDT</span>
+        <span class="ticker-price" id="tick-btc">$67,420.50</span>
+        <span class="ticker-change up" id="tick-btc-ch">+2.34%</span>
+      </div>
+      <div class="ticker-item">
+        <span class="ticker-pair">ETH/USDT</span>
+        <span class="ticker-price" id="tick-eth">$3,521.80</span>
+        <span class="ticker-change down" id="tick-eth-ch">-0.87%</span>
+      </div>
+      <div class="ticker-item">
+        <span class="ticker-pair">SOL/USDT</span>
+        <span class="ticker-price" id="tick-sol">$185.40</span>
+        <span class="ticker-change up" id="tick-sol-ch">+4.12%</span>
+      </div>
+      <div class="ticker-item">
+        <span class="ticker-pair">BNB/USDT</span>
+        <span class="ticker-price" id="tick-bnb">$612.30</span>
+        <span class="ticker-change up" id="tick-bnb-ch">+1.05%</span>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <span class="live-dot">LIVE</span>
+
+      <button class="topbar-btn" title="Notificações" onclick="showToast('info','Nova notificação','BTC/USDT atingiu nível de alerta: $67.500')">
+        <i class="fa-solid fa-bell"></i>
+        <span class="notif-badge"></span>
+      </button>
+
+      <button class="topbar-btn" title="Atualizar dados" onclick="refreshData()">
+        <i class="fa-solid fa-rotate" id="refreshIcon"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- PAGE CONTENT -->
+  <main class="page-content">
+
+    <!-- ==========================================
+         SCREEN 1: DASHBOARD
+    ========================================== -->
+    <section class="screen active" id="screen-dashboard">
+      <div class="page-header">
+        <div>
+          <h1>📊 Dashboard</h1>
+          <p>Visão geral da conta — atualizado em tempo real</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-outline" onclick="showToast('info','Exportando...','Relatório PDF sendo gerado')">
+            <i class="fa-solid fa-file-export"></i> Exportar
+          </button>
+          <button class="btn btn-primary" onclick="navigate('positions')">
+            <i class="fa-solid fa-layer-group"></i> Ver Posições
+          </button>
+        </div>
+      </div>
+
+      <!-- Equity Hero -->
+      <div class="card mb-6" style="background: linear-gradient(135deg, var(--bg-card) 60%, rgba(88,166,255,0.05));">
+        <div class="equity-header">
+          <div>
+            <div class="stat-label">Saldo Total da Conta</div>
+            <div class="equity-value" id="equityValue">$124,853.72</div>
+            <div class="equity-change-row">
+              <span class="badge badge-green" id="equityBadge">
+                <i class="fa-solid fa-arrow-trend-up"></i> +$3,241.80 hoje
+              </span>
+              <span class="text-secondary" style="font-size:.78rem;">+2.67% nas últimas 24h</span>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div class="stat-label">Margem Disponível</div>
+            <div style="font-family:var(--font-mono);font-size:1.3rem;font-weight:700;color:var(--blue);">$48,210.15</div>
+            <div style="font-size:.75rem;color:var(--text-muted);margin-top:4px;">Uso de margem: 38.6%</div>
+            <div class="progress-bar" style="width:200px;margin-top:6px;">
+              <div class="progress-fill" style="width:38.6%;background:var(--blue);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-label">P&L Diário</div>
+          <div class="stat-value green">+$3,241</div>
+          <div class="stat-change up"><i class="fa-solid fa-arrow-up"></i> +2.67% hoje</div>
+          <i class="stat-icon fa-solid fa-sun" style="color:var(--green);opacity:.2;"></i>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">P&L Semanal</div>
+          <div class="stat-value blue">+$9,874</div>
+          <div class="stat-change up"><i class="fa-solid fa-arrow-up"></i> +8.59% semana</div>
+          <i class="stat-icon fa-solid fa-calendar-week" style="color:var(--blue);opacity:.2;"></i>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">P&L Mensal</div>
+          <div class="stat-value green">+$21,340</div>
+          <div class="stat-change up"><i class="fa-solid fa-arrow-up"></i> +20.6% mês</div>
+          <i class="stat-icon fa-solid fa-calendar" style="color:var(--green);opacity:.2;"></i>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-label">Posições Abertas</div>
+          <div class="stat-value yellow">8</div>
+          <div class="stat-change" style="color:var(--yellow);">5 long · 3 short</div>
+          <i class="stat-icon fa-solid fa-layer-group" style="color:var(--yellow);opacity:.2;"></i>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">P&L Não Realizado</div>
+          <div class="stat-value green">+$5,642</div>
+          <div class="stat-change up"><i class="fa-solid fa-arrow-up"></i> aberto agora</div>
+          <i class="stat-icon fa-solid fa-chart-area" style="color:var(--green);opacity:.2;"></i>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">Win Rate</div>
+          <div class="stat-value blue">74.2%</div>
+          <div class="stat-change up"><i class="fa-solid fa-trophy"></i> 89/120 trades</div>
+          <i class="stat-icon fa-solid fa-percent" style="color:var(--blue);opacity:.2;"></i>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-label">Risco Atual</div>
+          <div class="stat-value yellow">3.8%</div>
+          <div class="stat-change" style="color:var(--yellow);"><i class="fa-solid fa-shield-halved"></i> Moderado</div>
+          <i class="stat-icon fa-solid fa-shield-halved" style="color:var(--yellow);opacity:.2;"></i>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Alavancagem Média</div>
+          <div class="stat-value" style="color:var(--text-primary);">12.4x</div>
+          <div class="stat-change" style="color:var(--text-muted);">entre posições</div>
+          <i class="stat-icon fa-solid fa-bolt" style="color:var(--yellow);opacity:.2;"></i>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="charts-grid">
+        <!-- Equity Curve -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-title">Equity Curve</div>
+              <div class="chart-subtitle">Evolução do patrimônio líquido</div>
+            </div>
+            <div class="chart-filter-group">
+              <button class="chart-filter" onclick="updateEquityChart('1D', this)">1D</button>
+              <button class="chart-filter active" onclick="updateEquityChart('1W', this)">1S</button>
+              <button class="chart-filter" onclick="updateEquityChart('1M', this)">1M</button>
+              <button class="chart-filter" onclick="updateEquityChart('3M', this)">3M</button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="equityChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Allocation Doughnut -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-title">Alocação</div>
+              <div class="chart-subtitle">Exposição por ativo</div>
+            </div>
+          </div>
+          <div class="chart-container" style="height:180px;">
+            <canvas id="allocationChart"></canvas>
+          </div>
+          <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:.75rem;">
+              <span><span style="color:#F7931A;">●</span> BTC/USDT</span><span class="mono">38.2%</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:.75rem;">
+              <span><span style="color:#627EEA;">●</span> ETH/USDT</span><span class="mono">24.1%</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:.75rem;">
+              <span><span style="color:#9B72FF;">●</span> SOL/USDT</span><span class="mono">18.5%</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:.75rem;">
+              <span><span style="color:#58A6FF;">●</span> Outros</span><span class="mono">19.2%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PnL Bar Chart -->
+      <div class="chart-card mb-6">
+        <div class="chart-card-header">
+          <div>
+            <div class="chart-title">P&L por Dia — Última semana</div>
+            <div class="chart-subtitle">Resultado diário realizado (USDT)</div>
+          </div>
+          <span class="badge badge-green">Semana positiva</span>
+        </div>
+        <div class="chart-container" style="height:180px;">
+          <canvas id="pnlBarChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Recent Trades -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Trades Recentes</div>
+          <button class="btn btn-outline btn-sm" onclick="navigate('history')">Ver todos</button>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Par</th>
+                <th>Lado</th>
+                <th>Preço Entrada</th>
+                <th>Preço Saída</th>
+                <th>PnL</th>
+                <th>PnL%</th>
+                <th>Data</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="pair-cell"><div class="pair-icon btc">BTC</div><div><div class="pair-name">BTC/USDT</div><div class="pair-type">Futures · 20x</div></div></div></td>
+                <td><span class="tag tag-long">LONG</span></td>
+                <td class="mono">$64,820.00</td>
+                <td class="mono">$67,240.00</td>
+                <td class="mono text-green">+$484.00</td>
+                <td class="text-green mono">+3.73%</td>
+                <td class="text-muted">21/02 08:14</td>
+              </tr>
+              <tr>
+                <td><div class="pair-cell"><div class="pair-icon eth">ETH</div><div><div class="pair-name">ETH/USDT</div><div class="pair-type">Futures · 15x</div></div></div></td>
+                <td><span class="tag tag-short">SHORT</span></td>
+                <td class="mono">$3,580.00</td>
+                <td class="mono">$3,521.00</td>
+                <td class="mono text-green">+$885.00</td>
+                <td class="text-green mono">+1.65%</td>
+                <td class="text-muted">21/02 07:42</td>
+              </tr>
+              <tr>
+                <td><div class="pair-cell"><div class="pair-icon sol">SOL</div><div><div class="pair-name">SOL/USDT</div><div class="pair-type">Futures · 25x</div></div></div></td>
+                <td><span class="tag tag-long">LONG</span></td>
+                <td class="mono">$178.20</td>
+                <td class="mono">$186.40</td>
+                <td class="mono text-green">+$1,025.00</td>
+                <td class="text-green mono">+4.60%</td>
+                <td class="text-muted">20/02 22:10</td>
+              </tr>
+              <tr>
+                <td><div class="pair-cell"><div class="pair-icon bnb">BNB</div><div><div class="pair-name">BNB/USDT</div><div class="pair-type">Futures · 10x</div></div></div></td>
+                <td><span class="tag tag-long">LONG</span></td>
+                <td class="mono">$608.00</td>
+                <td class="mono">$598.50</td>
+                <td class="mono text-red">-$95.00</td>
+                <td class="text-red mono">-1.56%</td>
+                <td class="text-muted">20/02 19:33</td>
+              </tr>
+              <tr>
+                <td><div class="pair-cell"><div class="pair-icon arb">ARB</div><div><div class="pair-name">ARB/USDT</div><div class="pair-type">Futures · 20x</div></div></div></td>
+                <td><span class="tag tag-short">SHORT</span></td>
+                <td class="mono">$2.145</td>
+                <td class="mono">$2.088</td>
+                <td class="mono text-green">+$570.00</td>
+                <td class="text-green mono">+2.66%</td>
+                <td class="text-muted">20/02 15:20</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SCREEN 2: POSITIONS
+    ========================================== -->
+    <section class="screen" id="screen-positions">
+      <div class="page-header">
+        <div>
+          <h1>📂 Posições Abertas</h1>
+          <p>8 posições ativas — atualizado há 3s</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-outline btn-sm" onclick="showToast('warning','Atenção','Fechar todas as posições? Confirme na sua corretora.')">
+            <i class="fa-solid fa-xmark"></i> Fechar Todas
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="showToast('success','Ordem enviada','Ordem market enviada com sucesso')">
+            <i class="fa-solid fa-plus"></i> Nova Posição
+          </button>
+        </div>
+      </div>
+
+      <!-- Position Summary -->
+      <div class="position-summary">
+        <div class="stat-card green">
+          <div class="stat-label">PnL Não Realizado Total</div>
+          <div class="stat-value green">+$5,642.80</div>
+          <div class="stat-change up"><i class="fa-solid fa-arrow-up"></i> +4.74%</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">Posições Long / Short</div>
+          <div class="stat-value blue">5 / 3</div>
+          <div class="stat-change" style="color:var(--text-muted);">8 ativos totais</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-label">Margem em Uso</div>
+          <div class="stat-value yellow">$76,643</div>
+          <div class="stat-change" style="color:var(--yellow);">38.6% da conta</div>
+        </div>
+      </div>
+
+      <!-- Positions Table -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Posições Futures</div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-outline btn-sm"><i class="fa-solid fa-filter"></i> Filtrar</button>
+            <button class="btn btn-outline btn-sm" onclick="showToast('info','Atualizando...','Buscando dados da Binance API')">
+              <i class="fa-solid fa-rotate"></i> Atualizar
+            </button>
+          </div>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Par</th>
+                <th>Lado</th>
+                <th>Alavancagem</th>
+                <th class="sortable sort-desc">Tamanho</th>
+                <th>Preço Entrada</th>
+                <th>Mark Price</th>
+                <th>PnL Não Real.</th>
+                <th>PnL%</th>
+                <th>Preço Liq.</th>
+                <th>Risco Liq.</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="long-row">
+                <td><div class="pair-cell"><div class="pair-icon btc">BTC</div><div><div class="pair-name">BTC/USDT</div><div class="pair-type">Perpetual</div></div></div></td>
+                <td><span class="tag tag-long"><i class="fa-solid fa-arrow-up"></i> LONG</span></td>
+                <td><span class="badge badge-blue mono">20x</span></td>
+                <td class="mono">0.5 BTC</td>
+                <td class="mono">$64,820.00</td>
+                <td class="mono text-blue">$67,420.50</td>
+                <td class="mono text-green">+$1,300.25</td>
+                <td class="text-green mono">+4.01%</td>
+                <td class="mono text-red">$61,578.90</td>
+                <td>
+                  <div style="font-size:.7rem;color:var(--text-muted);margin-bottom:3px;">8.6%</div>
+                  <div class="liq-risk-bar"><div class="liq-risk-fill" style="width:8.6%;background:var(--green);"></div></div>
+                </td>
+                <td>
+                  <div style="display:flex;gap:4px;">
+                    <button class="btn btn-sm btn-outline" onclick="showToast('info','TP/SL','Configure TP/SL para BTC/USDT')"><i class="fa-solid fa-crosshairs"></i></button>
+                    <button class="btn btn-sm btn-danger" onclick="showToast('warning','Fechar','Enviando ordem de fechamento...')"><i class="fa-solid fa-x"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="long-row">
+                <td><div class="pair-cell"><div class="pair-icon eth">ETH</div><div><div class="pair-name">ETH/USDT</div><div class="pair-type">Perpetual</div></div></div></td>
+                <td><span class="tag tag-long"><i class="fa-solid fa-arrow-up"></i> LONG</span></td>
+                <td><span class="badge badge-blue mono">15x</span></td>
+                <td class="mono">4.2 ETH</td>
+                <td class="mono">$3,480.00</td>
+                <td class="mono text-blue">$3,521.80</td>
+                <td class="mono text-green">+$175.56</td>
+                <td class="text-green mono">+1.20%</td>
+                <td class="mono text-red">$3,248.00</td>
+                <td>
+                  <div style="font-size:.7rem;color:var(--text-muted);margin-bottom:3px;">6.8%</div>
+                  <div class="liq-risk-bar"><div class="liq-risk-fill" style="width:6.8%;background:var(--green);"></div></div>
+                </td>
+                <td>
+                  <div style="display:flex;gap:4px;">
+                    <button class="btn btn-sm btn-outline" onclick="showToast('info','TP/SL','Configure TP/SL para ETH/USDT')"><i class="fa-solid fa-crosshairs"></i></button>
+                    <button class="btn btn-sm btn-danger" onclick="showToast('warning','Fechar','Enviando ordem de fechamento...')"><i class="fa-solid fa-x"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="short-row">
+                <td><div class="pair-cell"><div class="pair-icon sol">SOL</div><div><div class="pair-name">SOL/USDT</div><div class="pair-type">Perpetual</div></div></div></td>
+                <td><span class="tag tag-short"><i class="fa-solid fa-arrow-down"></i> SHORT</span></td>
+                <td><span class="badge badge-blue mono">25x</span></td>
+                <td class="mono">120 SOL</td>
+                <td class="mono">$192.40</td>
+                <td class="mono text-blue">$185.40</td>
+                <td class="mono text-green">+$840.00</td>
+                <td class="text-green mono">+3.64%</td>
+                <td class="mono text-red">$199.94</td>
+                <td>
+                  <div style="font-size:.7rem;color:var(--text-muted);margin-bottom:3px;">3.9%</div>
+                  <div class="liq-risk-bar"><div class="liq-risk-fill" style="width:3.9%;background:var(--green);"></div></div>
+                </td>
+                <td>
+                  <div style="display:flex;gap:4px;">
+                    <button class="btn btn-sm btn-outline" onclick="showToast('info','TP/SL','Configure TP/SL para SOL/USDT')"><i class="fa-solid fa-crosshairs"></i></button>
+                    <button class="btn btn-sm btn-danger" onclick="showToast('warning','Fechar','Enviando ordem de fechamento...')"><i class="fa-solid fa-x"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="long-row">
+                <td><div class="pair-cell"><div class="pair-icon bnb">BNB</div><div><div class="pair-name">BNB/USDT</div><div class="pair-type">Perpetual</div></div></div></td>
+                <td><span class="tag tag-long"><i class="fa-solid fa-arrow-up"></i> LONG</span></td>
+                <td><span class="badge badge-blue mono">10x</span></td>
+                <td class="mono">20 BNB</td>
+                <td class="mono">$598.20</td>
+                <td class="mono text-blue">$612.30</td>
+                <td class="mono text-green">+$282.00</td>
+                <td class="text-green mono">+2.36%</td>
+                <td class="mono text-red">$544.30</td>
+                <td>
+                  <div style="font-size:.7rem;color:var(--text-muted);margin-bottom:3px;">9.1%</div>
+                  <div class="liq-risk-bar"><div class="liq-risk-fill" style="width:9.1%;background:var(--green);"></div></div>
+                </td>
+                <td>
+                  <div style="display:flex;gap:4px;">
+                    <button class="btn btn-sm btn-outline"><i class="fa-solid fa-crosshairs"></i></button>
+                    <button class="btn btn-sm btn-danger" onclick="showToast('warning','Fechar','Enviando ordem de fechamento...')"><i class="fa-solid fa-x"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="short-row">
+                <td><div class="pair-cell"><div class="pair-icon arb">ARB</div><div><div class="pair-name">ARB/USDT</div><div class="pair-type">Perpetual</div></div></div></td>
+                <td><span class="tag tag-short"><i class="fa-solid fa-arrow-down"></i> SHORT</span></td>
+                <td><span class="badge badge-blue mono">20x</span></td>
+                <td class="mono">8000 ARB</td>
+                <td class="mono">$2.210</td>
+                <td class="mono text-blue">$2.156</td>
+                <td class="mono text-green">+$432.00</td>
+                <td class="text-green mono">+2.44%</td>
+                <td class="mono text-red">$2.320</td>
+                <td>
+                  <div style="font-size:.7rem;color:var(--yellow);margin-bottom:3px;">34.2% ⚠</div>
+                  <div class="liq-risk-bar"><div class="liq-risk-fill" style="width:34.2%;background:var(--yellow);"></div></div>
+                </td>
+                <td>
+                  <div style="display:flex;gap:4px;">
+                    <button class="btn btn-sm btn-outline"><i class="fa-solid fa-crosshairs"></i></button>
+                    <button class="btn btn-sm btn-danger" onclick="showToast('warning','Fechar','Enviando ordem de fechamento...')"><i class="fa-solid fa-x"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="long-row">
+                <td><div class="pair-cell"><div class="pair-icon link">LNK</div><div><div class="pair-name">LINK/USDT</div><div class="pair-type">Perpetual</div></div></div></td>
+                <td><span class="tag tag-long"><i class="fa-solid fa-arrow-up"></i> LONG</span></td>
+                <td><span class="badge badge-blue mono">10x</span></td>
+                <td class="mono">500 LINK</td>
+                <td class="mono">$19.40</td>
+                <td class="mono text-blue">$20.85</td>
+                <td class="mono text-green">+$725.00</td>
+                <td class="text-green mono">+7.47%</td>
+                <td class="mono text-red">$17.64</td>
+                <td>
+                  <div style="font-size:.7rem;color:var(--text-muted);margin-bottom:3px;">9.1%</div>
+                  <div class="liq-risk-bar"><div class="liq-risk-fill" style="width:9.1%;background:var(--green);"></div></div>
+                </td>
+                <td>
+                  <div style="display:flex;gap:4px;">
+                    <button class="btn btn-sm btn-outline"><i class="fa-solid fa-crosshairs"></i></button>
+                    <button class="btn btn-sm btn-danger" onclick="showToast('warning','Fechar','Enviando ordem...')"><i class="fa-solid fa-x"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="short-row">
+                <td><div class="pair-cell"><div class="pair-icon op">OP</div><div><div class="pair-name">OP/USDT</div><div class="pair-type">Perpetual</div></div></div></td>
+                <td><span class="tag tag-short"><i class="fa-solid fa-arrow-down"></i> SHORT</span></td>
+                <td><span class="badge badge-blue mono">15x</span></td>
+                <td class="mono">2500 OP</td>
+                <td class="mono">$3.840</td>
+                <td class="mono text-blue">$3.782</td>
+                <td class="mono text-green">+$145.00</td>
+                <td class="text-green mono">+1.51%</td>
+                <td class="mono text-red">$4.038</td>
+                <td>
+                  <div style="font-size:.7rem;color:var(--text-muted);margin-bottom:3px;">15.2%</div>
+                  <div class="liq-risk-bar"><div class="liq-risk-fill" style="width:15.2%;background:var(--blue);"></div></div>
+                </td>
+                <td>
+                  <div style="display:flex;gap:4px;">
+                    <button class="btn btn-sm btn-outline"><i class="fa-solid fa-crosshairs"></i></button>
+                    <button class="btn btn-sm btn-danger" onclick="showToast('warning','Fechar','Enviando ordem...')"><i class="fa-solid fa-x"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="long-row">
+                <td><div class="pair-cell"><div class="pair-icon matic">POL</div><div><div class="pair-name">POL/USDT</div><div class="pair-type">Perpetual</div></div></div></td>
+                <td><span class="tag tag-long"><i class="fa-solid fa-arrow-up"></i> LONG</span></td>
+                <td><span class="badge badge-blue mono">20x</span></td>
+                <td class="mono">15000 POL</td>
+                <td class="mono">$1.024</td>
+                <td class="mono text-red">$0.984</td>
+                <td class="mono text-red">-$600.00</td>
+                <td class="text-red mono">-3.91%</td>
+                <td class="mono text-red">$0.921</td>
+                <td>
+                  <div style="font-size:.7rem;color:var(--red);margin-bottom:3px;">60.8% 🔴</div>
+                  <div class="liq-risk-bar"><div class="liq-risk-fill" style="width:60.8%;background:var(--red);"></div></div>
+                </td>
+                <td>
+                  <div style="display:flex;gap:4px;">
+                    <button class="btn btn-sm btn-outline"><i class="fa-solid fa-crosshairs"></i></button>
+                    <button class="btn btn-sm btn-danger" onclick="showToast('error','URGENTE','Posição POL com alto risco de liquidação!')"><i class="fa-solid fa-x"></i></button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SCREEN 3: HISTORY
+    ========================================== -->
+    <section class="screen" id="screen-history">
+      <div class="page-header">
+        <div>
+          <h1>📋 Histórico de Trades</h1>
+          <p>Trades fechados — 120 registros encontrados</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-outline btn-sm" onclick="showToast('info','Exportando','CSV gerado com sucesso')">
+            <i class="fa-solid fa-download"></i> CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- Summary Stats -->
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);">
+        <div class="stat-card green">
+          <div class="stat-label">Total Trades</div>
+          <div class="stat-value" style="font-size:1.4rem;">120</div>
+          <div class="stat-change up">89 lucrativos</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">Lucro Total</div>
+          <div class="stat-value blue" style="font-size:1.4rem;">$38,240</div>
+          <div class="stat-change up"><i class="fa-solid fa-arrow-up"></i> este mês</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">Perdas Totais</div>
+          <div class="stat-value red" style="font-size:1.4rem;">-$16,900</div>
+          <div class="stat-change down">31 perdedores</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-label">Profit Factor</div>
+          <div class="stat-value yellow" style="font-size:1.4rem;">2.26</div>
+          <div class="stat-change" style="color:var(--yellow);">Acima de 2 ✓</div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-bar">
+        <div class="form-group">
+          <label class="form-label">Par</label>
+          <select class="form-select">
+            <option>Todos</option>
+            <option>BTC/USDT</option>
+            <option>ETH/USDT</option>
+            <option>SOL/USDT</option>
+            <option>BNB/USDT</option>
+            <option>ARB/USDT</option>
+            <option>LINK/USDT</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Lado</label>
+          <select class="form-select">
+            <option>Todos</option>
+            <option>Long</option>
+            <option>Short</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data Início</label>
+          <input type="date" class="form-input" value="2026-02-01" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data Fim</label>
+          <input type="date" class="form-input" value="2026-02-21" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Resultado</label>
+          <select class="form-select">
+            <option>Todos</option>
+            <option>Lucro</option>
+            <option>Perda</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:8px;">
+          <button class="btn btn-primary" onclick="showToast('success','Filtro aplicado','Exibindo 47 trades')">
+            <i class="fa-solid fa-search"></i> Filtrar
+          </button>
+          <button class="btn btn-outline" onclick="showToast('info','Limpo','Filtros removidos')">Limpar</button>
+        </div>
+      </div>
+
+      <!-- History Table -->
+      <div class="card" style="padding:0;">
+        <div class="table-wrapper" style="border:none;border-radius:var(--radius-lg);">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Par</th>
+                <th>Lado</th>
+                <th>Alavancagem</th>
+                <th class="sortable">Entrada</th>
+                <th>Saída</th>
+                <th class="sortable sort-desc">PnL</th>
+                <th>PnL%</th>
+                <th>Duração</th>
+                <th>Data Fechamento</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody">
+              <!-- Filled by JS -->
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination" id="historyPagination"></div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SCREEN 4: ALERTS
+    ========================================== -->
+    <section class="screen" id="screen-alerts">
+      <div class="page-header">
+        <div>
+          <h1>🔔 Alertas</h1>
+          <p>Configure alertas de preço, PnL e liquidação</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary" onclick="showToast('success','Alerta criado','Novo alerta configurado com sucesso')">
+            <i class="fa-solid fa-plus"></i> Novo Alerta
+          </button>
+        </div>
+      </div>
+
+      <!-- New Alert Form -->
+      <div class="card mb-6">
+        <div class="card-header">
+          <div class="card-title"><i class="fa-solid fa-plus-circle" style="color:var(--blue);"></i> Criar Alerta</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Par</label>
+            <select class="form-select">
+              <option>BTC/USDT</option>
+              <option>ETH/USDT</option>
+              <option>SOL/USDT</option>
+              <option>BNB/USDT</option>
+              <option>ARB/USDT</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tipo de Alerta</label>
+            <select class="form-select" id="alertType" onchange="updateAlertForm()">
+              <option value="price">Preço</option>
+              <option value="pnl">PnL</option>
+              <option value="liq">Liquidação</option>
+              <option value="percent">Variação %</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Condição</label>
+            <select class="form-select">
+              <option>Maior que</option>
+              <option>Menor que</option>
+              <option>Cruzar acima</option>
+              <option>Cruzar abaixo</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Valor</label>
+            <input type="number" class="form-input mono" placeholder="Ex: 70000" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notificar via</label>
+            <select class="form-select">
+              <option>Telegram</option>
+              <option>Browser</option>
+              <option>Telegram + Browser</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="showToast('success','Alerta criado!','BTC/USDT → Preço &gt; $70.000 configurado')">
+            <i class="fa-solid fa-check"></i> Criar Alerta
+          </button>
+          <button class="btn btn-outline">Cancelar</button>
+        </div>
+      </div>
+
+      <!-- Active Alerts -->
+      <div style="margin-bottom:16px;font-size:.85rem;font-weight:700;">Alertas Ativos (6)</div>
+      <div class="alerts-grid">
+        <div class="alert-item active-alert">
+          <div class="alert-icon-wrap" style="background:var(--green-dim);">
+            <i class="fa-solid fa-arrow-trend-up" style="color:var(--green);"></i>
+          </div>
+          <div class="alert-body">
+            <div class="alert-title">BTC/USDT — Preço</div>
+            <div class="alert-desc">Notificar quando preço cruzar <strong>$70.000</strong></div>
+            <div class="alert-meta">
+              <span class="badge badge-green">Ativo</span>
+              <span class="badge badge-blue"><i class="fa-brands fa-telegram"></i> Telegram</span>
+              <span style="font-size:.7rem;color:var(--text-muted);">Atual: $67,420</span>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-outline" onclick="showToast('info','Alerta pausado','BTC alerta pausado')"><i class="fa-solid fa-pause"></i></button>
+        </div>
+
+        <div class="alert-item active-alert">
+          <div class="alert-icon-wrap" style="background:var(--red-dim);">
+            <i class="fa-solid fa-arrow-trend-down" style="color:var(--red);"></i>
+          </div>
+          <div class="alert-body">
+            <div class="alert-title">ETH/USDT — Preço</div>
+            <div class="alert-desc">Notificar quando preço ficar abaixo de <strong>$3.200</strong></div>
+            <div class="alert-meta">
+              <span class="badge badge-green">Ativo</span>
+              <span class="badge badge-blue"><i class="fa-brands fa-telegram"></i> Telegram</span>
+              <span style="font-size:.7rem;color:var(--text-muted);">Atual: $3,521</span>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-outline" onclick="showToast('info','Alerta pausado','ETH alerta pausado')"><i class="fa-solid fa-pause"></i></button>
+        </div>
+
+        <div class="alert-item triggered">
+          <div class="alert-icon-wrap" style="background:var(--yellow-dim);">
+            <i class="fa-solid fa-triangle-exclamation" style="color:var(--yellow);"></i>
+          </div>
+          <div class="alert-body">
+            <div class="alert-title">POL/USDT — Liquidação</div>
+            <div class="alert-desc">Risco de liquidação acima de <strong>50%</strong></div>
+            <div class="alert-meta">
+              <span class="badge badge-yellow">⚠ Disparado</span>
+              <span class="badge badge-blue"><i class="fa-brands fa-telegram"></i> Telegram</span>
+              <span style="font-size:.7rem;color:var(--red);">Risco atual: 60.8%</span>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-danger" onclick="showToast('success','Reconhecido','Alerta reconhecido')"><i class="fa-solid fa-check"></i></button>
+        </div>
+
+        <div class="alert-item active-alert">
+          <div class="alert-icon-wrap" style="background:var(--blue-dim);">
+            <i class="fa-solid fa-chart-line" style="color:var(--blue);"></i>
+          </div>
+          <div class="alert-body">
+            <div class="alert-title">Conta — PnL Diário</div>
+            <div class="alert-desc">Notificar se PnL diário ultrapassar <strong>+$5.000</strong></div>
+            <div class="alert-meta">
+              <span class="badge badge-green">Ativo</span>
+              <span class="badge badge-blue"><i class="fa-brands fa-telegram"></i> Telegram</span>
+              <span style="font-size:.7rem;color:var(--text-muted);">Atual: +$3,241</span>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-outline" onclick="showToast('info','Pausado','Alerta PnL pausado')"><i class="fa-solid fa-pause"></i></button>
+        </div>
+
+        <div class="alert-item active-alert">
+          <div class="alert-icon-wrap" style="background:var(--green-dim);">
+            <i class="fa-solid fa-bolt" style="color:var(--green);"></i>
+          </div>
+          <div class="alert-body">
+            <div class="alert-title">SOL/USDT — Variação</div>
+            <div class="alert-desc">Notificar se SOL variar mais de <strong>±5%</strong> em 1h</div>
+            <div class="alert-meta">
+              <span class="badge badge-green">Ativo</span>
+              <span class="badge badge-blue"><i class="fa-brands fa-telegram"></i> Telegram</span>
+              <span style="font-size:.7rem;color:var(--text-muted);">Atual: +4.12%</span>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-outline"><i class="fa-solid fa-pause"></i></button>
+        </div>
+
+        <div class="alert-item" style="opacity:.6;">
+          <div class="alert-icon-wrap" style="background:var(--border);">
+            <i class="fa-solid fa-bell-slash" style="color:var(--text-muted);"></i>
+          </div>
+          <div class="alert-body">
+            <div class="alert-title">BNB/USDT — Preço</div>
+            <div class="alert-desc">Notificar quando preço atingir <strong>$650</strong></div>
+            <div class="alert-meta">
+              <span class="badge badge-gray">Pausado</span>
+              <span style="font-size:.7rem;color:var(--text-muted);">Atual: $612.30</span>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-success" onclick="showToast('success','Ativado','Alerta BNB reativado')"><i class="fa-solid fa-play"></i></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SCREEN 5: TELEGRAM BOT
+    ========================================== -->
+    <section class="screen" id="screen-telegram">
+      <div class="page-header">
+        <div>
+          <h1><i class="fa-brands fa-telegram" style="color:#229ED9;"></i> Bot Telegram</h1>
+          <p>Gerencie o bot e configure notificações automáticas</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-danger btn-sm" onclick="showToast('warning','Bot parado','CryptoBot foi desligado')">
+            <i class="fa-solid fa-stop"></i> Parar Bot
+          </button>
+          <button class="btn btn-success btn-sm" onclick="showToast('success','Bot online','CryptoBot está rodando')">
+            <i class="fa-solid fa-play"></i> Iniciar Bot
+          </button>
+        </div>
+      </div>
+
+      <!-- Bot Status Card -->
+      <div class="bot-status-card">
+        <div class="bot-avatar">
+          <i class="fa-brands fa-telegram"></i>
+        </div>
+        <div class="bot-info">
+          <div class="bot-name">@CryptoPanelBot</div>
+          <div class="bot-handle">ID: 7823456789 · Token: ****••••••••••••••••</div>
+        </div>
+        <div>
+          <div class="bot-status-indicator">
+            <div class="status-dot"></div> Online
+          </div>
+          <div style="font-size:.7rem;color:var(--text-muted);margin-top:4px;">Rodando há 14h 32min</div>
+        </div>
+        <div style="margin-left:auto;">
+          <span class="badge badge-green"><i class="fa-solid fa-wifi"></i> Webhook Ativo</span>
+        </div>
+      </div>
+
+      <!-- Bot Stats -->
+      <div class="bot-stats-row">
+        <div class="bot-stat">
+          <div class="bot-stat-val">1,247</div>
+          <div class="bot-stat-label">Msgs Enviadas</div>
+        </div>
+        <div class="bot-stat">
+          <div class="bot-stat-val">89</div>
+          <div class="bot-stat-label">Comandos Hoje</div>
+        </div>
+        <div class="bot-stat">
+          <div class="bot-stat-val">6</div>
+          <div class="bot-stat-label">Alertas Disparados</div>
+        </div>
+        <div class="bot-stat">
+          <div class="bot-stat-val">99.8%</div>
+          <div class="bot-stat-label">Uptime</div>
+        </div>
+      </div>
+
+      <!-- Commands + Notifications -->
+      <div class="commands-grid">
+        <!-- Recent Commands -->
+        <div class="command-log">
+          <div class="command-log-header">
+            <span><i class="fa-solid fa-terminal" style="color:var(--green);margin-right:6px;"></i>Últimos Comandos</span>
+            <span class="live-dot">LIVE</span>
+          </div>
+          <div class="command-item">
+            <div class="cmd-user-icon">RF</div>
+            <div style="flex:1;">
+              <div class="cmd-text">/saldo</div>
+              <div class="cmd-user">@rafael_trader</div>
+            </div>
+            <div class="cmd-time">08:44</div>
+          </div>
+          <div class="command-item">
+            <div class="cmd-user-icon">RF</div>
+            <div style="flex:1;">
+              <div class="cmd-text">/posicoes</div>
+              <div class="cmd-user">@rafael_trader</div>
+            </div>
+            <div class="cmd-time">08:41</div>
+          </div>
+          <div class="command-item">
+            <div class="cmd-user-icon">RF</div>
+            <div style="flex:1;">
+              <div class="cmd-text">/pnl diario</div>
+              <div class="cmd-user">@rafael_trader</div>
+            </div>
+            <div class="cmd-time">08:30</div>
+          </div>
+          <div class="command-item">
+            <div class="cmd-user-icon">RF</div>
+            <div style="flex:1;">
+              <div class="cmd-text">/alerta BTC 70000</div>
+              <div class="cmd-user">@rafael_trader</div>
+            </div>
+            <div class="cmd-time">08:12</div>
+          </div>
+          <div class="command-item">
+            <div class="cmd-user-icon">RF</div>
+            <div style="flex:1;">
+              <div class="cmd-text">/historico 7d</div>
+              <div class="cmd-user">@rafael_trader</div>
+            </div>
+            <div class="cmd-time">07:55</div>
+          </div>
+          <div class="command-item">
+            <div class="cmd-user-icon">RF</div>
+            <div style="flex:1;">
+              <div class="cmd-text">/fechar SOL</div>
+              <div class="cmd-user">@rafael_trader</div>
+            </div>
+            <div class="cmd-time">07:42</div>
+          </div>
+          <div class="command-item">
+            <div class="cmd-user-icon">RF</div>
+            <div style="flex:1;">
+              <div class="cmd-text">/status</div>
+              <div class="cmd-user">@rafael_trader</div>
+            </div>
+            <div class="cmd-time">07:30</div>
+          </div>
+          <div class="command-item">
+            <div class="cmd-user-icon">RF</div>
+            <div style="flex:1;">
+              <div class="cmd-text">/winrate 30d</div>
+              <div class="cmd-user">@rafael_trader</div>
+            </div>
+            <div class="cmd-time">07:02</div>
+          </div>
+        </div>
+
+        <!-- Notification Config -->
+        <div class="command-log">
+          <div class="command-log-header">
+            <span><i class="fa-solid fa-bell" style="color:var(--yellow);margin-right:6px;"></i>Configurar Notificações</span>
+          </div>
+          <div style="padding:16px;">
+            <div class="form-group">
+              <label class="form-label">Chat ID do Telegram</label>
+              <div class="input-group">
+                <input type="text" class="form-input mono" value="423831224" />
+                <button class="btn btn-primary" onclick="showToast('success','Testado!','Mensagem de teste enviada ao Telegram')">Testar</button>
+              </div>
+              <p class="form-hint">Use /start no bot para obter seu chat ID</p>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="toggle-wrap">
+              <div>
+                <div class="toggle-label">Alertas de Preço</div>
+                <div class="toggle-desc">Notificar quando atingir targets</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" checked onchange="showToast('info','Configuração salva','Alertas de preço atualizados')"/>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-wrap">
+              <div>
+                <div class="toggle-label">Alertas de Liquidação</div>
+                <div class="toggle-desc">Aviso quando risco &gt; 40%</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" checked onchange="showToast('info','Configuração salva','Alertas de liquidação atualizados')"/>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-wrap">
+              <div>
+                <div class="toggle-label">Relatório Diário</div>
+                <div class="toggle-desc">Resumo às 23:59 todo dia</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" checked onchange="showToast('info','Configuração salva','Relatório diário ativado')"/>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-wrap">
+              <div>
+                <div class="toggle-label">PnL em Tempo Real</div>
+                <div class="toggle-desc">Update a cada 5 minutos</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" onchange="showToast('info','Configuração salva','PnL real-time ajustado')"/>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-wrap">
+              <div>
+                <div class="toggle-label">Trades Fechados</div>
+                <div class="toggle-desc">Notificar ao fechar posição</div>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" checked onchange="showToast('info','Configuração salva','Notificação de trades atualizada')"/>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+
+            <div style="margin-top:16px;">
+              <label class="form-label">Horário silencioso</label>
+              <div class="form-row" style="grid-template-columns:1fr 1fr;">
+                <input type="time" class="form-input" value="23:00" />
+                <input type="time" class="form-input" value="07:00" />
+              </div>
+              <p class="form-hint">Alertas não críticos serão silenciados neste período</p>
+            </div>
+
+            <button class="btn btn-primary w-full mt-2" onclick="showToast('success','Salvo!','Configurações do bot atualizadas')">
+              <i class="fa-solid fa-floppy-disk"></i> Salvar Configurações
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Commands Reference -->
+      <div class="card" style="margin-top:20px;">
+        <div class="card-header">
+          <div class="card-title">Comandos Disponíveis</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;">
+          <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
+            <div style="font-family:var(--font-mono);font-size:.8rem;color:var(--green);margin-bottom:4px;">/saldo</div>
+            <div style="font-size:.75rem;color:var(--text-secondary);">Exibe saldo total e margem disponível</div>
+          </div>
+          <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
+            <div style="font-family:var(--font-mono);font-size:.8rem;color:var(--green);margin-bottom:4px;">/posicoes</div>
+            <div style="font-size:.75rem;color:var(--text-secondary);">Lista todas posições abertas com PnL</div>
+          </div>
+          <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
+            <div style="font-family:var(--font-mono);font-size:.8rem;color:var(--green);margin-bottom:4px;">/pnl [periodo]</div>
+            <div style="font-size:.75rem;color:var(--text-secondary);">PnL do período: diario, semanal, mensal</div>
+          </div>
+          <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
+            <div style="font-family:var(--font-mono);font-size:.8rem;color:var(--green);margin-bottom:4px;">/alerta [par] [valor]</div>
+            <div style="font-size:.75rem;color:var(--text-secondary);">Cria alerta de preço para o par</div>
+          </div>
+          <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
+            <div style="font-family:var(--font-mono);font-size:.8rem;color:var(--green);margin-bottom:4px;">/fechar [par]</div>
+            <div style="font-size:.75rem;color:var(--text-secondary);">Fecha posição de mercado (requer confirmação)</div>
+          </div>
+          <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
+            <div style="font-family:var(--font-mono);font-size:.8rem;color:var(--green);margin-bottom:4px;">/historico [Nd]</div>
+            <div style="font-size:.75rem;color:var(--text-secondary);">Histórico de trades dos últimos N dias</div>
+          </div>
+          <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
+            <div style="font-family:var(--font-mono);font-size:.8rem;color:var(--green);margin-bottom:4px;">/winrate [periodo]</div>
+            <div style="font-size:.75rem;color:var(--text-secondary);">Taxa de acerto e estatísticas do período</div>
+          </div>
+          <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;">
+            <div style="font-family:var(--font-mono);font-size:.8rem;color:var(--green);margin-bottom:4px;">/status</div>
+            <div style="font-size:.75rem;color:var(--text-secondary);">Status geral: bot, API, conexão exchange</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SCREEN 6: SETTINGS
+    ========================================== -->
+    <section class="screen" id="screen-settings">
+      <div class="page-header">
+        <div>
+          <h1>⚙️ Configurações</h1>
+          <p>API keys, preferências e tema da interface</p>
+        </div>
+      </div>
+
+      <div class="settings-layout">
+        <!-- Settings Nav -->
+        <div class="settings-nav">
+          <div class="settings-nav-item active" onclick="showSettingsPanel('api', this)">
+            <i class="fa-solid fa-key"></i> API Keys
+          </div>
+          <div class="settings-nav-item" onclick="showSettingsPanel('interface', this)">
+            <i class="fa-solid fa-palette"></i> Interface
+          </div>
+          <div class="settings-nav-item" onclick="showSettingsPanel('trading', this)">
+            <i class="fa-solid fa-chart-line"></i> Trading
+          </div>
+          <div class="settings-nav-item" onclick="showSettingsPanel('security', this)">
+            <i class="fa-solid fa-shield-halved"></i> Segurança
+          </div>
+          <div class="settings-nav-item" onclick="showSettingsPanel('about', this)">
+            <i class="fa-solid fa-info-circle"></i> Sobre
+          </div>
+        </div>
+
+        <!-- Settings Panels -->
+        <div>
+          <!-- API Keys Panel -->
+          <div class="settings-panel active" id="panel-api">
+            <div class="settings-section">
+              <div class="settings-section-title">
+                <i class="fa-brands fa-bitcoin" style="color:var(--yellow);"></i>
+                Binance API
+              </div>
+              <div class="form-group">
+                <label class="form-label">API Key</label>
+                <div class="api-key-display">
+                  <span id="binanceKeyDisplay">abc123def456••••••••••••••••••••••••••••••••••••••••••••••••••</span>
+                  <button class="btn btn-sm btn-outline" onclick="toggleApiKey('binanceKeyDisplay','full-binance-api-key-here-64chars-total-xxxx')">
+                    <i class="fa-solid fa-eye"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Secret Key</label>
+                <div class="api-key-display">
+                  <span>••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••</span>
+                  <button class="btn btn-sm btn-outline"><i class="fa-solid fa-eye"></i></button>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="showToast('success','API testada','Conexão com Binance OK · Ping: 12ms')">
+                  <i class="fa-solid fa-wifi"></i> Testar Conexão
+                </button>
+                <button class="btn btn-outline" onclick="showToast('info','Editando','Insira a nova API key')">
+                  <i class="fa-solid fa-pencil"></i> Editar Keys
+                </button>
+                <button class="btn btn-danger" onclick="showToast('warning','Atenção','Tem certeza? As keys serão removidas.')">
+                  <i class="fa-solid fa-trash"></i> Remover
+                </button>
+              </div>
+              <div class="divider"></div>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <span class="badge badge-green"><i class="fa-solid fa-check"></i> Spot</span>
+                <span class="badge badge-green"><i class="fa-solid fa-check"></i> Futures</span>
+                <span class="badge badge-gray">Withdraw: OFF</span>
+                <span style="font-size:.72rem;color:var(--text-muted);margin-left:auto;">Permissões detectadas automaticamente</span>
+              </div>
+            </div>
+
+            <div class="settings-section">
+              <div class="settings-section-title">
+                <i class="fa-brands fa-telegram" style="color:#229ED9;"></i>
+                Telegram Bot
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Bot Token</label>
+                  <input type="password" class="form-input mono" value="7823456789:AAHxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Chat ID</label>
+                  <input type="text" class="form-input mono" value="423831224" />
+                </div>
+              </div>
+              <button class="btn btn-primary" onclick="showToast('success','Salvo!','Token do bot atualizado')">
+                <i class="fa-solid fa-floppy-disk"></i> Salvar Token
+              </button>
+            </div>
+          </div>
+
+          <!-- Interface Panel -->
+          <div class="settings-panel" id="panel-interface">
+            <div class="settings-section">
+              <div class="settings-section-title">
+                <i class="fa-solid fa-moon" style="color:var(--blue);"></i>
+                Tema & Aparência
+              </div>
+              <div class="toggle-wrap">
+                <div>
+                  <div class="toggle-label">Modo Escuro</div>
+                  <div class="toggle-desc">Alternância entre tema dark e light</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="themeToggle" checked onchange="toggleTheme()" />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="toggle-wrap">
+                <div>
+                  <div class="toggle-label">Sidebar Compacta</div>
+                  <div class="toggle-desc">Reduzir sidebar apenas a ícones</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" onchange="toggleSidebar()" />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="toggle-wrap">
+                <div>
+                  <div class="toggle-label">Animações</div>
+                  <div class="toggle-desc">Transições e efeitos visuais</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" checked />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="toggle-wrap">
+                <div>
+                  <div class="toggle-label">Números Mascarados</div>
+                  <div class="toggle-desc">Ocultar valores monetários (modo privacidade)</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" onchange="showToast('info','Modo privacidade','Valores ocultados')"/>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="settings-section">
+              <div class="settings-section-title">
+                <i class="fa-solid fa-sliders" style="color:var(--green);"></i>
+                Moeda & Formato
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Moeda de Exibição</label>
+                  <select class="form-select">
+                    <option>USDT</option>
+                    <option>BRL</option>
+                    <option>USD</option>
+                    <option>EUR</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Fuso Horário</label>
+                  <select class="form-select">
+                    <option>America/Sao_Paulo (BRT -3)</option>
+                    <option>UTC</option>
+                    <option>America/New_York</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Casas Decimais</label>
+                  <select class="form-select">
+                    <option>2</option>
+                    <option>4</option>
+                    <option>8</option>
+                  </select>
+                </div>
+              </div>
+              <button class="btn btn-primary" onclick="showToast('success','Salvo!','Preferências de exibição atualizadas')">
+                <i class="fa-solid fa-floppy-disk"></i> Salvar Preferências
+              </button>
+            </div>
+          </div>
+
+          <!-- Trading Panel -->
+          <div class="settings-panel" id="panel-trading">
+            <div class="settings-section">
+              <div class="settings-section-title">
+                <i class="fa-solid fa-shield-halved" style="color:var(--yellow);"></i>
+                Gestão de Risco
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Risco Máximo por Trade (%)</label>
+                  <input type="number" class="form-input" value="2" min="0.1" max="10" step="0.1" />
+                  <p class="form-hint">% do saldo total por operação</p>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Stop Loss Automático (%)</label>
+                  <input type="number" class="form-input" value="5" min="1" max="30" />
+                  <p class="form-hint">Aciona stop quando posição cair X%</p>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Drawdown Máximo Diário (%)</label>
+                  <input type="number" class="form-input" value="10" min="1" max="50" />
+                  <p class="form-hint">Para trading ao atingir esse prejuízo</p>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Alavancagem Padrão</label>
+                  <input type="number" class="form-input" value="10" min="1" max="125" />
+                  <p class="form-hint">Alavancagem usada em novas posições</p>
+                </div>
+              </div>
+              <div class="toggle-wrap">
+                <div>
+                  <div class="toggle-label">Stop Loss Automático</div>
+                  <div class="toggle-desc">Enviar ordem de stop automaticamente</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" checked />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="toggle-wrap">
+                <div>
+                  <div class="toggle-label">Parar ao Drawdown Máximo</div>
+                  <div class="toggle-desc">Bloquear novas operações quando limite atingido</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" checked />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <button class="btn btn-primary" style="margin-top:16px;" onclick="showToast('success','Salvo!','Parâmetros de risco atualizados')">
+                <i class="fa-solid fa-floppy-disk"></i> Salvar Parâmetros
+              </button>
+            </div>
+          </div>
+
+          <!-- Security Panel -->
+          <div class="settings-panel" id="panel-security">
+            <div class="settings-section">
+              <div class="settings-section-title">
+                <i class="fa-solid fa-lock" style="color:var(--red);"></i>
+                Segurança
+              </div>
+              <div class="toggle-wrap">
+                <div>
+                  <div class="toggle-label">2FA via Telegram</div>
+                  <div class="toggle-desc">Confirmação de ações via Telegram</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" checked />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="toggle-wrap">
+                <div>
+                  <div class="toggle-label">Confirmar Ordens Grandes</div>
+                  <div class="toggle-desc">Pedir confirmação para ordens &gt; $1.000</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" checked />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="toggle-wrap">
+                <div>
+                  <div class="toggle-label">Log de Auditoria</div>
+                  <div class="toggle-desc">Registrar todas as ações com timestamp</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" checked />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="divider"></div>
+              <div class="form-group">
+                <label class="form-label">IPs Permitidos (whitelist)</label>
+                <input type="text" class="form-input mono" placeholder="Ex: 192.168.1.0/24, 177.20.x.x" value="177.20.114.0/24, 100.86.143.93" />
+                <p class="form-hint">Separar por vírgula. Deixe vazio para sem restrição.</p>
+              </div>
+              <button class="btn btn-primary" onclick="showToast('success','Salvo!','Configurações de segurança salvas')">
+                <i class="fa-solid fa-shield-halved"></i> Salvar Segurança
+              </button>
+            </div>
+          </div>
+
+          <!-- About Panel -->
+          <div class="settings-panel" id="panel-about">
+            <div class="settings-section">
+              <div class="settings-section-title">
+                <i class="fa-solid fa-info-circle" style="color:var(--blue);"></i>
+                Sobre o CryptoPanel
+              </div>
+              <div style="display:flex;align-items:center;gap:20px;margin-bottom:20px;">
+                <div class="logo-icon" style="width:60px;height:60px;font-size:28px;">
+                  <i class="fa-solid fa-chart-line" style="color:#fff;"></i>
+                </div>
+                <div>
+                  <div style="font-size:1.2rem;font-weight:700;">CryptoPanel</div>
+                  <div style="color:var(--text-muted);font-size:.8rem;">Dashboard de Monitoramento Binance Futures</div>
+                  <div style="margin-top:6px;"><span class="badge badge-blue">v2.4.1</span> <span class="badge badge-green">Estável</span></div>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+                <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;">
+                  <div style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px;">Vers�o</div>
+                  <div style="font-family:var(--font-mono);font-size:.9rem;">2.4.1-stable</div>
+                </div>
+                <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;">
+                  <div style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px;">Build</div>
+                  <div style="font-family:var(--font-mono);font-size:.9rem;">2026.02.21</div>
+                </div>
+                <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;">
+                  <div style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px;">Biblioteca de Charts</div>
+                  <div style="font-family:var(--font-mono);font-size:.9rem;">Chart.js v4.4.0</div>
+                </div>
+                <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;">
+                  <div style="font-size:.7rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px;">Exchange</div>
+                  <div style="font-family:var(--font-mono);font-size:.9rem;">Binance Futures</div>
+                </div>
+              </div>
+              <div style="background:var(--yellow-dim);border:1px solid var(--yellow);border-radius:var(--radius-sm);padding:14px;font-size:.8rem;color:var(--text-secondary);">
+                <i class="fa-solid fa-triangle-exclamation" style="color:var(--yellow);margin-right:6px;"></i>
+                <strong>Aviso:</strong> Este � um prot�tipo para portf�lio. N�o conecte API keys reais. Use apenas em ambiente de teste.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+/* =====================================================
+   NAVIGATION
+===================================================== */
+const screens = ['dashboard','positions','history','alerts','telegram','settings'];
+const screenTitles = {
+  dashboard:  'Dashboard',
+  positions:  'Posi��es Abertas',
+  history:    'Hist�rico de Trades',
+  alerts:     'Alertas',
+  telegram:   'Bot Telegram',
+  settings:   'Configura��es'
+};
+
+function navigate(name) {
+  screens.forEach(s => {
+    document.getElementById('screen-' + s).classList.remove('active');
+    document.getElementById('nav-' + s).classList.remove('active');
+  });
+  document.getElementById('screen-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  document.getElementById('topbarTitle').textContent = screenTitles[name];
+
+  // Init charts when dashboard is shown
+  if (name === 'dashboard') {
+    setTimeout(initCharts, 100);
+  }
+
+  // Mobile: close sidebar
+  if (window.innerWidth <= 768) {
+    closeMobileSidebar();
+  }
+
+  window.scrollTo(0, 0);
+}
+
+/* =====================================================
+   SIDEBAR TOGGLE
+===================================================== */
+let sidebarCollapsed = false;
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const main    = document.getElementById('main');
+
+  if (window.innerWidth <= 768) {
+    // Mobile: slide in/out
+    sidebar.classList.toggle('mobile-open');
+    document.getElementById('sidebarOverlay').classList.toggle('visible');
+  } else {
+    // Desktop: collapse/expand
+    sidebarCollapsed = !sidebarCollapsed;
+    sidebar.classList.toggle('collapsed', sidebarCollapsed);
+    main.classList.toggle('expanded', sidebarCollapsed);
+  }
+}
+
+function closeMobileSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebarOverlay').classList.remove('visible');
+}
+
+/* =====================================================
+   SETTINGS PANELS
+===================================================== */
+function showSettingsPanel(name, el) {
+  document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.settings-nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  el.classList.add('active');
+}
+
+/* =====================================================
+   THEME TOGGLE
+===================================================== */
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  showToast('info', isDark ? 'Tema Claro' : 'Tema Escuro', 'Tema da interface alterado');
+  // Re-init charts for new colors
+  setTimeout(initCharts, 200);
+}
+
+/* =====================================================
+   TOAST NOTIFICATIONS
+===================================================== */
+let toastCount = 0;
+
+function showToast(type, title, body) {
+  const icons = {
+    success: 'fa-circle-check',
+    error:   'fa-circle-xmark',
+    warning: 'fa-triangle-exclamation',
+    info:    'fa-circle-info'
+  };
+  const id = 'toast-' + (++toastCount);
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.id = id;
+  toast.innerHTML = `
+    <i class="fa-solid ${icons[type]} toast-icon"></i>
+    <div>
+      <div class="toast-title">${title}</div>
+      <div class="toast-body">${body}</div>
+    </div>
+  `;
+  container.appendChild(toast);
+  setTimeout(() => removeToast(id), 4000);
+}
+
+function removeToast(id) {
+  const toast = document.getElementById(id);
+  if (!toast) return;
+  toast.classList.add('removing');
+  setTimeout(() => toast.remove(), 300);
+}
+
+/* =====================================================
+   REFRESH DATA
+===================================================== */
+function refreshData() {
+  const icon = document.getElementById('refreshIcon');
+  icon.style.animation = 'spin 1s linear infinite';
+  setTimeout(() => {
+    icon.style.animation = '';
+    showToast('success', 'Dados atualizados', 'Pre�os e posi��es sincronizados com a Binance');
+    updateTickerPrices();
+  }, 1500);
+}
+
+const spinStyle = document.createElement('style');
+spinStyle.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
+document.head.appendChild(spinStyle);
+
+/* =====================================================
+   LIVE TICKER SIMULATION
+===================================================== */
+const tickerData = {
+  btc: { price: 67420.50, change: 2.34 },
+  eth: { price: 3521.80,  change: -0.87 },
+  sol: { price: 185.40,   change: 4.12 },
+  bnb: { price: 612.30,   change: 1.05 }
+};
+
+function updateTickerPrices() {
+  Object.keys(tickerData).forEach(sym => {
+    const d = tickerData[sym];
+    // Random fluctuation
+    const delta = (Math.random() - 0.48) * d.price * 0.003;
+    d.price = Math.max(d.price * 0.95, d.price + delta);
+    d.change += (Math.random() - 0.5) * 0.1;
+
+    const priceEl  = document.getElementById('tick-' + sym);
+    const changeEl = document.getElementById('tick-' + sym + '-ch');
+    if (!priceEl) return;
+
+    const fmt = sym === 'btc'
+      ? '$' + d.price.toFixed(2)
+      : sym === 'sol' || sym === 'bnb'
+        ? '$' + d.price.toFixed(2)
+        : '$' + d.price.toFixed(2);
+
+    priceEl.textContent  = fmt;
+    changeEl.textContent = (d.change >= 0 ? '+' : '') + d.change.toFixed(2) + '%';
+    changeEl.className   = 'ticker-change ' + (d.change >= 0 ? 'up' : 'down');
+  });
+}
+
+setInterval(updateTickerPrices, 3000);
+
+/* =====================================================
+   HISTORY TABLE DATA
+===================================================== */
+const historyData = [
+  { id: 120, pair: 'BTC/USDT', icon: 'btc', side: 'LONG',  lev: '20x', entry: 64820.00, exit: 67240.00, pnl: 484.00,   pct: 3.73,  dur: '4h 12m',  date: '21/02 08:14' },
+  { id: 119, pair: 'ETH/USDT', icon: 'eth', side: 'SHORT', lev: '15x', entry: 3580.00,  exit: 3521.00,  pnl: 885.00,   pct: 1.65,  dur: '2h 58m',  date: '21/02 07:42' },
+  { id: 118, pair: 'SOL/USDT', icon: 'sol', side: 'LONG',  lev: '25x', entry: 178.20,   exit: 186.40,   pnl: 1025.00,  pct: 4.60,  dur: '8h 22m',  date: '20/02 22:10' },
+  { id: 117, pair: 'BNB/USDT', icon: 'bnb', side: 'LONG',  lev: '10x', entry: 608.00,   exit: 598.50,   pnl: -95.00,   pct: -1.56, dur: '1h 05m',  date: '20/02 19:33' },
+  { id: 116, pair: 'ARB/USDT', icon: 'arb', side: 'SHORT', lev: '20x', entry: 2.145,    exit: 2.088,    pnl: 570.00,   pct: 2.66,  dur: '3h 44m',  date: '20/02 15:20' },
+  { id: 115, pair: 'BTC/USDT', icon: 'btc', side: 'SHORT', lev: '20x', entry: 68400.00, exit: 65200.00, pnl: 3200.00,  pct: 4.68,  dur: '12h 01m', date: '20/02 10:05' },
+  { id: 114, pair: 'LINK/USDT',icon: 'link',side: 'LONG',  lev: '10x', entry: 18.20,    exit: 20.40,    pnl: 1100.00,  pct: 12.09, dur: '6h 30m',  date: '19/02 23:40' },
+  { id: 113, pair: 'ETH/USDT', icon: 'eth', side: 'LONG',  lev: '15x', entry: 3310.00,  exit: 3520.00,  pnl: 3150.00,  pct: 6.34,  dur: '18h 15m', date: '19/02 18:22' },
+  { id: 112, pair: 'SOL/USDT', icon: 'sol', side: 'SHORT', lev: '25x', entry: 195.00,   exit: 180.00,   pnl: 1875.00,  pct: 7.69,  dur: '5h 00m',  date: '19/02 11:00' },
+  { id: 111, pair: 'BTC/USDT', icon: 'btc', side: 'LONG',  lev: '20x', entry: 63100.00, exit: 62400.00, pnl: -700.00,  pct: -1.11, dur: '45m',     date: '18/02 20:30' },
+  { id: 110, pair: 'OP/USDT',  icon: 'op',  side: 'SHORT', lev: '15x', entry: 4.100,    exit: 3.840,    pnl: 975.00,   pct: 6.34,  dur: '7h 10m',  date: '18/02 16:14' },
+  { id: 109, pair: 'BNB/USDT', icon: 'bnb', side: 'LONG',  lev: '10x', entry: 580.00,   exit: 612.00,   pnl: 640.00,   pct: 5.52,  dur: '14h 00m', date: '18/02 09:00' },
+  { id: 108, pair: 'ARB/USDT', icon: 'arb', side: 'LONG',  lev: '20x', entry: 1.980,    exit: 2.120,    pnl: 1400.00,  pct: 7.07,  dur: '9h 22m',  date: '17/02 22:45' },
+  { id: 107, pair: 'ETH/USDT', icon: 'eth', side: 'SHORT', lev: '15x', entry: 3650.00,  exit: 3710.00,  pnl: -900.00,  pct: -1.64, dur: '2h 00m',  date: '17/02 18:00' },
+  { id: 106, pair: 'BTC/USDT', icon: 'btc', side: 'LONG',  lev: '20x', entry: 60500.00, exit: 63400.00, pnl: 2900.00,  pct: 4.79,  dur: '22h 00m', date: '17/02 08:30' },
+];
+
+let currentPage = 1;
+const pageSize  = 8;
+
+function renderHistoryTable() {
+  const tbody = document.getElementById('historyTableBody');
+  const pag   = document.getElementById('historyPagination');
+  if (!tbody) return;
+
+  const total = historyData.length;
+  const pages = Math.ceil(total / pageSize);
+  const start = (currentPage - 1) * pageSize;
+  const slice = historyData.slice(start, start + pageSize);
+
+  tbody.innerHTML = slice.map(t => {
+    const isLong = t.side === 'LONG';
+    const pnlCls = t.pnl >= 0 ? 'text-green' : 'text-red';
+    const pnlStr = (t.pnl >= 0 ? '+' : '') + '$' + Math.abs(t.pnl).toFixed(2);
+    const pctStr = (t.pct >= 0 ? '+' : '') + t.pct.toFixed(2) + '%';
+    const entFmt = t.entry >= 1000 ? '$' + t.entry.toLocaleString('en-US', {minimumFractionDigits:2,maximumFractionDigits:2})
+                                   : '$' + t.entry.toFixed(3);
+    const extFmt = t.exit  >= 1000 ? '$' + t.exit.toLocaleString('en-US', {minimumFractionDigits:2,maximumFractionDigits:2})
+                                   : '$' + t.exit.toFixed(3);
+    return `
+      <tr class="${isLong ? 'long-row' : 'short-row'}">
+        <td class="mono text-muted">#${t.id}</td>
+        <td>
+          <div class="pair-cell">
+            <div class="pair-icon ${t.icon}">${t.icon.toUpperCase().substring(0,3)}</div>
+            <div><div class="pair-name">${t.pair}</div><div class="pair-type">Futures</div></div>
+          </div>
+        </td>
+        <td><span class="tag ${isLong ? 'tag-long' : 'tag-short'}">${t.side}</span></td>
+        <td><span class="badge badge-blue mono">${t.lev}</span></td>
+        <td class="mono">${entFmt}</td>
+        <td class="mono">${extFmt}</td>
+        <td class="mono ${pnlCls}">${pnlStr}</td>
+        <td class="mono ${pnlCls}">${pctStr}</td>
+        <td class="text-muted" style="font-size:.78rem;">${t.dur}</td>
+        <td class="text-muted" style="font-size:.78rem;">${t.date}</td>
+      </tr>`;
+  }).join('');
+
+  // Pagination
+  let pagHtml = '';
+  if (currentPage > 1) {
+    pagHtml += `<button class="page-btn" onclick="goPage(${currentPage - 1})"><i class="fa-solid fa-chevron-left"></i></button>`;
+  }
+  for (let i = 1; i <= pages; i++) {
+    pagHtml += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+  }
+  if (currentPage < pages) {
+    pagHtml += `<button class="page-btn" onclick="goPage(${currentPage + 1})"><i class="fa-solid fa-chevron-right"></i></button>`;
+  }
+  pag.innerHTML = pagHtml;
+}
+
+function goPage(p) {
+  currentPage = p;
+  renderHistoryTable();
+}
+
+/* =====================================================
+   CHART.JS INITIALIZATION
+===================================================== */
+let equityChart      = null;
+let allocationChart  = null;
+let pnlBarChart      = null;
+
+function getChartDefaults() {
+  const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+  return {
+    gridColor:  isDark ? 'rgba(33,38,45,0.8)'  : 'rgba(200,210,220,0.5)',
+    textColor:  isDark ? '#8B949E'              : '#57606A',
+    tooltipBg:  isDark ? '#161B22'              : '#ffffff',
+    tooltipBdr: isDark ? '#21262D'              : '#D1D9E0',
+  };
+}
+
+function initCharts() {
+  initEquityChart('1W');
+  initAllocationChart();
+  initPnlBarChart();
+}
+
+/* --- EQUITY CURVE --- */
+const equityDatasets = {
+  '1D': {
+    labels: ['00:00','02:00','04:00','06:00','08:00','10:00','12:00','14:00','16:00','18:00','20:00','22:00','08:46'],
+    data:   [121612,121450,121900,122100,121800,122500,122800,123100,123400,123800,124200,124600,124853]
+  },
+  '1W': {
+    labels: ['15/02','16/02','17/02','18/02','19/02','20/02','21/02'],
+    data:   [114979,116240,118900,120300,121500,122800,124853]
+  },
+  '1M': {
+    labels: ['01/02','05/02','10/02','15/02','20/02','21/02'],
+    data:   [103513,107200,111800,115600,121200,124853]
+  },
+  '3M': {
+    labels: ['Nov','Dez','Jan','Fev'],
+    data:   [82000,91000,103513,124853]
+  }
+};
+
+function updateEquityChart(period, btn) {
+  document.querySelectorAll('.chart-filter').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  initEquityChart(period);
+}
+
+function initEquityChart(period) {
+  const ctx  = document.getElementById('equityChart');
+  if (!ctx) return;
+  const def  = getChartDefaults();
+  const ds   = equityDatasets[period] || equityDatasets['1W'];
+
+  if (equityChart) { equityChart.destroy(); equityChart = null; }
+
+  const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 220);
+  gradient.addColorStop(0,   'rgba(88,166,255,0.25)');
+  gradient.addColorStop(1,   'rgba(88,166,255,0.0)');
+
+  equityChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ds.labels,
+      datasets: [{
+        label: 'Equity (USDT)',
+        data:  ds.data,
+        borderColor:     '#58A6FF',
+        backgroundColor: gradient,
+        borderWidth:     2.5,
+        fill:            true,
+        tension:         0.4,
+        pointRadius:     4,
+        pointBackgroundColor: '#58A6FF',
+        pointBorderColor:     '#0D1117',
+        pointBorderWidth:     2,
+        pointHoverRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { intersect: false, mode: 'index' },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: def.tooltipBg,
+          borderColor:     def.tooltipBdr,
+          borderWidth:     1,
+          titleColor:      '#E6EDF3',
+          bodyColor:       '#8B949E',
+          callbacks: {
+            label: ctx => ' $' + ctx.parsed.y.toLocaleString('en-US', {minimumFractionDigits:2})
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid:  { color: def.gridColor },
+          ticks: { color: def.textColor, font: { family: 'JetBrains Mono', size: 11 } }
+        },
+        y: {
+          grid:  { color: def.gridColor },
+          ticks: {
+            color: def.textColor,
+            font:  { family: 'JetBrains Mono', size: 11 },
+            callback: v => '$' + (v/1000).toFixed(0) + 'k'
+          }
+        }
+      }
+    }
+  });
+}
+
+/* --- ALLOCATION DOUGHNUT --- */
+function initAllocationChart() {
+  const ctx = document.getElementById('allocationChart');
+  if (!ctx) return;
+  if (allocationChart) { allocationChart.destroy(); allocationChart = null; }
+
+  allocationChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['BTC/USDT','ETH/USDT','SOL/USDT','BNB/USDT','ARB/USDT','Outros'],
+      datasets: [{
+        data:             [38.2, 24.1, 18.5, 8.8, 4.3, 6.1],
+        backgroundColor:  ['#F7931A','#627EEA','#9B72FF','#F0B90B','#29A0F0','#58A6FF'],
+        borderColor:      '#161B22',
+        borderWidth:      3,
+        hoverBorderWidth: 4,
+      }]
+    },
+    options: {
+      responsive:          true,
+      maintainAspectRatio: false,
+      cutout:              '68%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#161B22',
+          borderColor:     '#21262D',
+          borderWidth:     1,
+          titleColor:      '#E6EDF3',
+          bodyColor:       '#8B949E',
+          callbacks: {
+            label: ctx => ' ' + ctx.label + ': ' + ctx.parsed + '%'
+          }
+        }
+      }
+    }
+  });
+}
+
+/* --- PNL BAR CHART --- */
+function initPnlBarChart() {
+  const ctx = document.getElementById('pnlBarChart');
+  if (!ctx) return;
+  const def = getChartDefaults();
+  if (pnlBarChart) { pnlBarChart.destroy(); pnlBarChart = null; }
+
+  const vals   = [-320, 1240, 2800, 890, 3560, 1920, 3241];
+  const labels = ['Seg 17','Ter 18','Qua 19','Qui 20','Sex 21','Sab 22','Dom 23'];
+
+  pnlBarChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'PnL Di�rio (USDT)',
+        data:  vals,
+        backgroundColor: vals.map(v => v >= 0
+          ? 'rgba(0,214,143,0.75)'
+          : 'rgba(255,107,107,0.75)'),
+        borderColor: vals.map(v => v >= 0 ? '#00D68F' : '#FF6B6B'),
+        borderWidth:  1.5,
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive:          true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: def.tooltipBg,
+          borderColor:     def.tooltipBdr,
+          borderWidth:     1,
+          titleColor:      '#E6EDF3',
+          bodyColor:       '#8B949E',
+          callbacks: {
+            label: ctx => {
+              const v = ctx.parsed.y;
+              return ' ' + (v >= 0 ? '+' : '') + '$' + v.toLocaleString('en-US', {minimumFractionDigits:2});
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid:  { display: false },
+          ticks: { color: def.textColor, font: { family: 'JetBrains Mono', size: 11 } }
+        },
+        y: {
+          grid:  { color: def.gridColor },
+          ticks: {
+            color:    def.textColor,
+            font:     { family: 'JetBrains Mono', size: 11 },
+            callback: v => (v >= 0 ? '+' : '') + '$' + v.toLocaleString('en-US')
+          }
+        }
+      }
+    }
+  });
+}
+
+/* =====================================================
+   API KEY TOGGLE
+===================================================== */
+function toggleApiKey(elId, fullKey) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const masked = fullKey.substring(0, 6) + '��������������������������������������������������������������';
+  if (el.textContent.includes('�')) {
+    el.textContent = fullKey;
+  } else {
+    el.textContent = masked;
+  }
+}
+
+/* =====================================================
+   AUTO-SIMULATE LIVE DATA
+===================================================== */
+function simulateLiveUpdates() {
+  // Update equity value with slight fluctuation
+  const equityVal = document.getElementById('equityValue');
+  if (equityVal) {
+    const base = 124853.72;
+    const delta = (Math.random() - 0.48) * 80;
+    const newVal = base + delta;
+    equityVal.textContent = '$' + newVal.toLocaleString('en-US', {minimumFractionDigits:2,maximumFractionDigits:2});
+  }
+}
+
+setInterval(simulateLiveUpdates, 5000);
+
+/* =====================================================
+   INIT ON LOAD
+===================================================== */
+document.addEventListener('DOMContentLoaded', () => {
+  initCharts();
+  renderHistoryTable();
+
+  // Responsive sidebar init
+  if (window.innerWidth <= 768) {
+    document.getElementById('main').style.marginLeft = '0';
+  }
+
+  // Show welcome toast after brief delay
+  setTimeout(() => {
+    showToast('success', 'CryptoPanel Online', 'Conectado � Binance Futures � Dados ao vivo');
+  }, 800);
+
+  setTimeout(() => {
+    showToast('warning', 'Alerta: POL/USDT', 'Risco de liquida��o atingiu 60.8% � verifique a posi��o');
+  }, 2500);
+});
+
+// Handle window resize
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 768) {
+    document.getElementById('sidebar').classList.remove('mobile-open');
+    document.getElementById('sidebarOverlay').classList.remove('visible');
+    const main = document.getElementById('main');
+    main.style.marginLeft = sidebarCollapsed ? '64px' : 'var(--sidebar-w)';
+  } else {
+    document.getElementById('main').style.marginLeft = '0';
+  }
+});
+</script>
+</body>
+</html>
